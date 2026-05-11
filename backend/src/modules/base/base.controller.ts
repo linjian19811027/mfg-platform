@@ -17,6 +17,7 @@ import { OrganizationService } from './services/organization.service.js';
 import { UomService } from './services/uom.service.js';
 import { BatchService, BatchQuery } from './services/batch.service.js';
 import { SysFile } from '../file/entities/sys-file.entity.js';
+import { SysNumberingRule } from './entities/sys-numbering-rule.entity.js';
 import { TenantContext } from '../../shared/tenant/tenant.context.js';
 
 @ApiTags('基础主数据')
@@ -28,6 +29,8 @@ export class BaseController {
     private readonly uomService: UomService,
     private readonly batchService: BatchService,
     @InjectRepository(SysFile) private readonly fileRepo: Repository<SysFile>,
+    @InjectRepository(SysNumberingRule)
+    private readonly ruleRepo: Repository<SysNumberingRule>,
   ) {}
 
   // ── 组织架构 ──────────────────────────────────────────
@@ -131,12 +134,48 @@ export class BaseController {
     const [list, total] = await qb.getManyAndCount();
     return { list, total, page: p, pageSize: ps };
   }
-
   @Delete('files/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: '删除文件记录' })
   async deleteFile(@Param('id') id: string) {
     const tenantId = TenantContext.requireCurrentTenant();
     await this.fileRepo.delete({ id, tenantId });
+  }
+
+  // ── 编码规则管理 ──────────────────────────────────────────
+  @Get('numbering-rules')
+  @ApiOperation({ summary: '编码规则列表' })
+  async getNumberingRules(
+    @Query('businessKey') businessKey?: string,
+    @Query('keyword') keyword?: string,
+  ) {
+    const tenantId = TenantContext.requireCurrentTenant();
+    const qb = this.ruleRepo.createQueryBuilder('r')
+      .where('r.tenant_id = :tenantId', { tenantId });
+    if (businessKey) qb.andWhere('r.business_key = :businessKey', { businessKey });
+    if (keyword) qb.andWhere('(r.name LIKE :kw OR r.code LIKE :kw)', { kw: `%${keyword}%` });
+    const list = await qb.getMany();
+    return { list, total: list.length };
+  }
+
+  @Post('numbering-rules')
+  @ApiOperation({ summary: '创建编码规则' })
+  createNumberingRule(@Body() body: any) {
+    const tenantId = TenantContext.requireCurrentTenant();
+    return this.ruleRepo.save(this.ruleRepo.create({ ...body, tenantId }));
+  }
+
+  @Put('numbering-rules/:id')
+  @ApiOperation({ summary: '更新编码规则' })
+  async updateNumberingRule(@Param('id') id: string, @Body() body: any) {
+    await this.ruleRepo.update(id, body);
+    return this.ruleRepo.findOne({ where: { id } });
+  }
+
+  @Delete('numbering-rules/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: '删除编码规则' })
+  deleteNumberingRule(@Param('id') id: string) {
+    return this.ruleRepo.delete(id);
   }
 }

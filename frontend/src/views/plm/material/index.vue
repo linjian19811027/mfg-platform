@@ -9,6 +9,7 @@
           <a-option value="SEMI">{{ $t('plm.material.type.semi') }}</a-option>
           <a-option value="FINISHED">{{ $t('plm.material.type.finished') }}</a-option>
         </a-select>
+        <CategorySelect v-model="query.categoryId" style="width: 180px" @change="loadData" />
         <a-select v-model="query.status" :placeholder="$t('common.status')" allow-clear style="width: 120px">
           <a-option value="ACTIVE">{{ $t('plm.material.status.active') }}</a-option>
           <a-option value="DESIGN">{{ $t('plm.material.status.design') }}</a-option>
@@ -114,6 +115,7 @@ import { useI18n } from 'vue-i18n'
 import { Message } from '@arco-design/web-vue'
 import MTable from '@/components/MTable/index.vue'
 import MForm from '@/components/MForm/index.vue'
+import CategorySelect from '@/components/BusinessSelect/CategorySelect.vue'
 import type { MTableColumn } from '@/components/MTable/index.vue'
 import type { MFormField } from '@/components/MForm/index.vue'
 import { plmApi } from '@/api/plm'
@@ -125,7 +127,7 @@ const submitting = ref(false)
 const tableData = ref<any[]>([])
 const total = ref(0)
 
-const query = reactive({ keyword: '', type: '', status: '', page: 1, pageSize: 20 })
+const query = reactive({ keyword: '', type: '', categoryId: '', status: '', page: 1, pageSize: 20 })
 
 const drawerVisible = ref(false)
 const drawerMode = ref<'create' | 'edit'>('create')
@@ -143,7 +145,8 @@ const columns = computed<MTableColumn[]>(() => [
 ])
 
 const formSchema = computed<MFormField[]>(() => [
-  { field: 'code', label: t('common.code'), type: 'input', required: true, placeholder: t('common.keyword') },
+  { field: 'categoryId', label: t('plm.material.category'), type: 'category-select', required: true },
+  { field: 'code', label: t('common.code'), type: 'input', required: false, placeholder: t('plm.material.placeholder.codeAuto') },
   { field: 'name', label: t('common.name'), type: 'input', required: true, placeholder: t('common.keyword') },
   {
     field: 'type', label: t('common.type'), type: 'select', required: true,
@@ -154,13 +157,7 @@ const formSchema = computed<MFormField[]>(() => [
     ],
   },
   {
-    field: 'uomId', label: t('common.unit'), type: 'select', required: true,
-    options: [
-      { label: t('plm.material.uom.piece'), value: '1' },
-      { label: t('plm.material.uom.unit'), value: '2' },
-      { label: t('plm.material.uom.kg'), value: '3' },
-      { label: t('plm.material.uom.m'), value: '4' },
-    ],
+    field: 'uomId', label: t('common.unit'), type: 'uom-select', required: true,
   },
   { field: 'specification', label: t('common.specification'), type: 'input', placeholder: t('common.keyword') },
 ])
@@ -214,6 +211,7 @@ async function loadData() {
 function resetQuery() {
   query.keyword = ''
   query.type = ''
+  query.categoryId = ''
   query.status = ''
   query.page = 1
   loadData()

@@ -18,6 +18,7 @@ import {
 import { EventTypes } from '../../event/event-types.constant.js';
 import type { EcnExecutionService } from './ecn-execution.service.js';
 import { sanitizeUpdateData } from '../../../shared/utils/sanitize.js';
+import { NumberingService } from '../../base/services/numbering.service.js';
 
 // ECR 状态流转
 const ECR_TRANSITIONS: Record<string, string[]> = {
@@ -37,6 +38,7 @@ export class ChangeService {
     private readonly ecnRepo: Repository<PlmEcn>,
     @Inject(MESSAGE_SERVICE)
     private readonly messageSvc: MessageService,
+    private readonly numberingSvc: NumberingService,
     @Optional()
     private readonly ecnExecutionSvc?: EcnExecutionService,
   ) {}
@@ -81,8 +83,13 @@ export class ChangeService {
 
     // 自动生成 ECR 编号
     if (!data.ecrNo) {
-      const count = await this.ecrRepo.count({ where: { tenantId } });
-      data.ecrNo = `ECR-${new Date().getFullYear()}-${String(count + 1).padStart(4, '0')}`;
+      try {
+        data.ecrNo = await this.numberingSvc.generate('PLM_ECR', tenantId, data);
+      } catch (err) {
+        // 如果没有配置规则，回退到默认逻辑
+        const count = await this.ecrRepo.count({ where: { tenantId } });
+        data.ecrNo = `ECR-${new Date().getFullYear()}-${String(count + 1).padStart(4, '0')}`;
+      }
     }
 
     return this.ecrRepo.save(this.ecrRepo.create(data));
@@ -173,8 +180,13 @@ export class ChangeService {
 
     // 自动生成 ECN 编号
     if (!data.ecnNo) {
-      const count = await this.ecnRepo.count({ where: { tenantId } });
-      data.ecnNo = `ECN-${new Date().getFullYear()}-${String(count + 1).padStart(4, '0')}`;
+      try {
+        data.ecnNo = await this.numberingSvc.generate('PLM_ECN', tenantId, data);
+      } catch (err) {
+        // 如果没有配置规则，回退到默认逻辑
+        const count = await this.ecnRepo.count({ where: { tenantId } });
+        data.ecnNo = `ECN-${new Date().getFullYear()}-${String(count + 1).padStart(4, '0')}`;
+      }
     }
 
     const ecn = await this.ecnRepo.save(this.ecnRepo.create(data));

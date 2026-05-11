@@ -142,7 +142,7 @@
           </a-form-item>
           <a-form-item :label="$t('plm.routing.工序名称')" style="width: 160px">
             <a-select
-              v-model="newOpForm.name"
+              v-model="selectedStdOpId"
               :placeholder="$t('plm.routing.选择标准工序')"
               allow-search
               allow-clear
@@ -154,13 +154,13 @@
               <a-option
                 v-for="op in stdOpOptions"
                 :key="op.id"
-                :value="op.name"
+                :value="op.id"
                 :label="`${op.code} - ${op.name}`"
               />
             </a-select>
           </a-form-item>
-          <a-form-item :label="$t('plm.routing.工作中心')" style="width: 150px">
-            <a-input v-model="newOpForm.workcenterName" :placeholder="$t('plm.routing.工作中心')" style="width: 110px" />
+          <a-form-item :label="$t('plm.routing.工作中心')" style="width: 200px">
+            <WorkCenterSelect v-model="newOpForm.workcenterId" @change="(node) => newOpForm.workcenterName = node?.name" style="width: 160px" />
           </a-form-item>
           <a-form-item :label="$t('plm.routing.标准工时')" style="width: 120px">
             <a-input-number v-model="newOpForm.standardTime" :min="0" :precision="1" style="width: 80px" />
@@ -207,10 +207,11 @@
           <span v-else>{{ record.name }}</span>
         </template>
         <template #workcenterName="{ record }">
-          <a-input
+          <WorkCenterSelect
             v-if="editingOpId === record.id"
-            v-model="editOpForm.workcenterName"
-            style="width: 100px"
+            v-model="editOpForm.workcenterId"
+            @change="(node) => editOpForm.workcenterName = node?.name"
+            style="width: 150px"
           />
           <span v-else>{{ record.workcenterName ?? '-' }}</span>
         </template>
@@ -322,13 +323,14 @@
 </template>
 
 <script setup lang="ts">
-const { t } = useI18n()
 import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 import { ref, reactive, onMounted } from 'vue'
 import { Message } from '@arco-design/web-vue'
 import MTable from '@/components/MTable/index.vue'
 import type { MTableColumn } from '@/components/MTable/index.vue'
 import { plmApi, type Routing, type RoutingOperation, type Material, type StandardOperation } from '@/api/plm'
+import WorkCenterSelect from '@/components/BusinessSelect/WorkCenterSelect.vue'
 
 // ─── 列表状态 ────────────────────────────────────────────────
 const loading = ref(true) // 初始 true，确保页面首帧就有 loading 状态
@@ -491,14 +493,16 @@ const opsLoading = ref(false)
 // 新增工序
 const showAddOpForm = ref(false)
 const addOpLoading = ref(false)
-const newOpForm = reactive<Partial<RoutingOperation>>({
-  seqNo: undefined, name: '', workcenterName: '', standardTime: undefined, setupTime: undefined, description: '',
+const newOpForm = reactive<any>({
+  seqNo: undefined, name: '', workcenterId: '', workcenterName: '', standardTime: undefined, setupTime: undefined, description: '',
 })
 
 // 编辑工序
 const editingOpId = ref<string | null>(null)
 const editOpLoading = ref(false)
-const editOpForm = reactive<Partial<RoutingOperation>>({})
+const editOpForm = reactive<any>({
+  id: '', seqNo: undefined, name: '', workcenterId: '', workcenterName: '', standardTime: undefined, setupTime: undefined, description: '',
+})
 
 async function openOpsDrawer(routing: Routing) {
   currentRouting.value = routing
@@ -522,7 +526,8 @@ async function loadOperations(routingId: string) {
 
 function startAddOp() {
   showAddOpForm.value = true
-  Object.assign(newOpForm, { seqNo: undefined, name: '', workcenterName: '', standardTime: undefined, setupTime: undefined, description: '' })
+  selectedStdOpId.value = undefined
+  Object.assign(newOpForm, { seqNo: undefined, name: '', workcenterId: '', workcenterName: '', standardTime: undefined, setupTime: undefined, description: '' })
 }
 
 function cancelAddOp() {
@@ -530,6 +535,7 @@ function cancelAddOp() {
 }
 
 // 标准工序搜索
+const selectedStdOpId = ref<string | undefined>(undefined)
 const stdOpOptions = ref<StandardOperation[]>([])
 let stdOpTimer: ReturnType<typeof setTimeout> | null = null
 async function searchStdOps(kw: string) {
@@ -542,12 +548,24 @@ async function searchStdOps(kw: string) {
 }
 
 function onStdOpChange(val: any) {
-  const selected = stdOpOptions.value.find(o => o.name === val)
+  if (!val) {
+    // 清空时重置
+    newOpForm.name = ''
+    newOpForm.workcenterId = ''
+    newOpForm.workcenterName = ''
+    newOpForm.standardTime = undefined
+    newOpForm.setupTime = undefined
+    newOpForm.description = ''
+    return
+  }
+  const selected = stdOpOptions.value.find(o => o.id === val)
   if (selected) {
-    newOpForm.workcenterName = selected.workCenterName
-    newOpForm.standardTime = selected.stdHours
-    newOpForm.setupTime = selected.setupTime
-    newOpForm.description = selected.description
+    newOpForm.name = selected.name
+    newOpForm.workcenterId = selected.workCenterId ?? ''
+    newOpForm.workcenterName = selected.workCenterName ?? ''
+    newOpForm.standardTime = selected.stdHours != null ? Number(selected.stdHours) : undefined
+    newOpForm.setupTime = selected.setupTime != null ? Number(selected.setupTime) : undefined
+    newOpForm.description = selected.description ?? ''
   }
 }
 
@@ -570,9 +588,18 @@ async function submitAddOp() {
   }
 }
 
-function startEditOp(op: RoutingOperation) {
-  editingOpId.value = op.id
-  Object.assign(editOpForm, { ...op })
+function startEditOp(record: RoutingOperation) {
+  editingOpId.value = record.id
+  Object.assign(editOpForm, {
+    id: record.id,
+    seqNo: record.sequence,
+    name: record.name,
+    workcenterId: record.workcenterId,
+    workcenterName: record.workcenterName,
+    standardTime: record.standardTime != null ? Number(record.standardTime) : undefined,
+    setupTime: record.setupTime != null ? Number(record.setupTime) : undefined,
+    description: record.description,
+  })
 }
 
 function cancelEditOp() {

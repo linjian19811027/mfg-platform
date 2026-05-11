@@ -2,7 +2,7 @@
   <div class="page-container">
     <a-card :bordered="false" style="margin-bottom: 16px">
       <a-space wrap>
-        <a-input v-model="query.supplierId" :placeholder="$t('scm.asn.index.供应商ID')" allow-clear style="width: 160px" @keyup.enter="loadData" />
+        <SupplierSelect v-model="query.supplierId" :placeholder="$t('scm.asn.index.供应商')" style="width: 200px" @change="loadData" />
         <a-select v-model="query.status" :placeholder="$t('common.status')" allow-clear style="width: 130px">
           <a-option value="PENDING">待到货</a-option>
           <a-option value="RECEIVED">已接收</a-option>
@@ -52,6 +52,7 @@ import MForm from '@/components/MForm/index.vue'
 import type { MTableColumn } from '@/components/MTable/index.vue'
 import type { MFormField } from '@/components/MForm/index.vue'
 import { scmApi } from '@/api/scm'
+import SupplierSelect from '@/components/BusinessSelect/SupplierSelect.vue'
 
 const loading = ref(false)
 const tableData = ref<any[]>([])
@@ -69,13 +70,12 @@ const columns: MTableColumn[] = [
 ]
 
 const formSchema: MFormField[] = [
-  { field: 'supplierId', label: '供应商ID', type: 'input', required: true },
+  { field: 'supplierId', label: '供应商', type: 'supplier-select', required: true },
   { field: 'poId', label: '采购订单ID（可选）', type: 'input' },
   { field: 'expectedDate', label: '预计到货日期', type: 'date', required: true },
 ]
 
 function isOverdue(date: string) { return date && new Date(date) < new Date() }
-
 async function loadData() {
   loading.value = true
   try {

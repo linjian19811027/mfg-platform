@@ -115,6 +115,55 @@
             @update:model-value="update(field.field, $event)"
           />
 
+          <!-- business-selects -->
+          <SupplierSelect
+            v-else-if="field.type === 'supplier-select'"
+            :model-value="(modelValue[field.field] as string)"
+            :disabled="field.disabled"
+            v-bind="field.props"
+            @update:model-value="update(field.field, $event)"
+          />
+
+          <WorkCenterSelect
+            v-else-if="field.type === 'work-center-select'"
+            :model-value="(modelValue[field.field] as string)"
+            :disabled="field.disabled"
+            v-bind="field.props"
+            @update:model-value="update(field.field, $event)"
+          />
+
+          <WarehouseSelect
+            v-else-if="field.type === 'warehouse-select'"
+            :model-value="(modelValue[field.field] as string)"
+            :disabled="field.disabled"
+            v-bind="field.props"
+            @update:model-value="update(field.field, $event)"
+          />
+
+          <UomSelect
+            v-else-if="field.type === 'uom-select'"
+            :model-value="(modelValue[field.field] as string)"
+            :disabled="field.disabled"
+            v-bind="field.props"
+            @update:model-value="update(field.field, $event)"
+          />
+
+          <MaterialSelect
+            v-else-if="field.type === 'material-select'"
+            :model-value="(modelValue[field.field] as string)"
+            :disabled="field.disabled"
+            v-bind="field.props"
+            @update:model-value="update(field.field, $event)"
+          />
+
+          <CategorySelect
+            v-else-if="field.type === 'category-select'"
+            :model-value="(modelValue[field.field] as string)"
+            :disabled="field.disabled"
+            v-bind="field.props"
+            @update:model-value="update(field.field, $event)"
+          />
+
           <!-- slot -->
           <template v-else-if="field.type === 'slot' && field.slotName">
             <slot :name="field.slotName" :field="field" :value="modelValue[field.field]" :update="(v: unknown) => update(field.field, v)" />
@@ -136,11 +185,17 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import SupplierSelect from '@/components/BusinessSelect/SupplierSelect.vue'
+import WorkCenterSelect from '@/components/BusinessSelect/WorkCenterSelect.vue'
+import WarehouseSelect from '@/components/BusinessSelect/WarehouseSelect.vue'
+import UomSelect from '@/components/BusinessSelect/UomSelect.vue'
+import MaterialSelect from '@/components/BusinessSelect/MaterialSelect.vue'
+import CategorySelect from '@/components/BusinessSelect/CategorySelect.vue'
 
 export interface MFormField {
   field: string
   label: string
-  type: 'input' | 'number' | 'select' | 'date' | 'datetime' | 'textarea' | 'switch' | 'radio' | 'checkbox' | 'slot'
+  type: 'input' | 'number' | 'select' | 'date' | 'datetime' | 'textarea' | 'switch' | 'radio' | 'checkbox' | 'slot' | 'supplier-select' | 'work-center-select' | 'warehouse-select' | 'uom-select' | 'material-select' | 'category-select'
   placeholder?: string
   required?: boolean
   rules?: unknown[]

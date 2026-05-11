@@ -47,6 +47,7 @@ import { EcnExecutionController } from './ecn-execution.controller.js';
 import { FileModule } from '../file/file.module.js';
 import { MessageModule } from '../../shared/message/message.module.js';
 import { CacheModule } from '../../shared/cache/cache.module.js';
+import { BaseModule } from '../base/base.module.js';
 
 @Module({
   imports: [
@@ -77,6 +78,7 @@ import { CacheModule } from '../../shared/cache/cache.module.js';
     FileModule,
     MessageModule,
     CacheModule,
+    BaseModule,
   ],
   controllers: [PlmController, EcnExecutionController],
   providers: [

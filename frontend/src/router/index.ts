@@ -26,6 +26,7 @@ const routes: RouteRecordRaw[] = [
       { path: 'plm/material/:id', name: 'PlmMaterialDetail', component: () => import('@/views/plm/material/detail.vue') },
       { path: 'plm/bom', name: 'PlmBom', component: () => import('@/views/plm/bom/index.vue') },
       { path: 'plm/routings', name: 'PlmRouting', component: () => import('@/views/plm/routing/index.vue') },
+      { path: 'plm/standard-operations', name: 'PlmStdOperation', component: () => import('@/views/plm/standard-operation/index.vue') },
       { path: 'plm/ecr', name: 'PlmEcr', component: () => import('@/views/plm/ecr/index.vue') },
       { path: 'plm/ecn', name: 'PlmEcn', component: () => import('@/views/plm/ecn/index.vue') },
       { path: 'plm/categories', name: 'PlmCategory', component: () => import('@/views/plm/category/index.vue') },
@@ -120,6 +121,7 @@ const routes: RouteRecordRaw[] = [
       { path: 'sys/tenant', name: 'SysTenant', component: () => import('@/views/sys/tenant/index.vue') },
       { path: 'sys/monitor', name: 'SysMonitor', component: () => import('@/views/sys/monitor/index.vue') },
       { path: 'sys/logs', name: 'SysLogs', component: () => import('@/views/sys/logs/index.vue') },
+      { path: 'sys/numbering', name: 'SysNumbering', component: () => import('@/views/sys/numbering/index.vue') },
       // HR
       { path: 'hr/employees', name: 'HrEmployee', component: () => import('@/views/hr/employees/index.vue') },
       { path: 'hr/employees/:id', name: 'HrEmployeeDetail', component: () => import('@/views/hr/employees/detail.vue') },

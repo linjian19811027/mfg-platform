@@ -40,23 +40,13 @@
     <a-drawer v-model:visible="drawerVisible" :title="$t('scm.purchase-request.index.新建采购申请')" :width="520" @cancel="drawerVisible = false">
       <a-form :model="createForm" layout="vertical">
         <a-form-item :label="$t('scm.purchase-request.index.物料')" required>
-          <a-select
-            v-model="createForm.materialId"
-            :placeholder="$t('scm.purchase-request.index.搜索物料编码名称')"
-            allow-search
-            allow-clear
-            :filter-option="false"
-            style="width: 100%"
-            @search="searchMaterials"
-          >
-            <a-option v-for="m in matOptions" :key="m.id" :value="m.id" :label="`${m.code} - ${m.name}`" />
-          </a-select>
+          <MaterialSelect v-model="createForm.materialId" @change="(m) => { if(m) createForm.unit = m.unit }" />
         </a-form-item>
         <a-form-item :label="$t('scm.purchase-request.index.申请数量')" required>
           <a-input-number v-model="createForm.qty" :min="0.001" :precision="4" style="width: 100%" />
         </a-form-item>
         <a-form-item :label="$t('scm.purchase-request.index.单位')">
-          <a-input v-model="createForm.unit" />
+          <UomSelect v-model="createForm.unit" />
         </a-form-item>
         <a-form-item :label="$t('scm.purchase-request.index.期望到货日期')">
           <a-date-picker v-model="createForm.expectedDate" style="width: 100%" />
@@ -82,17 +72,7 @@
     <a-modal v-model:visible="convertModalVisible" :title="$t('scm.purchase-request.index.转采购订单')" :ok-loading="converting" @ok="handleConvert" @cancel="convertModalVisible = false">
       <a-form layout="vertical">
         <a-form-item :label="$t('scm.purchase-request.index.供应商')" required>
-          <a-select
-            v-model="convertForm.supplierId"
-            :placeholder="$t('scm.purchase-request.index.搜索供应商名称')"
-            allow-search
-            allow-clear
-            :filter-option="false"
-            style="width: 100%"
-            @search="searchSuppliers"
-          >
-            <a-option v-for="s in supplierOptions" :key="s.id" :value="s.id" :label="s.name" />
-          </a-select>
+          <SupplierSelect v-model="convertForm.supplierId" />
         </a-form-item>
         <a-form-item :label="$t('scm.purchase-request.index.币种')" required><a-input v-model="convertForm.currency" placeholder="CNY" /></a-form-item>
         <a-form-item :label="$t('scm.purchase-request.index.预计到货日期')"><a-date-picker v-model="convertForm.expectedDate" style="width: 100%" /></a-form-item>
@@ -102,15 +82,18 @@
 </template>
 
 <script setup lang="ts">
-const { t } = useI18n()
-import { useI18n } from 'vue-i18n'
 import { ref, reactive, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { Message } from '@arco-design/web-vue'
 import MTable from '@/components/MTable/index.vue'
 import type { MTableColumn } from '@/components/MTable/index.vue'
 import { scmApi, type PurchaseRequest, type Supplier } from '@/api/scm'
 import { plmApi, type Material } from '@/api/plm'
+import MaterialSelect from '@/components/BusinessSelect/MaterialSelect.vue'
+import SupplierSelect from '@/components/BusinessSelect/SupplierSelect.vue'
+import UomSelect from '@/components/BusinessSelect/UomSelect.vue'
 
+const { t } = useI18n()
 const loading = ref(false)
 const tableData = ref<any[]>([])
 const total = ref(0)
@@ -151,18 +134,9 @@ function onTableChange(e: { page: number; pageSize: number }) { query.page = e.p
 const drawerVisible = ref(false)
 const saving = ref(false)
 const createForm = reactive({ materialId: '', qty: undefined as number | undefined, unit: '', expectedDate: '', reason: '' })
-const matOptions = ref<Material[]>([])
-let matTimer: ReturnType<typeof setTimeout> | null = null
-async function searchMaterials(kw: string) {
-  if (matTimer) clearTimeout(matTimer)
-  matTimer = setTimeout(async () => {
-    const res = await plmApi.getMaterials({ keyword: kw, pageSize: 20 })
-    matOptions.value = res.list ?? []
-  }, 300)
-}
+
 function openDrawer(_item: null) {
   Object.assign(createForm, { materialId: '', qty: undefined, unit: '', expectedDate: '', reason: '' })
-  matOptions.value = []
   drawerVisible.value = true
 }
 async function handleCreate() {
@@ -199,26 +173,22 @@ const convertModalVisible = ref(false)
 const converting = ref(false)
 const convertingPr = ref<PurchaseRequest | null>(null)
 const convertForm = reactive({ supplierId: '', currency: 'CNY', expectedDate: '' })
-const supplierOptions = ref<Supplier[]>([])
-let supTimer: ReturnType<typeof setTimeout> | null = null
-async function searchSuppliers(kw: string) {
-  if (supTimer) clearTimeout(supTimer)
-  supTimer = setTimeout(async () => {
-    const res = await scmApi.getSuppliers({ keyword: kw, pageSize: 20 })
-    supplierOptions.value = res.list ?? []
-  }, 300)
-}
+
 function convertToPo(pr: PurchaseRequest) {
   convertingPr.value = pr
   Object.assign(convertForm, { supplierId: '', currency: 'CNY', expectedDate: pr.expectedDate ?? '' })
-  supplierOptions.value = []
   convertModalVisible.value = true
 }
 async function handleConvert() {
-  if (!convertingPr.value || !convertForm.supplierId) { Message.warning('请填写供应商ID'); return }
+  if (!convertingPr.value || !convertForm.supplierId) { Message.warning('请选择供应商'); return }
   converting.value = true
   try {
-    await scmApi.createPurchaseOrder({ code: `PO-${Date.now()}`, supplierId: convertForm.supplierId, currency: convertForm.currency, orderDate: new Date().toISOString().slice(0, 10), expectedDate: convertForm.expectedDate || undefined })
+    await scmApi.createPurchaseOrder({
+      supplierId: convertForm.supplierId,
+      currency: convertForm.currency,
+      orderDate: new Date().toISOString().slice(0, 10),
+      expectedDate: convertForm.expectedDate || undefined
+    })
     Message.success('采购订单已创建')
     convertModalVisible.value = false
   } catch { /* handled */ } finally { converting.value = false }

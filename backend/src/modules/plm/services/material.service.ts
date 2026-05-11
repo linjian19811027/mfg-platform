@@ -9,12 +9,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, FindOptionsWhere } from 'typeorm';
 import { PlmMaterial } from '../entities/plm-material.entity.js';
 import { PlmMaterialSubstitute } from '../entities/plm-material-substitute.entity.js';
+import { PlmMaterialCategory } from '../entities/plm-material-category.entity.js';
 import { TenantContext } from '../../../shared/tenant/tenant.context.js';
 import { UserContext } from '../../../shared/user/user.context.js';
 import {
   CACHE_PROVIDER,
   CacheProvider,
 } from '../../../shared/cache/cache.interface.js';
+import { MaterialCodeService } from './material-code.service.js';
 
 // 状态流转规则：key=当前状态, value=允许流转到的状态
 const STATUS_TRANSITIONS: Record<string, string[]> = {
@@ -50,8 +52,11 @@ export class MaterialService {
     private readonly repo: Repository<PlmMaterial>,
     @InjectRepository(PlmMaterialSubstitute)
     private readonly subRepo: Repository<PlmMaterialSubstitute>,
+    @InjectRepository(PlmMaterialCategory)
+    private readonly categoryRepo: Repository<PlmMaterialCategory>,
     @Inject(CACHE_PROVIDER)
     private readonly cache: CacheProvider,
+    private readonly codeSvc: MaterialCodeService,
   ) {}
 
   async findAll(
@@ -109,12 +114,40 @@ export class MaterialService {
     data.status = data.status ?? 'DESIGN';
     data.createdBy = data.createdBy ?? UserContext.getCurrentUserId();
 
-    // 编码唯一性校验
-    if (data.code) {
-      const exists = await this.repo.findOne({
-        where: { tenantId, code: data.code },
-      });
-      if (exists) throw new BadRequestException('PLM_MATERIAL_CODE_EXISTS');
+    // ── 编码处理逻辑 ──
+    const rule = await this.codeSvc.findRule(tenantId, data.categoryId);
+
+    if (!data.code) {
+      // 如果未提供编码，尝试根据规则自动生成
+      if (!rule) {
+        throw new BadRequestException('PLM_MATERIAL_CODE_REQUIRED');
+      }
+
+      if (rule.codeType === 'AUTO') {
+        let categoryCode: string | undefined;
+        if (data.categoryId) {
+          const category = await this.categoryRepo.findOne({ where: { id: data.categoryId, tenantId } });
+          categoryCode = category?.code;
+        }
+        data.code = await this.codeSvc.generate(rule.id, categoryCode);
+      } else if (rule.codeType === 'MIXED') {
+        // MIXED 模式通常需要用户提供后缀，如果未提供则报错
+        throw new BadRequestException('PLM_MATERIAL_CODE_SUFFIX_REQUIRED');
+      } else {
+        // MANUAL 模式必须提供编码
+        throw new BadRequestException('PLM_MATERIAL_CODE_REQUIRED');
+      }
+    } else {
+      // 如果提供了编码，校验唯一性并根据规则校验（如果是 MANUAL 模式）
+      if (rule && rule.codeType === 'MANUAL') {
+        await this.codeSvc.validateManual(tenantId, data.code);
+      } else {
+        // 通用唯一性校验
+        const exists = await this.repo.findOne({
+          where: { tenantId, code: data.code },
+        });
+        if (exists) throw new BadRequestException('PLM_MATERIAL_CODE_EXISTS');
+      }
     }
 
     return this.repo.save(this.repo.create(data));

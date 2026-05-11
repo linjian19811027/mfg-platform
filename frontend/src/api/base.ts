@@ -185,6 +185,23 @@ function filterBatches(params: BatchListParams) {
   return { list: list.slice(start, start + pageSize), total }
 }
 
+export const baseApi = {
+  // 编码规则管理
+  getNumberingRules: (params?: any) => 
+    request.get<{ list: any[]; total: number }>('/v1/base/numbering-rules', params),
+  
+  createNumberingRule: (data: any) => 
+    request.post<any>('/v1/base/numbering-rules', data),
+  
+  updateNumberingRule: (id: string, data: any) => 
+    request.put<any>(`/v1/base/numbering-rules/${id}`, data),
+  
+  deleteNumberingRule: (id: string) => 
+    request.delete<void>(`/v1/base/numbering-rules/${id}`),
+
+  // 组织架构相关...
+}
+
 export const batchApi = {
   // 批次列表
   getBatches: async (params: BatchListParams): Promise<{ list: MaterialBatch[]; total: number }> => {

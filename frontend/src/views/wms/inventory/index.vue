@@ -2,8 +2,8 @@
   <div class="page-container">
     <a-card :bordered="false" style="margin-bottom: 16px">
       <a-space wrap>
-        <a-input v-model="query.materialId" :placeholder="$t('wms.inventory.index.物料ID')" allow-clear style="width: 160px" @keyup.enter="loadData" />
-        <a-input v-model="query.warehouseId" :placeholder="$t('wms.inventory.index.仓库ID')" allow-clear style="width: 160px" @keyup.enter="loadData" />
+        <MaterialSelect v-model="query.materialId" style="width: 200px" @change="loadData" />
+        <WarehouseSelect v-model="query.warehouseId" style="width: 180px" @change="loadData" />
         <a-input v-model="query.batchId" :placeholder="$t('wms.inventory.index.批次号')" allow-clear style="width: 160px" @keyup.enter="loadData" />
         <a-button type="primary" @click="loadData">{{ $t('common.search') }}</a-button>
         <a-button @click="resetQuery">{{ $t('common.reset') }}</a-button>
@@ -26,12 +26,9 @@
         @change="onTableChange"
       >
         <template #frozenQty="{ record }">
-          <span :style="{ color: (record.lockedQty as number) > 0 ? '#ff6b35' : '#e6edf3' }">
-            {{ record.lockedQty ?? 0 }}
+          <span :style="{ color: (record.frozenQty as number) > 0 ? '#ff6b35' : 'inherit' }">
+            {{ record.frozenQty ?? 0 }}
           </span>
-        </template>
-        <template #uomId="{ record }">
-          <span>{{ ({ '1': '个', '2': '件', '3': 'kg', '4': 'm' } as Record<string,string>)[record.uomId as string] ?? record.uomId }}</span>
         </template>
         <template #action="{ record }">
           <a-space>
@@ -58,19 +55,13 @@
     <a-drawer v-model:visible="receiptVisible" :title="$t('wms.inventory.index.入库操作')" :width="480" @cancel="receiptVisible = false">
       <a-form :model="receiptFormData" layout="vertical">
         <a-form-item :label="$t('wms.inventory.index.物料')" required>
-          <a-select v-model="receiptFormData.materialId" :placeholder="$t('wms.inventory.index.搜索物料')" allow-search allow-clear :filter-option="false" style="width:100%" @search="searchMaterials">
-            <a-option v-for="m in matOptions" :key="m.id" :value="m.id" :label="`${m.code} - ${m.name}`" />
-          </a-select>
+          <MaterialSelect v-model="receiptFormData.materialId" />
         </a-form-item>
         <a-form-item :label="$t('wms.inventory.index.仓库')" required>
-          <a-select v-model="receiptFormData.warehouseId" :placeholder="$t('wms.inventory.index.选择仓库')" allow-clear style="width:100%" @change="onWarehouseChange('receipt')">
-            <a-option v-for="w in warehouseOptions" :key="w.id" :value="w.id" :label="w.name" />
-          </a-select>
+          <WarehouseSelect v-model="receiptFormData.warehouseId" />
         </a-form-item>
         <a-form-item :label="$t('wms.inventory.index.库位')">
-          <a-select v-model="receiptFormData.locationId" :placeholder="$t('wms.inventory.index.选择库位')" allow-clear style="width:100%">
-            <a-option v-for="l in locationOptions" :key="l.id" :value="l.id" :label="l.code" />
-          </a-select>
+          <LocationSelect v-model="receiptFormData.locationId" :warehouse-id="receiptFormData.warehouseId" />
         </a-form-item>
         <a-form-item :label="$t('wms.inventory.index.数量')" required>
           <a-input-number v-model="receiptFormData.qty" :min="0.001" :precision="4" style="width:100%" />
@@ -96,19 +87,13 @@
     <a-drawer v-model:visible="issueVisible" :title="$t('wms.inventory.index.出库操作')" :width="480" @cancel="issueVisible = false">
       <a-form :model="issueFormData" layout="vertical">
         <a-form-item :label="$t('wms.inventory.index.物料')" required>
-          <a-select v-model="issueFormData.materialId" :placeholder="$t('wms.inventory.index.搜索物料')" allow-search allow-clear :filter-option="false" style="width:100%" @search="searchMaterials">
-            <a-option v-for="m in matOptions" :key="m.id" :value="m.id" :label="`${m.code} - ${m.name}`" />
-          </a-select>
+          <MaterialSelect v-model="issueFormData.materialId" />
         </a-form-item>
         <a-form-item :label="$t('wms.inventory.index.仓库')" required>
-          <a-select v-model="issueFormData.warehouseId" :placeholder="$t('wms.inventory.index.选择仓库')" allow-clear style="width:100%" @change="onWarehouseChange('issue')">
-            <a-option v-for="w in warehouseOptions" :key="w.id" :value="w.id" :label="w.name" />
-          </a-select>
+          <WarehouseSelect v-model="issueFormData.warehouseId" />
         </a-form-item>
         <a-form-item :label="$t('wms.inventory.index.库位')">
-          <a-select v-model="issueFormData.locationId" :placeholder="$t('wms.inventory.index.选择库位')" allow-clear style="width:100%">
-            <a-option v-for="l in locationOptions" :key="l.id" :value="l.id" :label="l.code" />
-          </a-select>
+          <LocationSelect v-model="issueFormData.locationId" :warehouse-id="issueFormData.warehouseId" />
         </a-form-item>
         <a-form-item :label="$t('wms.inventory.index.数量')" required>
           <a-input-number v-model="issueFormData.qty" :min="0.001" :precision="4" style="width:100%" />
@@ -134,14 +119,10 @@
     <a-modal v-model:visible="adjustVisible" :title="$t('wms.inventory.index.库存调整盘盈盘亏')" :ok-loading="submitting" @ok="handleAdjust" @cancel="adjustVisible = false">
       <a-form :model="adjustForm" layout="vertical">
         <a-form-item :label="$t('wms.inventory.index.物料')" required>
-          <a-select v-model="adjustForm.materialId" :placeholder="$t('wms.inventory.index.搜索物料')" allow-search allow-clear :filter-option="false" style="width:100%" @search="searchMaterials">
-            <a-option v-for="m in matOptions" :key="m.id" :value="m.id" :label="`${m.code} - ${m.name}`" />
-          </a-select>
+          <MaterialSelect v-model="adjustForm.materialId" />
         </a-form-item>
         <a-form-item :label="$t('wms.inventory.index.仓库')" required>
-          <a-select v-model="adjustForm.warehouseId" :placeholder="$t('wms.inventory.index.选择仓库')" allow-clear style="width:100%">
-            <a-option v-for="w in warehouseOptions" :key="w.id" :value="w.id" :label="w.name" />
-          </a-select>
+          <WarehouseSelect v-model="adjustForm.warehouseId" />
         </a-form-item>
         <a-form-item :label="$t('wms.inventory.index.调整类型')" required>
           <a-select v-model="adjustForm.adjustType">
@@ -161,15 +142,17 @@
 </template>
 
 <script setup lang="ts">
-const { t } = useI18n()
-import { useI18n } from 'vue-i18n'
 import { ref, reactive, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { Message } from '@arco-design/web-vue'
 import MTable from '@/components/MTable/index.vue'
 import type { MTableColumn } from '@/components/MTable/index.vue'
 import { wmsApi } from '@/api/wms'
-import { plmApi, type Material } from '@/api/plm'
+import MaterialSelect from '@/components/BusinessSelect/MaterialSelect.vue'
+import WarehouseSelect from '@/components/BusinessSelect/WarehouseSelect.vue'
+import LocationSelect from '@/components/BusinessSelect/LocationSelect.vue'
 
+const { t } = useI18n()
 const loading = ref(false)
 const submitting = ref(false)
 const tableData = ref<any[]>([])
@@ -184,7 +167,7 @@ const columns: MTableColumn[] = [
   { key: 'batchNo', title: t('wms.inventory.index.批次号'), dataIndex: 'batchNo', width: 120 },
   { key: 'qty', title: t('wms.inventory.index.可用数量'), dataIndex: 'availableQty', width: 100 },
   { key: 'frozenQty', title: t('wms.inventory.index.冻结数量'), slotName: 'frozenQty', width: 100 },
-  { key: 'unit', title: t('wms.inventory.index.单位'), slotName: 'uomId', width: 80 },
+  { key: 'unit', title: t('wms.inventory.index.单位'), dataIndex: 'unit', width: 80 },
   { key: 'action', title: t('wms.inventory.index.操作'), slotName: 'action', width: 100 },
 ]
 
@@ -200,32 +183,6 @@ async function loadData() {
 function resetQuery() { query.materialId = ''; query.warehouseId = ''; query.batchId = ''; query.page = 1; loadData() }
 function onTableChange(e: { page: number; pageSize: number }) { query.page = e.page; query.pageSize = e.pageSize; loadData() }
 
-// 物料/仓库/库位搜索
-const matOptions = ref<Material[]>([])
-const warehouseOptions = ref<{ id: string; code: string; name: string }[]>([])
-const locationOptions = ref<{ id: string; code: string; name: string; warehouseId: string }[]>([])
-let matTimer: ReturnType<typeof setTimeout> | null = null
-
-async function searchMaterials(kw: string) {
-  if (matTimer) clearTimeout(matTimer)
-  matTimer = setTimeout(async () => {
-    const res = await plmApi.getMaterials({ keyword: kw, pageSize: 20 })
-    matOptions.value = res.list ?? []
-  }, 300)
-}
-
-async function loadWarehouses() {
-  const res = await wmsApi.getWarehouses()
-  warehouseOptions.value = res.list ?? []
-}
-
-async function onWarehouseChange(form: 'receipt' | 'issue') {
-  const whId = form === 'receipt' ? receiptFormData.warehouseId : issueFormData.warehouseId
-  if (!whId) { locationOptions.value = []; return }
-  const res = await wmsApi.getLocations({ warehouseId: whId, pageSize: 200 })
-  locationOptions.value = res.list ?? []
-}
-
 // 入库/出库
 const receiptVisible = ref(false)
 const issueVisible = ref(false)
@@ -234,12 +191,10 @@ const issueFormData = reactive({ materialId: '', warehouseId: '', locationId: ''
 
 function openReceipt() {
   Object.assign(receiptFormData, { materialId: '', warehouseId: '', locationId: '', qty: undefined, type: 'PURCHASE' })
-  matOptions.value = []; locationOptions.value = []
   receiptVisible.value = true
 }
 function openIssue() {
   Object.assign(issueFormData, { materialId: '', warehouseId: '', locationId: '', qty: undefined, type: 'PRODUCTION' })
-  matOptions.value = []; locationOptions.value = []
   issueVisible.value = true
 }
 
@@ -280,7 +235,6 @@ const adjustForm = reactive({ materialId: '', warehouseId: '', adjustType: 'GAIN
 
 function openAdjust() {
   Object.assign(adjustForm, { materialId: '', warehouseId: '', adjustType: 'GAIN', qty: 0, reason: '' })
-  matOptions.value = []
   adjustVisible.value = true
 }
 
@@ -298,7 +252,7 @@ async function handleAdjust() {
   } catch { /* handled */ } finally { submitting.value = false }
 }
 
-onMounted(() => { loadData(); loadWarehouses() })
+onMounted(() => { loadData() })
 </script>
 
 <style scoped>
