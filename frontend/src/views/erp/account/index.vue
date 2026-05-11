@@ -35,8 +35,8 @@
   </div>
 </template>
 <script setup lang="ts">
-const { t } = useI18n()
-import { useI18n } from 'vue-i18n'
+
+
 import { ref, reactive, onMounted } from 'vue'
 import { Message } from '@arco-design/web-vue'
 import { erpExtApi, type ErpAccount } from '@/api/erp-ext'

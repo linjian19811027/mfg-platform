@@ -592,7 +592,7 @@ function startEditOp(record: RoutingOperation) {
   editingOpId.value = record.id
   Object.assign(editOpForm, {
     id: record.id,
-    seqNo: record.sequence,
+    seqNo: record.seqNo,
     name: record.name,
     workcenterId: record.workcenterId,
     workcenterName: record.workcenterName,

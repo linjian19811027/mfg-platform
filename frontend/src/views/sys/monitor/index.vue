@@ -131,8 +131,7 @@
 </template>
 
 <script setup lang="ts">
-const { t } = useI18n()
-import { useI18n } from 'vue-i18n'
+
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { Message } from '@arco-design/web-vue'
 import { IconCloud, IconComputer, IconStorage, IconApps, IconRefresh } from '@arco-design/web-vue/es/icon'

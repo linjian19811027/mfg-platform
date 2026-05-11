@@ -87,8 +87,7 @@ import { useI18n } from 'vue-i18n'
 import { Message } from '@arco-design/web-vue'
 import MTable from '@/components/MTable/index.vue'
 import type { MTableColumn } from '@/components/MTable/index.vue'
-import { scmApi, type PurchaseRequest, type Supplier } from '@/api/scm'
-import { plmApi, type Material } from '@/api/plm'
+import { scmApi, type PurchaseRequest } from '@/api/scm'
 import MaterialSelect from '@/components/BusinessSelect/MaterialSelect.vue'
 import SupplierSelect from '@/components/BusinessSelect/SupplierSelect.vue'
 import UomSelect from '@/components/BusinessSelect/UomSelect.vue'
@@ -100,8 +99,10 @@ const total = ref(0)
 const query = reactive({ status: '', page: 1, pageSize: 20 })
 
 const STATUS_MAP: Record<string, { label: string; color: string }> = {
-  DRAFT: { label: '草稿', color: 'gray' }, PENDING: { label: '待审批', color: 'orange' },
-  APPROVED: { label: '已批准', color: 'green' }, REJECTED: { label: '已拒绝', color: 'red' },
+  DRAFT: { label: t('common.draft'), color: 'gray' },
+  PENDING: { label: t('scm.purchase-request.status.pending'), color: 'orange' },
+  APPROVED: { label: t('scm.purchase-request.status.approved'), color: 'green' },
+  REJECTED: { label: t('scm.purchase-request.status.rejected'), color: 'red' },
 }
 
 const columns: MTableColumn[] = [

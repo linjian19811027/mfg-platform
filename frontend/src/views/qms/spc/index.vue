@@ -52,8 +52,7 @@
 </template>
 
 <script setup lang="ts">
-const { t } = useI18n()
-import { useI18n } from 'vue-i18n'
+
 import { ref, reactive, onUnmounted, nextTick } from 'vue'
 import { Message } from '@arco-design/web-vue'
 import * as echarts from 'echarts/core'

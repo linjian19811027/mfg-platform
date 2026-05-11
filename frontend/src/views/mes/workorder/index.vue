@@ -178,7 +178,7 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { Message, Modal } from '@arco-design/web-vue'
+import { Message } from '@arco-design/web-vue'
 
 const { t } = useI18n()
 import MTable from '@/components/MTable/index.vue'
@@ -249,9 +249,9 @@ async function searchMaterials(kw: string) {
   }, 300)
 }
 
-const statusColor = (s: string) => STATUS_MAP[s]?.color ?? 'gray'
-const statusLabel = (s: string) => STATUS_MAP[s]?.label ?? s
-const nextStatuses = (s: string) => TRANSITIONS[s] ?? []
+const statusColor = (s: string) => (STATUS_MAP.value as any)[s]?.color ?? 'gray'
+const statusLabel = (s: string) => (STATUS_MAP.value as any)[s]?.label ?? s
+const nextStatuses = (s: string) => (TRANSITIONS.value as any)[s] ?? []
 
 // 拆分合计计算
 const splitSum = computed(() => splitQtys.value.reduce((s, v) => s + (v || 0), 0))

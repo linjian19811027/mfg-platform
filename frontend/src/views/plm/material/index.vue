@@ -259,9 +259,6 @@ async function handleSubmit(data: Record<string, unknown>) {
 // ─── 状态变更 ─────────────────────────────────────────────────
 const statusLoadingId = ref<string | null>(null)
 
-const STATUS_LABEL: Record<string, string> = {
-  TRIAL: '试用', ACTIVE: '启用', INACTIVE: '停用', OBSOLETE: '废止',
-}
 
 async function handleChangeMaterialStatus(id: string, status: string) {
   statusLoadingId.value = id

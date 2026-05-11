@@ -43,7 +43,7 @@ const fetchData = async () => {
   loading.value = true
   try {
     const res = await wmsApi.getLocations({ warehouseId: props.warehouseId, pageSize: 500 })
-    options.value = res.list
+    options.value = (res.list ?? []) as any[]
   } catch (error) {
     console.error('Fetch locations failed:', error)
   } finally {

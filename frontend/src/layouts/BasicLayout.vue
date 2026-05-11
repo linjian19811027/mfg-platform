@@ -269,7 +269,7 @@ function getTitle(item: MenuItem) {
 
 // === SHEET MODE (Tabs) LOGIC ===
 interface TabView {
-  title: string
+  key: string
   path: string
 }
 const visitedViews = ref<TabView[]>([])
@@ -298,7 +298,7 @@ watch(
     const exists = visitedViews.value.some(v => v.path === newPath)
     if (!exists) {
       const info = getPageInfo(newPath)
-      visitedViews.value.push({ path: newPath, key: info.key } as any)
+      visitedViews.value.push({ path: newPath, key: info.key })
     }
   },
   { immediate: true }

@@ -25,8 +25,7 @@
   </div>
 </template>
 <script setup lang="ts">
-const { t } = useI18n()
-import { useI18n } from 'vue-i18n'
+
 import { ref, reactive, computed, onMounted } from 'vue'
 import { erpExtApi } from '@/api/erp-ext'
 const loading = ref(false); const activeTab = ref('balance'); const query = reactive({ period: '' })

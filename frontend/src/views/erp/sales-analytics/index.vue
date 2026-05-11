@@ -17,8 +17,7 @@
   </div>
 </template>
 <script setup lang="ts">
-const { t } = useI18n()
-import { useI18n } from 'vue-i18n'
+
 import { ref, reactive, onMounted, onUnmounted, nextTick } from 'vue'
 import * as echarts from 'echarts/core'
 import { LineChart, BarChart, PieChart } from 'echarts/charts'

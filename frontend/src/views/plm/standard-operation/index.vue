@@ -105,14 +105,13 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
-import { useI18n } from 'vue-i18n'
 import { Message } from '@arco-design/web-vue'
 import MTable from '@/components/MTable/index.vue'
 import type { MTableColumn } from '@/components/MTable/index.vue'
 import { plmApi, type StandardOperation } from '@/api/plm'
 import WorkCenterSelect from '@/components/BusinessSelect/WorkCenterSelect.vue'
 
-const { t } = useI18n()
+
 
 // ─── 列表 ─────────────────────────────────────────────────────
 const loading = ref(false)

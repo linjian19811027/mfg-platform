@@ -102,8 +102,7 @@
 </template>
 
 <script setup lang="ts">
-const { t } = useI18n()
-import { useI18n } from 'vue-i18n'
+
 import { ref, computed, onMounted } from 'vue'
 import { roleApi, type PermissionNode } from '@/api/sys'
 
