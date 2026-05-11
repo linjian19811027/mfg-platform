@@ -1,0 +1,71 @@
+# ─── 依赖目录 ────────────────────────────────────────────────
+node_modules/
+.pnp
+.pnp.js
+
+# ─── 环境变量（敏感信息，不提交）────────────────────────────
+.env
+.env.local
+.env.production
+.env.staging
+# 开发环境模板可以提交，但要确保不含真实密码
+# .env.development  ← 按需决定是否提交
+
+# ─── 构建产物 ────────────────────────────────────────────────
+backend/dist/
+frontend/dist/
+frontend/.vite/
+
+# ─── 日志文件 ────────────────────────────────────────────────
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+backend/build-out.txt
+backend/jest-out.txt
+backend/jest-result.txt
+
+# ─── 测试报告 ────────────────────────────────────────────────
+coverage/
+backend/coverage/
+e2e-test/*-report.json
+e2e-test/scan-report.json
+
+# ─── 本地文件存储（上传的文件）──────────────────────────────
+backend/data/
+data/
+
+# ─── 操作系统文件 ────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ─── IDE / 编辑器 ────────────────────────────────────────────
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.swp
+
+# VSCode 个人配置不提交，但团队共享配置可以提交
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/launch.json
+
+# ─── TypeScript 编译缓存 ─────────────────────────────────────
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+
+# ─── 临时文件 ────────────────────────────────────────────────
+*.tmp
+*.temp
+.cache/

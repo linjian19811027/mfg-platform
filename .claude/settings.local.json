@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s -X POST http://localhost:3000/api/v1/auth/login -H 'Content-Type: application/json' -d '{\"username\":\"admin\",\"password\":\"admin@123456\",\"tenantCode\":\"DEFAULT\"}')",
+      "Bash(curl -s -X POST http://localhost:3000/api/v1/auth/login -H 'Content-Type: application/json' -d '{\"username\":\"admin\",\"password\":\"Admin@123456\",\"tenantCode\":\"DEFAULT\"}')",
+      "Bash(node scripts/check-no-foreign-keys.mjs)",
+      "Bash(node scripts/init-test-data.mjs)",
+      "Bash(node -e ' *)",
+      "Bash(node scripts/init-test-data-full.mjs)",
+      "Bash(node scripts/init-complete-test-data.mjs)",
+      "Bash(node scripts/init-complete-test-data-v4.mjs)",
+      "Bash(node scripts/init-final.mjs)",
+      "Bash(curl -s -X POST http://localhost:3000/api/v1/auth/login -H \"Content-Type: application/json\" -d '{\"username\":\"admin\",\"password\":\"Admin@123456\",\"tenantCode\":\"DEFAULT\"}')",
+      "Bash(node scripts/test-bom.mjs)"
+    ]
+  }
+}

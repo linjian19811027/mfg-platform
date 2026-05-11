@@ -1,0 +1,5 @@
+  console.log
+    [SETUP] Password hash refreshed
+
+      at Object.<anonymous> (test/setup-jest.ts:18:13)
+

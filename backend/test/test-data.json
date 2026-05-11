@@ -1,0 +1,678 @@
+{
+  "timestamp": "2026-05-09T02:05:06.704Z",
+  "materials": [
+    {
+      "id": "77",
+      "code": "MAT_TEST_1778292304988",
+      "name": "测试物料_1778292304988"
+    },
+    {
+      "id": "78",
+      "code": "MAT_TEST_1778292305527",
+      "name": "测试物料_1778292305527"
+    },
+    {
+      "id": "79",
+      "code": "MAT_TEST_1778292305582",
+      "name": "测试物料_1778292305582"
+    }
+  ],
+  "routings": [],
+  "workOrders": {
+    "released": [
+      {
+        "id": "335",
+        "woNo": "WO_RELEASED_1778292306044",
+        "status": "RELEASED"
+      },
+      {
+        "id": "336",
+        "woNo": "WO_RELEASED_1778292306074",
+        "status": "RELEASED"
+      },
+      {
+        "id": "337",
+        "woNo": "WO_RELEASED_1778292306108",
+        "status": "RELEASED"
+      },
+      {
+        "id": "338",
+        "woNo": "WO_RELEASED_1778292306161",
+        "status": "RELEASED"
+      },
+      {
+        "id": "339",
+        "woNo": "WO_RELEASED_1778292306186",
+        "status": "RELEASED"
+      }
+    ],
+    "inProgress": [
+      {
+        "id": "340",
+        "woNo": "WO_IP_1778292306301",
+        "status": "IN_PROGRESS"
+      },
+      {
+        "id": "341",
+        "woNo": "WO_IP_1778292306361",
+        "status": "IN_PROGRESS"
+      },
+      {
+        "id": "342",
+        "woNo": "WO_IP_1778292306442",
+        "status": "IN_PROGRESS"
+      }
+    ],
+    "completed": [
+      {
+        "id": "343",
+        "woNo": "WO_COMP_1778292306581",
+        "status": "COMPLETED"
+      },
+      {
+        "id": "344",
+        "woNo": "WO_COMP_1778292306651",
+        "status": "COMPLETED"
+      },
+      {
+        "id": "345",
+        "woNo": "WO_COMP_1778292306825",
+        "status": "COMPLETED"
+      }
+    ]
+  },
+  "warehouses": [
+    {
+      "id": "1",
+      "code": "WH1",
+      "name": "Updated"
+    },
+    {
+      "id": "2",
+      "code": "WH2",
+      "name": "Warehouse 2"
+    },
+    {
+      "id": "3",
+      "code": "WH3",
+      "name": "Warehouse 3"
+    },
+    {
+      "id": "7",
+      "code": "WH-TEST",
+      "name": "Test Warehouse"
+    },
+    {
+      "id": "11",
+      "code": "WH01",
+      "name": "Warehouse 1"
+    },
+    {
+      "id": "12",
+      "code": "WH02",
+      "name": "Warehouse 2"
+    },
+    {
+      "id": "13",
+      "code": "WH03",
+      "name": "Warehouse 3"
+    },
+    {
+      "id": "14",
+      "code": "WH04",
+      "name": "Warehouse 4"
+    },
+    {
+      "id": "15",
+      "code": "WH05",
+      "name": "Warehouse 5"
+    },
+    {
+      "id": "16",
+      "code": "WH001",
+      "name": "Warehouse 1"
+    },
+    {
+      "id": "17",
+      "code": "WH002",
+      "name": "Warehouse 2"
+    },
+    {
+      "id": "18",
+      "code": "WH003",
+      "name": "Warehouse 3"
+    },
+    {
+      "id": "19",
+      "code": "WH004",
+      "name": "Warehouse 4"
+    },
+    {
+      "id": "20",
+      "code": "WH005",
+      "name": "Warehouse 5"
+    },
+    {
+      "id": "29",
+      "code": "WH-TEST-001",
+      "name": "���Բֿ�"
+    },
+    {
+      "id": "30",
+      "code": "WH-NEW-001",
+      "name": "���Բֿ�"
+    },
+    {
+      "id": "31",
+      "code": "WH-TEST-002",
+      "name": "Test Warehouse"
+    },
+    {
+      "id": "32",
+      "code": "WH_27989314",
+      "name": "Test Warehouse"
+    },
+    {
+      "id": "33",
+      "code": "WH_31898736",
+      "name": "Test Warehouse"
+    },
+    {
+      "id": "34",
+      "code": "WH_32176584",
+      "name": "Test Warehouse"
+    },
+    {
+      "id": "35",
+      "code": "WH_32388521",
+      "name": "Test Warehouse"
+    },
+    {
+      "id": "36",
+      "code": "WH_32541990",
+      "name": "Test Warehouse"
+    },
+    {
+      "id": "37",
+      "code": "WH_34509898",
+      "name": "Test Warehouse"
+    },
+    {
+      "id": "38",
+      "code": "WH_34584557",
+      "name": "Test Warehouse"
+    },
+    {
+      "id": "39",
+      "code": "WH_34658836",
+      "name": "Test Warehouse"
+    },
+    {
+      "id": "40",
+      "code": "WH_34719772",
+      "name": "Test Warehouse"
+    },
+    {
+      "id": "41",
+      "code": "WH_34796224",
+      "name": "Test Warehouse"
+    },
+    {
+      "id": "42",
+      "code": "WH_34850941",
+      "name": "Test Warehouse"
+    },
+    {
+      "id": "43",
+      "code": "WH_34896337",
+      "name": "Test Warehouse"
+    },
+    {
+      "id": "44",
+      "code": "WH_34964567",
+      "name": "Test Warehouse"
+    },
+    {
+      "id": "45",
+      "code": "WH_35020385",
+      "name": "Test Warehouse"
+    },
+    {
+      "id": "46",
+      "code": "WH_35039284",
+      "name": "Test Warehouse"
+    },
+    {
+      "id": "47",
+      "code": "WH_44613366",
+      "name": "Test Warehouse"
+    },
+    {
+      "id": "48",
+      "code": "WH_44696153",
+      "name": "Test Warehouse"
+    },
+    {
+      "id": "49",
+      "code": "WH_44755105",
+      "name": "Test Warehouse"
+    },
+    {
+      "id": "50",
+      "code": "WH_44848949",
+      "name": "Test Warehouse"
+    },
+    {
+      "id": "51",
+      "code": "WH_44901649",
+      "name": "Test Warehouse"
+    },
+    {
+      "id": "52",
+      "code": "WH_44944877",
+      "name": "Test Warehouse"
+    },
+    {
+      "id": "53",
+      "code": "WH_45390131",
+      "name": "Test Warehouse"
+    },
+    {
+      "id": "54",
+      "code": "WH_45952394",
+      "name": "Test Warehouse"
+    },
+    {
+      "id": "55",
+      "code": "WH_46023165",
+      "name": "Test Warehouse"
+    },
+    {
+      "id": "56",
+      "code": "WH_46090037",
+      "name": "Test Warehouse"
+    },
+    {
+      "id": "57",
+      "code": "WH_46135606",
+      "name": "Test Warehouse"
+    },
+    {
+      "id": "58",
+      "code": "WH_46578866",
+      "name": "Test Warehouse"
+    },
+    {
+      "id": "59",
+      "code": "WH_46599641",
+      "name": "Test Warehouse"
+    },
+    {
+      "id": "60",
+      "code": "WH_46617494",
+      "name": "Test Warehouse"
+    },
+    {
+      "id": "61",
+      "code": "WH_46674959",
+      "name": "Test Warehouse"
+    },
+    {
+      "id": "62",
+      "code": "WH_46692241",
+      "name": "Test Warehouse"
+    },
+    {
+      "id": "63",
+      "code": "WH_47261739",
+      "name": "Test Warehouse"
+    },
+    {
+      "id": "64",
+      "code": "WH_47437530",
+      "name": "Test Warehouse"
+    },
+    {
+      "id": "65",
+      "code": "WH_47689626",
+      "name": "Test Warehouse"
+    },
+    {
+      "id": "66",
+      "code": "WH_47955262",
+      "name": "Test Warehouse"
+    },
+    {
+      "id": "67",
+      "code": "WH_48003557",
+      "name": "Test Warehouse"
+    },
+    {
+      "id": "68",
+      "code": "WH_48046617",
+      "name": "Test Warehouse"
+    },
+    {
+      "id": "69",
+      "code": "WH_48151494",
+      "name": "Test Warehouse"
+    },
+    {
+      "id": "70",
+      "code": "WH_48209387",
+      "name": "Test Warehouse"
+    },
+    {
+      "id": "71",
+      "code": "WH_48515275",
+      "name": "Test Warehouse"
+    }
+  ],
+  "customers": [
+    {
+      "id": "22",
+      "code": "CUS-184467440737095516151",
+      "name": "Customer 2"
+    },
+    {
+      "id": "21",
+      "code": "CUS-111111111111111111111",
+      "name": "Customer 1"
+    },
+    {
+      "id": "20",
+      "code": "CUS-11111111111111111111",
+      "name": "Customer 10"
+    },
+    {
+      "id": "19",
+      "code": "CUS-1111111111111111111",
+      "name": "Customer 9"
+    },
+    {
+      "id": "18",
+      "code": "CUS-111111111111111111",
+      "name": "Customer 8"
+    },
+    {
+      "id": "17",
+      "code": "CUS-11111111111111111",
+      "name": "Customer 7"
+    },
+    {
+      "id": "16",
+      "code": "CUS-1111111111111111",
+      "name": "Customer 6"
+    },
+    {
+      "id": "15",
+      "code": "CUS-111111111111111",
+      "name": "Customer 5"
+    },
+    {
+      "id": "14",
+      "code": "CUS-11111111111111",
+      "name": "Customer 4"
+    },
+    {
+      "id": "13",
+      "code": "CUS-1111111111111",
+      "name": "Customer 3"
+    },
+    {
+      "id": "12",
+      "code": "CUS-111111111111",
+      "name": "Customer 2"
+    },
+    {
+      "id": "11",
+      "code": "CUS-11111111111",
+      "name": "Customer 1"
+    },
+    {
+      "id": "10",
+      "code": "CUS-1111111111",
+      "name": "Customer 10"
+    },
+    {
+      "id": "9",
+      "code": "CUS-111111111",
+      "name": "Customer 9"
+    },
+    {
+      "id": "8",
+      "code": "CUS-11111111",
+      "name": "Customer 8"
+    },
+    {
+      "id": "7",
+      "code": "CUS-1111111",
+      "name": "Customer 7"
+    },
+    {
+      "id": "6",
+      "code": "CUS-111111",
+      "name": "Customer 6"
+    },
+    {
+      "id": "5",
+      "code": "CUS-11111",
+      "name": "Customer 5"
+    },
+    {
+      "id": "4",
+      "code": "CUS-1111",
+      "name": "Customer 4"
+    },
+    {
+      "id": "3",
+      "code": "CUS-111",
+      "name": "Customer 3"
+    }
+  ],
+  "suppliers": [
+    {
+      "id": "89",
+      "code": "SUP_48517687",
+      "name": "Test Supplier"
+    },
+    {
+      "id": "88",
+      "code": "SUP_48211911",
+      "name": "Test Supplier"
+    },
+    {
+      "id": "87",
+      "code": "SUP_48153884",
+      "name": "Test Supplier"
+    },
+    {
+      "id": "86",
+      "code": "SUP_48049021",
+      "name": "Test Supplier"
+    },
+    {
+      "id": "85",
+      "code": "SUP_48005983",
+      "name": "Test Supplier"
+    },
+    {
+      "id": "84",
+      "code": "SUP_47957602",
+      "name": "Test Supplier"
+    },
+    {
+      "id": "83",
+      "code": "SUP_47691928",
+      "name": "Test Supplier"
+    },
+    {
+      "id": "82",
+      "code": "SUP_47440041",
+      "name": "Test Supplier"
+    },
+    {
+      "id": "81",
+      "code": "SUP_47264711",
+      "name": "Test Supplier"
+    },
+    {
+      "id": "80",
+      "code": "SUP_46694676",
+      "name": "Test Supplier"
+    },
+    {
+      "id": "79",
+      "code": "SUP_46677396",
+      "name": "Test Supplier"
+    },
+    {
+      "id": "78",
+      "code": "SUP_46619843",
+      "name": "Test Supplier"
+    },
+    {
+      "id": "77",
+      "code": "SUP_46602107",
+      "name": "Test Supplier"
+    },
+    {
+      "id": "76",
+      "code": "SUP_46584050",
+      "name": "Test Supplier"
+    },
+    {
+      "id": "75",
+      "code": "SUP_46139900",
+      "name": "Test Supplier"
+    },
+    {
+      "id": "74",
+      "code": "SUP_46094795",
+      "name": "Test Supplier"
+    },
+    {
+      "id": "73",
+      "code": "SUP_46027518",
+      "name": "Test Supplier"
+    },
+    {
+      "id": "72",
+      "code": "SUP_45956489",
+      "name": "Test Supplier"
+    },
+    {
+      "id": "71",
+      "code": "SUP_45396050",
+      "name": "Test Supplier"
+    },
+    {
+      "id": "70",
+      "code": "SUP_44947901",
+      "name": "Test Supplier"
+    }
+  ],
+  "employees": [],
+  "resources": [
+    {
+      "id": "132",
+      "code": "RES_48516367",
+      "name": "Test Resource"
+    },
+    {
+      "id": "131",
+      "code": "RES_48210644",
+      "name": "Test Resource"
+    },
+    {
+      "id": "130",
+      "code": "RES_48152597",
+      "name": "Test Resource"
+    },
+    {
+      "id": "129",
+      "code": "RES_48047728",
+      "name": "Test Resource"
+    },
+    {
+      "id": "128",
+      "code": "RES_48004707",
+      "name": "Test Resource"
+    },
+    {
+      "id": "127",
+      "code": "RES_47956337",
+      "name": "Test Resource"
+    },
+    {
+      "id": "126",
+      "code": "RES_47690663",
+      "name": "Test Resource"
+    },
+    {
+      "id": "125",
+      "code": "RES_47438687",
+      "name": "Test Resource"
+    },
+    {
+      "id": "124",
+      "code": "RES_47263127",
+      "name": "Test Resource"
+    },
+    {
+      "id": "123",
+      "code": "RES_46693408",
+      "name": "Test Resource"
+    },
+    {
+      "id": "122",
+      "code": "RES_46676155",
+      "name": "Test Resource"
+    },
+    {
+      "id": "121",
+      "code": "RES_46618564",
+      "name": "Test Resource"
+    },
+    {
+      "id": "120",
+      "code": "RES_46600793",
+      "name": "Test Resource"
+    },
+    {
+      "id": "119",
+      "code": "RES_46582199",
+      "name": "Test Resource"
+    },
+    {
+      "id": "118",
+      "code": "RES_46137697",
+      "name": "Test Resource"
+    },
+    {
+      "id": "117",
+      "code": "RES_46092194",
+      "name": "Test Resource"
+    },
+    {
+      "id": "116",
+      "code": "RES_46025276",
+      "name": "Test Resource"
+    },
+    {
+      "id": "115",
+      "code": "RES_45954374",
+      "name": "Test Resource"
+    },
+    {
+      "id": "114",
+      "code": "RES_45391586",
+      "name": "Test Resource"
+    },
+    {
+      "id": "113",
+      "code": "RES_44946341",
+      "name": "Test Resource"
+    }
+  ]
+}
