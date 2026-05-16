@@ -10,8 +10,8 @@ export function getDatabaseConfig(config: ConfigService): TypeOrmModuleOptions {
     username: config.get<string>('DATABASE_USER', 'root'),
     password: config.get<string>('DATABASE_PASS', ''),
     database: config.get<string>('DATABASE_NAME', 'mfg_platform'),
-    // 自动扫描所有实体
-    entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+    // 自动加载通过 TypeOrmModule.forFeature() 注册的实体
+    autoLoadEntities: true,
     // 订阅器：自动填充 createdBy/updatedBy
     subscribers: [AuditFieldsSubscriber],
     // 开发环境自动同步表结构，生产环境必须关闭

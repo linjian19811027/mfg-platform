@@ -5,22 +5,22 @@
       <!-- 统计卡片 -->
       <a-col :span="6">
         <a-card :bordered="false">
-          <a-statistic :title="$t('hr.work-hours.dashboard.本月总工时')" :value="dashboard.totalHours" suffix="小时" :precision="2" />
+          <a-statistic :title="$t('hr.work-hours.dashboard.本月总工时')" :value="dashboard.totalHours" :suffix="t('hr.employees.detail.小时')" :precision="2" />
         </a-card>
       </a-col>
       <a-col :span="6">
         <a-card :bordered="false">
-          <a-statistic :title="$t('hr.work-hours.dashboard.正常工时')" :value="dashboard.normalHours" suffix="小时" :precision="2" />
+          <a-statistic :title="$t('hr.work-hours.dashboard.正常工时')" :value="dashboard.normalHours" :suffix="$t('hr.employees.detail.小时')" :precision="2" />
         </a-card>
       </a-col>
       <a-col :span="6">
         <a-card :bordered="false">
-          <a-statistic :title="$t('hr.work-hours.dashboard.加班工时')" :value="dashboard.overtimeHours" suffix="小时" :precision="2" :value-style="{ color: '#f53f3f' }" />
+          <a-statistic :title="$t('hr.work-hours.dashboard.加班工时')" :value="dashboard.overtimeHours" :suffix="$t('hr.employees.detail.小时')" :precision="2" :value-style="{ color: '#f53f3f' }" />
         </a-card>
       </a-col>
       <a-col :span="6">
         <a-card :bordered="false">
-          <a-statistic :title="$t('hr.work-hours.dashboard.人均工时')" :value="dashboard.avgHours" suffix="小时" :precision="2" />
+          <a-statistic :title="$t('hr.work-hours.dashboard.人均工时')" :value="dashboard.avgHours" :suffix="$t('hr.employees.detail.小时')" :precision="2" />
         </a-card>
       </a-col>
     </a-row>
@@ -51,7 +51,7 @@
                   </template>
                 </a-list-item-meta>
                 <template #actions>
-                  <span style="font-weight: 500">{{ item.totalHours }} 小时</span>
+                  <span style="font-weight: 500">{{ item.totalHours }} {{ $t('hr.employees.detail.小时') }}</span>
                 </template>
               </a-list-item>
             </template>
@@ -84,6 +84,9 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { Message } from '@arco-design/web-vue'
 import * as echarts from 'echarts'
 import { getWorkHourDashboard } from '@/api/hr'
+
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 
 const dashboard = ref<any>({
   totalHours: 0,
@@ -122,7 +125,7 @@ async function fetchDashboard() {
     const res = await getWorkHourDashboard({})
     dashboard.value = res
   } catch (error: any) {
-    Message.error(error.message || '加载失败')
+    Message.error(error.message || t('hr.work-hours.dashboard.加载失败'))
   }
 }
 
@@ -149,7 +152,7 @@ function initTrendChart() {
       },
     },
     legend: {
-      data: ['正常工时', '加班工时'],
+      data: [t('hr.work-hours.dashboard.正常工时'), t('hr.work-hours.dashboard.加班工时')],
     },
     grid: {
       left: '3%',
@@ -164,11 +167,11 @@ function initTrendChart() {
     },
     yAxis: {
       type: 'value',
-      name: '工时（小时）',
+      name: t('hr.work-hours.dashboard.工时小时'),
     },
     series: [
       {
-        name: '正常工时',
+        name: t('hr.work-hours.dashboard.正常工时'),
         type: 'line',
         stack: 'Total',
         areaStyle: {},
@@ -181,7 +184,7 @@ function initTrendChart() {
         },
       },
       {
-        name: '加班工时',
+        name: t('hr.work-hours.dashboard.加班工时'),
         type: 'line',
         stack: 'Total',
         areaStyle: {},
@@ -212,7 +215,7 @@ function initJobTypeChart() {
   const option = {
     tooltip: {
       trigger: 'item',
-      formatter: '{a} <br/>{b}: {c} 小时 ({d}%)',
+      formatter: `{a} <br/>{b}: {c} ${t('hr.employees.detail.小时')} ({d}%)`,
     },
     legend: {
       orient: 'vertical',
@@ -220,7 +223,7 @@ function initJobTypeChart() {
     },
     series: [
       {
-        name: '工种工时',
+        name: t('hr.work-hours.dashboard.工种工时分布'),
         type: 'pie',
         radius: '50%',
         data,
@@ -269,11 +272,11 @@ function initWorkCenterChart() {
     },
     yAxis: {
       type: 'value',
-      name: '工时（小时）',
+      name: t('hr.work-hours.dashboard.工时小时'),
     },
     series: [
       {
-        name: '总工时',
+        name: t('hr.work-hours.dashboard.总工时'),
         type: 'bar',
         data: hours,
         itemStyle: {

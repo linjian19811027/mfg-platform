@@ -4,15 +4,15 @@
       <a-space wrap>
         <SupplierSelect v-model="query.supplierId" :placeholder="$t('scm.asn.index.供应商')" style="width: 200px" @change="loadData" />
         <a-select v-model="query.status" :placeholder="$t('common.status')" allow-clear style="width: 130px">
-          <a-option value="PENDING">待到货</a-option>
-          <a-option value="RECEIVED">已接收</a-option>
-          <a-option value="CANCELLED">已取消</a-option>
+          <a-option value="PENDING">{{ $t('scm.asn.lbl1553') }}</a-option>
+          <a-option value="RECEIVED">{{ $t('scm.asn.accepted') }}</a-option>
+          <a-option value="CANCELLED">{{ $t('scm.asn.lbl1554') }}</a-option>
         </a-select>
         <a-button type="primary" @click="loadData">{{ $t('common.search') }}</a-button>
         <a-button @click="resetQuery">{{ $t('common.reset') }}</a-button>
       </a-space>
       <template #extra>
-        <a-button type="primary" @click="openDrawer">新建 ASN</a-button>
+        <a-button type="primary" @click="openDrawer">{{ $t('scm.asn.lbl1555') }}</a-button>
       </template>
     </a-card>
 
@@ -20,16 +20,16 @@
       <MTable :columns="columns" :data="tableData" :loading="loading" :total="total" :page-size="20" @change="onTableChange">
         <template #status="{ record }">
           <a-tag :color="record.status === 'RECEIVED' ? 'green' : record.status === 'CANCELLED' ? 'gray' : isOverdue(record.expectedDate as string) ? 'orange' : 'blue'">
-            {{ record.status === 'RECEIVED' ? '已接收' : record.status === 'CANCELLED' ? '已取消' : isOverdue(record.expectedDate as string) ? '逾期未到' : '待到货' }}
+            {{ record.status === 'RECEIVED' ? t('scm.asn.r33056') : record.status === 'CANCELLED' ? t('scm.asn.r33057') : isOverdue(record.expectedDate as string) ? $t('scm.asn.lbl1556') : $t('scm.asn.lbl1557') }}
           </a-tag>
         </template>
         <template #action="{ record }">
           <a-space>
             <a-popconfirm v-if="record.status === 'PENDING'" :content="$t('scm.asn.index.确认接收该ASN')" @ok="handleReceive(record.id as string)">
-              <a-link>接收</a-link>
+              <a-link>{{ $t('scm.asn.lbl1558') }}</a-link>
             </a-popconfirm>
             <a-popconfirm v-if="record.status === 'PENDING'" :content="$t('scm.asn.index.确认取消该ASN')" @ok="handleCancel(record.id as string)">
-              <a-link status="danger">取消</a-link>
+              <a-link status="danger">{{ $t('scm.asn.cancel') }}</a-link>
             </a-popconfirm>
           </a-space>
         </template>
@@ -70,9 +70,9 @@ const columns: MTableColumn[] = [
 ]
 
 const formSchema: MFormField[] = [
-  { field: 'supplierId', label: '供应商', type: 'supplier-select', required: true },
-  { field: 'poId', label: '采购订单ID（可选）', type: 'input' },
-  { field: 'expectedDate', label: '预计到货日期', type: 'date', required: true },
+  { field: 'supplierId', label: t('scm.asn.lbl1559'), type: 'supplier-select', required: true },
+  { field: 'poId', label: t('scm.asn.lbl1560'), type: 'input' },
+  { field: 'expectedDate', label: t('scm.asn.lbl1561'), type: 'date', required: true },
 ]
 
 function isOverdue(date: string) { return date && new Date(date) < new Date() }
@@ -97,17 +97,17 @@ const formData = ref<Record<string, unknown>>({})
 function openDrawer() { formData.value = {}; drawerVisible.value = true }
 async function handleCreate(data: Record<string, unknown>) {
   saving.value = true
-  try { await scmApi.createAsn(data); Message.success('创建成功'); drawerVisible.value = false; loadData() }
+  try { await scmApi.createAsn(data); Message.success(t('scm.创建成功')); drawerVisible.value = false; loadData() }
   catch { /* handled */ } finally { saving.value = false }
 }
 
 async function handleReceive(id: string) {
-  try { await scmApi.receiveAsn(id); Message.success('已接收'); loadData() }
+  try { await scmApi.receiveAsn(id); Message.success(t('scm.已接收')); loadData() }
   catch { /* handled */ }
 }
 
 async function handleCancel(id: string) {
-  try { await scmApi.cancelAsn(id); Message.success('已取消'); loadData() }
+  try { await scmApi.cancelAsn(id); Message.success(t('scm.已取消')); loadData() }
   catch { /* handled */ }
 }
 

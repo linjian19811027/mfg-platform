@@ -5,20 +5,20 @@
       <a-space wrap>
         <a-input
           v-model="query.keyword"
-          placeholder="工序编码/名称"
+          :placeholder="t('plm.standard-operation.lbl1430')"
           allow-clear
           style="width: 200px"
           @keyup.enter="loadData"
         />
-        <a-select v-model="query.status" placeholder="状态" allow-clear style="width: 120px">
-          <a-option value="ACTIVE">启用</a-option>
-          <a-option value="INACTIVE">停用</a-option>
+        <a-select v-model="query.status" :placeholder="t('plm.standard-operation.status')" allow-clear style="width: 120px">
+          <a-option value="ACTIVE">{{ $t('plm.standard-operation.enable') }}</a-option>
+          <a-option value="INACTIVE">{{ $t('plm.standard-operation.disable') }}</a-option>
         </a-select>
         <a-button type="primary" @click="loadData">{{ $t('common.search') }}</a-button>
         <a-button @click="resetQuery">{{ $t('common.reset') }}</a-button>
       </a-space>
       <template #extra>
-        <a-button type="primary" @click="openDrawer('create')">新建标准工序</a-button>
+        <a-button type="primary" @click="openDrawer('create')">{{ $t('plm.standard-operation.lbl1431') }}</a-button>
       </template>
     </a-card>
 
@@ -34,7 +34,7 @@
       >
         <template #status="{ record }">
           <a-tag :color="record.status === 'ACTIVE' ? 'green' : 'gray'">
-            {{ record.status === 'ACTIVE' ? '启用' : '停用' }}
+            {{ record.status === 'ACTIVE' ? $t('plm.standard-operation.enable') : $t('plm.standard-operation.disable') }}
           </a-tag>
         </template>
         <template #stdHours="{ record }">
@@ -50,13 +50,13 @@
               v-if="record.status === 'ACTIVE'"
               status="warning"
               @click="handleToggleStatus(record, 'INACTIVE')"
-            >停用</a-link>
+            >{{ $t('plm.standard-operation.disable') }}</a-link>
             <a-link
               v-if="record.status === 'INACTIVE'"
               @click="handleToggleStatus(record, 'ACTIVE')"
-            >启用</a-link>
+            >{{ $t('plm.standard-operation.enable') }}</a-link>
             <a-popconfirm
-              content="确认删除该标准工序？删除后使用该工序的路线不受影响。"
+              :content="t('plm.standard-operation.r22012')"
               @ok="handleDelete(record.id as string)"
             >
               <a-link status="danger">{{ $t('common.delete') }}</a-link>
@@ -69,28 +69,28 @@
     <!-- 新建/编辑抽屉 -->
     <a-drawer
       v-model:visible="drawerVisible"
-      :title="drawerMode === 'create' ? '新建标准工序' : '编辑标准工序'"
+      ::title="t('plm.standard-operation.lbl1432')"
       :width="520"
       @cancel="drawerVisible = false"
     >
       <a-form :model="formData" layout="vertical">
-        <a-form-item label="工序编码" required>
-          <a-input v-model="formData.code" placeholder="如 OP-WELD-01" />
+        <a-form-item :label="t('plm.standard-operation.opCode')" required>
+          <a-input v-model="formData.code" :placeholder="t('plm.standard-operation.lbl1433')" />
         </a-form-item>
-        <a-form-item label="工序名称" required>
-          <a-input v-model="formData.name" placeholder="如 手工电弧焊" />
+        <a-form-item :label="t('plm.standard-operation.opName')" required>
+          <a-input v-model="formData.name" :placeholder="t('plm.standard-operation.lbl1434')" />
         </a-form-item>
-        <a-form-item label="默认工作中心">
+        <a-form-item :label="t('plm.standard-operation.defaultWorkCenter')">
           <WorkCenterSelect v-model="formData.workCenterId" @change="(node) => formData.workCenterName = node?.name" />
         </a-form-item>
-        <a-form-item label="标准工时 (分钟)">
-          <a-input-number v-model="formData.stdHours" :min="0" :precision="1" style="width: 100%" placeholder="标准作业时间" />
+        <a-form-item :label="t('plm.standard-operation.standardDuration')">
+          <a-input-number v-model="formData.stdHours" :min="0" :precision="1" style="width: 100%" :placeholder="t('plm.standard-operation.lbl1435')" />
         </a-form-item>
-        <a-form-item label="准备时间 (分钟)">
-          <a-input-number v-model="formData.setupTime" :min="0" :precision="1" style="width: 100%" placeholder="换模/准备时间" />
+        <a-form-item :label="t('plm.standard-operation.r33041')">
+          <a-input-number v-model="formData.setupTime" :min="0" :precision="1" style="width: 100%" :placeholder="t('plm.standard-operation.lbl1436')" />
         </a-form-item>
-        <a-form-item label="描述">
-          <a-textarea v-model="formData.description" placeholder="工序操作要点描述" :max-length="500" />
+        <a-form-item :label="t('plm.standard-operation.r33042')">
+          <a-textarea v-model="formData.description" :placeholder="t('plm.standard-operation.lbl1437')" :max-length="500" />
         </a-form-item>
         <a-form-item style="margin-top: 24px">
           <a-space>
@@ -110,6 +110,8 @@ import MTable from '@/components/MTable/index.vue'
 import type { MTableColumn } from '@/components/MTable/index.vue'
 import { plmApi, type StandardOperation } from '@/api/plm'
 import WorkCenterSelect from '@/components/BusinessSelect/WorkCenterSelect.vue'
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 
 
 
@@ -120,14 +122,14 @@ const total = ref(0)
 const query = reactive({ keyword: '', status: '', page: 1, pageSize: 20 })
 
 const columns: MTableColumn[] = [
-  { key: 'code', title: '工序编码', dataIndex: 'code', width: 130 },
-  { key: 'name', title: '工序名称', dataIndex: 'name', width: 160 },
-  { key: 'workCenterName', title: '默认工作中心', dataIndex: 'workCenterName', width: 140 },
-  { key: 'stdHours', title: '标准工时', slotName: 'stdHours', width: 110 },
-  { key: 'setupTime', title: '准备时间', slotName: 'setupTime', width: 110 },
-  { key: 'description', title: '描述', dataIndex: 'description', width: 200, ellipsis: true },
-  { key: 'status', title: '状态', slotName: 'status', width: 80 },
-  { key: 'action', title: '操作', slotName: 'action', width: 180 },
+  { key: 'code', title: t('plm.standard-operation.lbl1438'), dataIndex: 'code', width: 130 },
+  { key: 'name', title: t('plm.standard-operation.lbl1439'), dataIndex: 'name', width: 160 },
+  { key: 'workCenterName', title: t('plm.standard-operation.lbl1440'), dataIndex: 'workCenterName', width: 140 },
+  { key: 'stdHours', title: t('plm.standard-operation.lbl1441'), slotName: 'stdHours', width: 110 },
+  { key: 'setupTime', title: t('plm.standard-operation.lbl1442'), slotName: 'setupTime', width: 110 },
+  { key: 'description', title: t('plm.standard-operation.description'), dataIndex: 'description', width: 200, ellipsis: true },
+  { key: 'status', title: t('plm.standard-operation.status'), slotName: 'status', width: 80 },
+  { key: 'action', title: t('plm.standard-operation.action'), slotName: 'action', width: 180 },
 ]
 
 async function loadData() {
@@ -191,16 +193,16 @@ function openDrawer(mode: 'create' | 'edit', record?: any) {
 }
 
 async function handleSubmit() {
-  if (!formData.code) { Message.warning('请输入工序编码'); return }
-  if (!formData.name) { Message.warning('请输入工序名称'); return }
+  if (!formData.code) { Message.warning(t('plm.请输入工序编码')); return }
+  if (!formData.name) { Message.warning(t('plm.请输入工序名称')); return }
   submitting.value = true
   try {
     if (drawerMode.value === 'create') {
       await plmApi.createStandardOperation({ ...formData })
-      Message.success('新建成功')
+      Message.success(t('plm.新建成功'))
     } else {
       await plmApi.updateStandardOperation(editId.value, { ...formData })
-      Message.success('保存成功')
+      Message.success(t('plm.保存成功'))
     }
     drawerVisible.value = false
     loadData()
@@ -215,7 +217,7 @@ async function handleSubmit() {
 async function handleToggleStatus(record: any, newStatus: string) {
   try {
     await plmApi.updateStandardOperation(record.id, { status: newStatus })
-    Message.success(newStatus === 'ACTIVE' ? '已启用' : '已停用')
+    Message.success(newStatus === 'ACTIVE' ? t('plm.standard-operation.lbl1443') : t('plm.standard-operation.lbl1444'))
     loadData()
   } catch {
     // handled
@@ -226,7 +228,7 @@ async function handleToggleStatus(record: any, newStatus: string) {
 async function handleDelete(id: string) {
   try {
     await plmApi.deleteStandardOperation(id)
-    Message.success('删除成功')
+    Message.success(t('plm.删除成功'))
     loadData()
   } catch {
     // handled

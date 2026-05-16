@@ -19,7 +19,7 @@
           <a-space>
             <a-button type="primary" @click="handleTrace" :loading="loading">
               <template #icon><icon-search /></template>
-              追溯
+              {{ $t('traceability.backward.trace') }}
             </a-button>
             <a-button @click="handleReset">{{ $t('common.reset') }}</a-button>
           </a-space>
@@ -29,16 +29,16 @@
       <!-- 追溯结果 -->
       <div v-if="traceResult">
         <a-alert v-if="traceResult.truncated" type="warning" style="margin-bottom: 16px">
-          追溯节点超过 500 个，已截断显示。建议缩小追溯范围。
+          {{ $t('traceability.backward.traceNodesTruncated') }}
         </a-alert>
 
         <a-space style="margin-bottom: 16px">
           <a-button @click="handleExportPdf" :loading="exportLoading">
             <template #icon><icon-download /></template>
-            导出PDF报告
+            {{ $t('traceability.backward.exportPdf') }}
           </a-button>
-          <a-tag color="blue">总节点数: {{ traceResult.nodeCount }}</a-tag>
-          <a-tag v-if="hasMissingData" color="red">含数据缺失节点</a-tag>
+          <a-tag color="blue">{{ $t('traceability.backward.r22018', {nodeCount: traceResult.nodeCount}) }}</a-tag>
+          <a-tag v-if="hasMissingData" color="red">{{ $t('traceability.backward.lbl1807') }}</a-tag>
         </a-space>
 
         <!-- ECharts 树形图 -->
@@ -58,13 +58,13 @@
               <a-link @click="handleViewBatch(record)">{{ record.traceCode }}</a-link>
             </template>
             <template #inspectionStatus="{ record }">
-              <a-tag v-if="record.inspectionStatus === 'PASSED'" color="green">合格</a-tag>
-              <a-tag v-else-if="record.inspectionStatus === 'FAILED'" color="red">不合格</a-tag>
-              <a-tag v-else color="orange">待检</a-tag>
+              <a-tag v-if="record.inspectionStatus === 'PASSED'" color="green">{{ $t('traceability.backward.qualified') }}</a-tag>
+              <a-tag v-else-if="record.inspectionStatus === 'FAILED'" color="red">{{ $t('traceability.backward.unqualified') }}</a-tag>
+              <a-tag v-else color="orange">{{ $t('traceability.backward.uninspected') }}</a-tag>
             </template>
             <template #missingData="{ record }">
-              <a-tag v-if="record.missingData" color="red">数据缺失</a-tag>
-              <span v-else style="color: var(--color-text-3)">完整</span>
+              <a-tag v-if="record.missingData" color="red">{{ $t('traceability.backward.lbl1808') }}</a-tag>
+              <span v-else style="color: var(--color-text-3)">{{ $t('traceability.backward.lbl1809') }}</span>
             </template>
           </a-table>
         </a-card>
@@ -127,7 +127,7 @@ onUnmounted(() => {
 
 async function handleTrace() {
   if (!queryForm.traceCode) {
-    Message.warning('请输入追溯码')
+    Message.warning(t('traceability.请输入追溯码'))
     return
   }
   loading.value = true
@@ -135,9 +135,9 @@ async function handleTrace() {
     const res = await backwardTrace(queryForm.traceCode)
     traceResult.value = res
     setTimeout(renderTreeChart, 100)
-    Message.success('追溯完成')
+    Message.success(t('traceability.追溯完成'))
   } catch (e: any) {
-    Message.error(e.message || '追溯失败')
+    Message.error(e.message || t('traceability.追溯失败'))
   } finally {
     loading.value = false
   }
@@ -165,7 +165,7 @@ function renderTreeChart() {
       triggerOn: 'mousemove',
       formatter: (p: any) => {
         const d = p.data
-        return `<strong>${d.name}</strong><br/>物料: ${d.materialCode || '-'}<br/>供应商: ${d.supplierName || '-'}<br/>检验: ${d.inspectionStatus || '-'}${d.missingData ? '<br/><span style="color:#f53f3f">⚠ 数据缺失</span>' : ''}`
+        return `<strong>${d.name}</strong><br/>${t('traceability.backward.material')}: ${d.materialCode || '-'}<br/>${t('traceability.backward.supplier')}: ${d.supplierName || '-'}<br/>${t('traceability.backward.inspection')}: ${d.inspectionStatus || '-'}${d.missingData ? '<br/><span style="color:#f53f3f">' + t('traceability.backward.dataMissing') + '</span>' : ''}`
       },
     },
     series: [{
@@ -219,12 +219,12 @@ async function handleExportPdf() {
     const url = window.URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `反向追溯_${queryForm.traceCode}_${Date.now()}.pdf`
+    a.download = `${t('traceability.backward.r33087')}_${queryForm.traceCode}_${Date.now()}.pdf`
     a.click()
     window.URL.revokeObjectURL(url)
-    Message.success('导出成功')
+    Message.success(t('traceability.导出成功'))
   } catch (e: any) {
-    Message.error(e.message || '导出失败')
+    Message.error(e.message || t('traceability.导出失败'))
   } finally {
     exportLoading.value = false
   }

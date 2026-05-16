@@ -128,7 +128,7 @@ function statusColor(status?: string) {
 }
 
 function statusLabel(status?: string) {
-  return status === 'active' ? '启用' : status === 'inactive' ? '停用' : '草稿'
+  return status === 'active' ? t('plm.material.enable') : status === 'inactive' ? t('plm.material.disable') : t('plm.material.draft')
 }
 
 async function loadMaterial() {

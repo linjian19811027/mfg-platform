@@ -3,15 +3,15 @@
     <a-card :bordered="false" style="margin-bottom: 16px">
       <a-space wrap>
         <a-select v-model="query.status" :placeholder="$t('common.status')" allow-clear style="width: 130px">
-          <a-option value="OPEN">开放</a-option>
-          <a-option value="PROCESSING">处理中</a-option>
-          <a-option value="CLOSED">已关闭</a-option>
+          <a-option value="OPEN">{{ $t('scm.receipt-exception.lbl1598') }}</a-option>
+          <a-option value="PROCESSING">{{ $t('scm.receipt-exception.lbl1599') }}</a-option>
+          <a-option value="CLOSED">{{ $t('scm.receipt-exception.closed') }}</a-option>
         </a-select>
         <a-button type="primary" @click="loadData">{{ $t('common.search') }}</a-button>
         <a-button @click="resetQuery">{{ $t('common.reset') }}</a-button>
       </a-space>
       <template #extra>
-        <a-button type="primary" @click="openDrawer(null)">新建异常</a-button>
+        <a-button type="primary" @click="openDrawer(null)">{{ $t('scm.receipt-exception.lbl1600') }}</a-button>
       </template>
     </a-card>
 
@@ -19,21 +19,21 @@
       <MTable :columns="columns" :data="tableData" :loading="loading" :total="total" :page-size="20" @change="onTableChange">
         <template #status="{ record }">
           <a-tag :color="record.status === 'CLOSED' ? 'green' : record.status === 'PROCESSING' ? 'orange' : 'red'">
-            {{ record.status === 'CLOSED' ? '已关闭' : record.status === 'PROCESSING' ? '处理中' : '开放' }}
+            {{ record.status === 'CLOSED' ? t('scm.receipt-exception.r33062') : record.status === 'PROCESSING' ? $t('scm.receipt-exception.lbl1601') : $t('scm.receipt-exception.lbl1602') }}
           </a-tag>
         </template>
         <template #action="{ record }">
           <a-space>
-            <a-link v-if="record.status === 'OPEN'" @click="openDrawer(record as unknown as ReceiptException)">处理</a-link>
+            <a-link v-if="record.status === 'OPEN'" @click="openDrawer(record as unknown as ReceiptException)">{{ $t('scm.receipt-exception.lbl1603') }}</a-link>
             <a-popconfirm v-if="record.status === 'PROCESSING'" :content="$t('scm.receipt-exception.index.确认关闭该异常')" @ok="handleClose(record.id as string)">
-              <a-link>关闭</a-link>
+              <a-link>{{ $t('scm.receipt-exception.close') }}</a-link>
             </a-popconfirm>
           </a-space>
         </template>
       </MTable>
     </a-card>
 
-    <a-drawer v-model:visible="drawerVisible" :title="editing ? '处理异常' : '新建异常'" :width="520" @cancel="drawerVisible = false">
+    <a-drawer v-model:visible="drawerVisible" ::title="t('scm.receipt-exception.lbl1604')" :width="520" @cancel="drawerVisible = false">
       <MForm :schema="formSchema" v-model="formData" :loading="saving" :submit-text="$t('scm.receipt-exception.index.保存')" @submit="handleSave" @cancel="drawerVisible = false" />
     </a-drawer>
   </div>
@@ -64,12 +64,12 @@ const columns: MTableColumn[] = [
 ]
 
 const formSchema: MFormField[] = [
-  { field: 'exceptionType', label: '异常类型', type: 'select', required: true, options: [
-    { label: '数量不符', value: 'QTY_MISMATCH' }, { label: '质量问题', value: 'QUALITY_ISSUE' },
-    { label: '包装损坏', value: 'PACKAGING_DAMAGE' }, { label: '其他', value: 'OTHER' },
+  { field: 'exceptionType', label: t('scm.receipt-exception.lbl1605'), type: 'select', required: true, options: [
+    { label: t('scm.receipt-exception.lbl1606'), value: 'QTY_MISMATCH' }, { label: t('scm.receipt-exception.lbl1607'), value: 'QUALITY_ISSUE' },
+    { label: t('scm.receipt-exception.lbl1608'), value: 'PACKAGING_DAMAGE' }, { label: t('scm.receipt-exception.lbl1609'), value: 'OTHER' },
   ]},
-  { field: 'description', label: '异常描述', type: 'textarea', required: true, props: { autoSize: { minRows: 3 } } },
-  { field: 'handling', label: '处理方案', type: 'textarea', props: { autoSize: { minRows: 2 } } },
+  { field: 'description', label: t('scm.receipt-exception.lbl1610'), type: 'textarea', required: true, props: { autoSize: { minRows: 3 } } },
+  { field: 'handling', label: t('scm.receipt-exception.lbl1611'), type: 'textarea', props: { autoSize: { minRows: 2 } } },
 ]
 
 async function loadData() {
@@ -100,15 +100,15 @@ function openDrawer(item: ReceiptException | null) {
 async function handleSave(data: Record<string, unknown>) {
   saving.value = true
   try {
-    if (editing.value) { await scmApi.processException(editing.value.id, data); Message.success('处理成功') }
-    else { await scmApi.createReceiptException(data); Message.success('创建成功') }
+    if (editing.value) { await scmApi.processException(editing.value.id, data); Message.success(t('scm.处理成功')) }
+    else { await scmApi.createReceiptException(data); Message.success(t('scm.创建成功')) }
     drawerVisible.value = false
     loadData()
   } catch { /* handled */ } finally { saving.value = false }
 }
 
 async function handleClose(id: string) {
-  try { await scmApi.closeException(id); Message.success('已关闭'); loadData() }
+  try { await scmApi.closeException(id); Message.success(t('scm.已关闭')); loadData() }
   catch { /* handled */ }
 }
 

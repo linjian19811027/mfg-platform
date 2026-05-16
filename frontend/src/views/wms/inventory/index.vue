@@ -10,9 +10,9 @@
       </a-space>
       <template #extra>
         <a-space>
-          <a-button type="primary" @click="openReceipt">入库</a-button>
-          <a-button status="warning" @click="openIssue">出库</a-button>
-          <a-button @click="openAdjust">库存调整</a-button>
+          <a-button type="primary" @click="openReceipt">{{ $t('wms.inventory.lbl1893') }}</a-button>
+          <a-button status="warning" @click="openIssue">{{ $t('wms.inventory.lbl1894') }}</a-button>
+          <a-button @click="openAdjust">{{ $t('wms.inventory.lbl1895') }}</a-button>
         </a-space>
       </template>
     </a-card>
@@ -37,14 +37,14 @@
               :content="$t('wms.inventory.index.确认冻结该库存')"
               @ok="handleLock(record)"
             >
-              <a-link>冻结</a-link>
+              <a-link>{{ $t('wms.inventory.lbl1896') }}</a-link>
             </a-popconfirm>
             <a-popconfirm
               v-else
               :content="$t('wms.inventory.index.确认解冻该库存')"
               @ok="handleUnlock(record)"
             >
-              <a-link>解冻</a-link>
+              <a-link>{{ $t('wms.inventory.lbl1897') }}</a-link>
             </a-popconfirm>
           </a-space>
         </template>
@@ -68,15 +68,15 @@
         </a-form-item>
         <a-form-item :label="$t('wms.inventory.index.入库类型')" required>
           <a-select v-model="receiptFormData.type" style="width:100%">
-            <a-option value="PURCHASE">采购入库</a-option>
-            <a-option value="PRODUCTION">生产入库</a-option>
-            <a-option value="RETURN">退货入库</a-option>
-            <a-option value="OTHER">其他</a-option>
+            <a-option value="PURCHASE">{{ $t('wms.inventory.lbl1898') }}</a-option>
+            <a-option value="PRODUCTION">{{ $t('wms.inventory.lbl1899') }}</a-option>
+            <a-option value="RETURN">{{ $t('wms.inventory.lbl1900') }}</a-option>
+            <a-option value="OTHER">{{ $t('wms.inventory.lbl1901') }}</a-option>
           </a-select>
         </a-form-item>
         <a-form-item style="margin-top:24px">
           <a-space>
-            <a-button type="primary" :loading="submitting" @click="handleReceipt">确认入库</a-button>
+            <a-button type="primary" :loading="submitting" @click="handleReceipt">{{ $t('wms.inventory.lbl1902') }}</a-button>
             <a-button @click="receiptVisible = false">{{ $t('common.cancel') }}</a-button>
           </a-space>
         </a-form-item>
@@ -100,15 +100,15 @@
         </a-form-item>
         <a-form-item :label="$t('wms.inventory.index.出库类型')" required>
           <a-select v-model="issueFormData.type" style="width:100%">
-            <a-option value="PRODUCTION">生产领料</a-option>
-            <a-option value="SALES">销售出库</a-option>
-            <a-option value="TRANSFER">调拨出库</a-option>
-            <a-option value="OTHER">其他</a-option>
+            <a-option value="PRODUCTION">{{ $t('wms.inventory.lbl1903') }}</a-option>
+            <a-option value="SALES">{{ $t('wms.inventory.lbl1904') }}</a-option>
+            <a-option value="TRANSFER">{{ $t('wms.inventory.lbl1905') }}</a-option>
+            <a-option value="OTHER">{{ $t('wms.inventory.lbl1906') }}</a-option>
           </a-select>
         </a-form-item>
         <a-form-item style="margin-top:24px">
           <a-space>
-            <a-button type="primary" :loading="submitting" @click="handleIssue">确认出库</a-button>
+            <a-button type="primary" :loading="submitting" @click="handleIssue">{{ $t('wms.inventory.lbl1907') }}</a-button>
             <a-button @click="issueVisible = false">{{ $t('common.cancel') }}</a-button>
           </a-space>
         </a-form-item>
@@ -126,8 +126,8 @@
         </a-form-item>
         <a-form-item :label="$t('wms.inventory.index.调整类型')" required>
           <a-select v-model="adjustForm.adjustType">
-            <a-option value="GAIN">盘盈（增加）</a-option>
-            <a-option value="LOSS">盘亏（减少）</a-option>
+            <a-option value="GAIN">{{ $t('wms.inventory.lbl1908') }}</a-option>
+            <a-option value="LOSS">{{ $t('wms.inventory.lbl1909') }}</a-option>
           </a-select>
         </a-form-item>
         <a-form-item :label="$t('wms.inventory.index.调整数量')" required>
@@ -199,24 +199,24 @@ function openIssue() {
 }
 
 async function handleReceipt() {
-  if (!receiptFormData.materialId || !receiptFormData.warehouseId || !receiptFormData.qty) { Message.warning('请填写完整信息'); return }
+  if (!receiptFormData.materialId || !receiptFormData.warehouseId || !receiptFormData.qty) { Message.warning(t('wms.请填写完整信息')); return }
   submitting.value = true
-  try { await wmsApi.receipt({ ...receiptFormData }); Message.success('入库成功'); receiptVisible.value = false; loadData() }
+  try { await wmsApi.receipt({ ...receiptFormData }); Message.success(t('wms.入库成功')); receiptVisible.value = false; loadData() }
   catch { /* handled */ } finally { submitting.value = false }
 }
 
 async function handleIssue() {
-  if (!issueFormData.materialId || !issueFormData.warehouseId || !issueFormData.qty) { Message.warning('请填写完整信息'); return }
+  if (!issueFormData.materialId || !issueFormData.warehouseId || !issueFormData.qty) { Message.warning(t('wms.请填写完整信息')); return }
   submitting.value = true
-  try { await wmsApi.issue({ ...issueFormData }); Message.success('出库成功'); issueVisible.value = false; loadData() }
+  try { await wmsApi.issue({ ...issueFormData }); Message.success(t('wms.出库成功')); issueVisible.value = false; loadData() }
   catch { /* handled */ } finally { submitting.value = false }
 }
 
 // 冻结/解冻
 async function handleLock(record: Record<string, unknown>) {
   try {
-    await wmsApi.lockInventory({ inventoryId: record.id, reason: '手动冻结' })
-    Message.success('冻结成功')
+    await wmsApi.lockInventory({ inventoryId: record.id, reason: t('wms.inventory.lbl1910') })
+    Message.success(t('wms.冻结成功'))
     loadData()
   } catch { /* handled */ }
 }
@@ -224,7 +224,7 @@ async function handleLock(record: Record<string, unknown>) {
 async function handleUnlock(record: Record<string, unknown>) {
   try {
     await wmsApi.unlockInventory({ inventoryId: record.id })
-    Message.success('解冻成功')
+    Message.success(t('wms.解冻成功'))
     loadData()
   } catch { /* handled */ }
 }
@@ -240,13 +240,13 @@ function openAdjust() {
 
 async function handleAdjust() {
   if (!adjustForm.materialId || !adjustForm.warehouseId || !adjustForm.qty || !adjustForm.reason) {
-    Message.warning('请填写完整信息')
+    Message.warning(t('wms.请填写完整信息'))
     return
   }
   submitting.value = true
   try {
     await wmsApi.adjustInventory({ ...adjustForm })
-    Message.success('库存调整成功')
+    Message.success(t('wms.库存调整成功'))
     adjustVisible.value = false
     loadData()
   } catch { /* handled */ } finally { submitting.value = false }

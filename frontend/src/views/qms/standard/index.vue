@@ -4,31 +4,31 @@
       <a-space wrap>
         <a-input v-model="query.keyword" :placeholder="$t('qms.standard.index.标准编码名称')" allow-clear style="width: 200px" @keyup.enter="loadData" />
         <a-select v-model="query.inspectionType" :placeholder="$t('qms.standard.index.检验类型')" allow-clear style="width: 130px">
-          <a-option value="IQC">来料检验</a-option>
-          <a-option value="IPQC">过程检验</a-option>
-          <a-option value="FQC">成品检验</a-option>
-          <a-option value="OQC">出货检验</a-option>
+          <a-option value="IQC">{{ $t('qms.standard.lbl1532') }}</a-option>
+          <a-option value="IPQC">{{ $t('qms.standard.lbl1533') }}</a-option>
+          <a-option value="FQC">{{ $t('qms.standard.lbl1534') }}</a-option>
+          <a-option value="OQC">{{ $t('qms.standard.lbl1535') }}</a-option>
         </a-select>
         <a-select v-model="query.status" :placeholder="$t('common.status')" allow-clear style="width: 120px">
-          <a-option value="ACTIVE">启用</a-option>
-          <a-option value="INACTIVE">停用</a-option>
+          <a-option value="ACTIVE">{{ $t('qms.standard.enable') }}</a-option>
+          <a-option value="INACTIVE">{{ $t('qms.standard.disable') }}</a-option>
         </a-select>
         <a-button type="primary" @click="loadData">{{ $t('common.search') }}</a-button>
         <a-button @click="resetQuery">{{ $t('common.reset') }}</a-button>
       </a-space>
       <template #extra>
-        <a-button type="primary" @click="openDrawer(null)">新建检验标准</a-button>
+        <a-button type="primary" @click="openDrawer(null)">{{ $t('qms.standard.lbl1536') }}</a-button>
       </template>
     </a-card>
 
     <a-card :bordered="false">
       <MTable :columns="columns" :data="tableData" :loading="loading" :total="total" :page-size="20" @change="onTableChange">
         <template #status="{ record }">
-          <a-tag :color="record.status === 'ACTIVE' ? 'green' : 'gray'">{{ record.status === 'ACTIVE' ? '启用' : '停用' }}</a-tag>
+          <a-tag :color="record.status === 'ACTIVE' ? 'green' : 'gray'">{{ record.status === 'ACTIVE' ? $t('qms.standard.enable') : $t('qms.standard.disable') }}</a-tag>
         </template>
         <template #action="{ record }">
           <a-space>
-            <a-link @click="openDetailDrawer(record as unknown as InspectionStandard)">查看/版本</a-link>
+            <a-link @click="openDetailDrawer(record as unknown as InspectionStandard)">{{ $t('qms.standard.lbl1537') }}</a-link>
             <a-link @click="openDrawer(record as unknown as InspectionStandard)">{{ $t('common.edit') }}</a-link>
           </a-space>
         </template>
@@ -36,25 +36,25 @@
     </a-card>
 
     <!-- 新建/编辑抽屉 -->
-    <a-drawer v-model:visible="drawerVisible" :title="editing ? '编辑检验标准' : '新建检验标准'" :width="520" @cancel="drawerVisible = false">
+    <a-drawer v-model:visible="drawerVisible" ::title="t('qms.standard.lbl1538')" :width="520" @cancel="drawerVisible = false">
       <MForm :schema="formSchema" v-model="formData" :loading="saving" :submit-text="$t('qms.standard.index.保存')" @submit="handleSave" @cancel="drawerVisible = false" />
     </a-drawer>
 
     <!-- 详情/版本历史抽屉 -->
-    <a-drawer v-model:visible="detailDrawerVisible" :title="`${currentStd?.name ?? ''} - 版本历史`" :width="640" @cancel="detailDrawerVisible = false">
+    <a-drawer v-model:visible="detailDrawerVisible" ::title="t('qms.standard.lbl1539')" :width="640" @cancel="detailDrawerVisible = false">
       <template v-if="currentStd">
         <a-descriptions :column="2" bordered style="margin-bottom: 16px">
           <a-descriptions-item :label="$t('common.code')">{{ currentStd.code }}</a-descriptions-item>
           <a-descriptions-item :label="$t('qms.standard.index.版本')">{{ currentStd.version ?? 'V1.0' }}</a-descriptions-item>
           <a-descriptions-item :label="$t('qms.standard.index.检验类型')">{{ currentStd.inspectionType }}</a-descriptions-item>
           <a-descriptions-item :label="$t('common.status')">
-            <a-tag :color="currentStd.status === 'ACTIVE' ? 'green' : 'gray'">{{ currentStd.status === 'ACTIVE' ? '启用' : '停用' }}</a-tag>
+            <a-tag :color="currentStd.status === 'ACTIVE' ? 'green' : 'gray'">{{ currentStd.status === 'ACTIVE' ? $t('qms.standard.enable') : $t('qms.standard.disable') }}</a-tag>
           </a-descriptions-item>
         </a-descriptions>
 
         <div style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center">
-          <span style="font-weight: 500">检验项目</span>
-          <a-button size="small" type="primary" @click="openVersionModal">发布新版本</a-button>
+          <span style="font-weight: 500">{{ $t('qms.standard.lbl1540') }}</span>
+          <a-button size="small" type="primary" @click="openVersionModal">{{ $t('qms.standard.lbl1541') }}</a-button>
         </div>
         <a-table :columns="itemColumns" :data="currentStd.items ?? []" :pagination="false" row-key="id" size="small" />
       </template>
@@ -106,14 +106,14 @@ const itemColumns = [
 ]
 
 const formSchema: MFormField[] = [
-  { field: 'code', label: '标准编码', type: 'input', required: true },
-  { field: 'name', label: '标准名称', type: 'input', required: true },
-  { field: 'inspectionType', label: '检验类型', type: 'select', required: true, options: [
-    { label: '来料检验(IQC)', value: 'IQC' }, { label: '过程检验(IPQC)', value: 'IPQC' },
-    { label: '成品检验(FQC)', value: 'FQC' }, { label: '出货检验(OQC)', value: 'OQC' },
+  { field: 'code', label: t('qms.standard.lbl1542'), type: 'input', required: true },
+  { field: 'name', label: t('qms.standard.lbl1543'), type: 'input', required: true },
+  { field: 'inspectionType', label: t('qms.standard.lbl1544'), type: 'select', required: true, options: [
+    { label: t('qms.standard.lbl1545'), value: 'IQC' }, { label: t('qms.standard.lbl1546'), value: 'IPQC' },
+    { label: t('qms.standard.lbl1547'), value: 'FQC' }, { label: t('qms.standard.lbl1548'), value: 'OQC' },
   ]},
-  { field: 'materialId', label: '适用物料ID（可选）', type: 'input' },
-  { field: 'status', label: '状态', type: 'select', options: [{ label: '启用', value: 'ACTIVE' }, { label: '停用', value: 'INACTIVE' }] },
+  { field: 'materialId', label: t('qms.standard.lbl1549'), type: 'material-select' },
+  { field: 'status', label: t('qms.standard.status'), type: 'select', options: [{ label: t('qms.standard.enable'), value: 'ACTIVE' }, { label: t('qms.standard.disable'), value: 'INACTIVE' }] },
 ]
 
 async function loadData() {
@@ -147,7 +147,7 @@ async function handleSave(data: Record<string, unknown>) {
   saving.value = true
   try {
     await qmsApi.createStandard(data)
-    Message.success(editing.value ? '更新成功' : '创建成功')
+    Message.success(editing.value ? t('qms.standard.lbl1550') : t('qms.standard.lbl1551'))
     drawerVisible.value = false
     loadData()
   } catch { /* handled */ } finally { saving.value = false }
@@ -174,7 +174,7 @@ async function handleNewVersion() {
   versioning.value = true
   try {
     await qmsApi.createStandardVersion(currentStd.value.id, { changes: {}, reason: versionReason.value })
-    Message.success('新版本已发布')
+    Message.success(t('qms.新版本已发布'))
     versionModalVisible.value = false
     loadData()
   } catch { /* handled */ } finally { versioning.value = false }

@@ -130,6 +130,16 @@ export const menuConfig: MenuItem[] = [
     ],
   },
   {
+    key: 'base', title: '基础数据', icon: 'IconStorage',
+    children: [
+      { key: 'base-batch', title: '批次管理', path: '/base/batch', icon: 'IconList', permission: 'base:batch:view' },
+      { key: 'base-file', title: '文件管理', path: '/base/file', icon: 'IconFile', permission: 'base:file:view' },
+      { key: 'base-shift', title: '班次管理', path: '/base/shifts', icon: 'IconClockCircle', permission: 'base:shift:view' },
+      { key: 'base:work-center', title: '工作中心', path: '/base/work-centers', icon: 'IconStorage', permission: 'base:work-center:view' },
+      { key: 'base-cert-type', title: '认证类型', path: '/base/certification-types', icon: 'IconCertificate', permission: 'base:certtype:view' },
+    ],
+  },
+  {
     key: 'sys', title: '系统管理', icon: 'IconSettings',
     children: [
       { key: 'sys-user', title: '用户管理', path: '/sys/user', icon: 'IconUser', permission: 'sys:user:view' },
@@ -138,6 +148,7 @@ export const menuConfig: MenuItem[] = [
       { key: 'sys-logs', title: '系统日志', path: '/sys/logs', icon: 'IconFile', permission: 'sys:log:view' },
       { key: 'sys-monitor', title: '系统监控', path: '/sys/monitor', icon: 'IconDashboard', permission: 'sys:monitor:view' },
       { key: 'sys-organization', title: '组织架构', path: '/sys/organization', icon: 'IconNav', permission: 'sys:org:view' },
+      { key: 'sys-permission', title: '权限管理', path: '/sys/permission', icon: 'IconSafe', permission: 'sys:permission:view' },
       { key: 'sys-numbering', title: '通用编码管理', path: '/sys/numbering', icon: 'IconCode', permission: 'sys:config:view' },
     ],
   },

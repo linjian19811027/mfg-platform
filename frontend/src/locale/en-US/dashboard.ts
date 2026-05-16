@@ -1,0 +1,23 @@
+export default {
+  'dashboard.welcome': 'Welcome back, {name}!',
+  'dashboard.welcomeDesc': 'It\'s another great day for productivity. All metrics are stable.',
+  'dashboard.productionBoard': 'Production Screen',
+  'dashboard.totalOutput': 'Total Output Today',
+  'dashboard.equipRate': 'Equipment OEE',
+  'dashboard.avgMtt': 'Avg MTTR',
+  'dashboard.workers': 'On-duty Workers',
+  'dashboard.unit.piece': 'pcs',
+  'dashboard.unit.min': 'min',
+  'dashboard.unit.person': 'pax',
+  'dashboard.trendText': '{value}% vs yesterday',
+  'dashboard.oeeTrend': 'Production Efficiency Trend (OEE)',
+  'dashboard.week': 'Week',
+  'dashboard.month': 'Month',
+  'dashboard.mon': 'Mon',
+  'dashboard.tue': 'Tue',
+  'dashboard.wed': 'Wed',
+  'dashboard.thu': 'Thu',
+  'dashboard.fri': 'Fri',
+  'dashboard.sat': 'Sat',
+  'dashboard.sun': 'Sun'
+}

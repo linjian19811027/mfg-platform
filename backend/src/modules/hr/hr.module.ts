@@ -10,6 +10,8 @@ import { HrShift } from './entities/hr-shift.entity.js';
 import { HrShiftSchedule } from './entities/hr-shift-schedule.entity.js';
 import { HrWorkHourRecord } from './entities/hr-work-hour-record.entity.js';
 import { HrWorkHourSummary } from './entities/hr-work-hour-summary.entity.js';
+import { HrJobType } from './entities/hr-job-type.entity.js';
+import { HrEmployeeHistory } from './entities/hr-employee-history.entity.js';
 
 // Services
 import { EmployeeService } from './services/employee.service.js';
@@ -18,6 +20,8 @@ import { ShiftService } from './services/shift.service.js';
 import { WorkHourService } from './services/work-hour.service.js';
 import { SkillValidatorService } from './services/skill-validator.service.js';
 import { HrEventService } from './services/hr-event.service.js';
+import { JobTypeService } from './services/job-type.service.js';
+import { EmployeeHistoryService } from './services/employee-history.service.js';
 
 // Controller
 import { HrController } from './hr.controller.js';
@@ -32,6 +36,8 @@ import { HrController } from './hr.controller.js';
       HrShiftSchedule,
       HrWorkHourRecord,
       HrWorkHourSummary,
+      HrJobType,
+      HrEmployeeHistory,
     ]),
     MessageModule,
   ],
@@ -43,7 +49,9 @@ import { HrController } from './hr.controller.js';
     WorkHourService,
     SkillValidatorService,
     HrEventService,
+    JobTypeService,
+    EmployeeHistoryService,
   ],
-  exports: [SkillValidatorService, EmployeeService, CertificationService],
+  exports: [SkillValidatorService, EmployeeService, CertificationService, JobTypeService, EmployeeHistoryService],
 })
 export class HrModule {}

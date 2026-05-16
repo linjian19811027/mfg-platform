@@ -3,12 +3,12 @@
     <!-- 顶部标题栏 -->
     <div class="dashboard-header">
       <div class="header-left">
-        <span class="title">库存看板</span>
-        <span class="update-time">最后更新：{{ lastUpdateTime }}</span>
+        <span class="title">{{ $t('wms.dashboard.lbl1879') }}</span>
+        <span class="update-time">{{ $t('wms.dashboard.r22023', {lastUpdateTime: lastUpdateTime}) }}</span>
       </div>
       <a-button type="outline" size="small" :loading="loading" @click="refresh">
         <template #icon><icon-refresh /></template>
-        刷新
+        {{ $t('wms.dashboard.refresh') }}
       </a-button>
     </div>
 
@@ -16,19 +16,19 @@
     <a-row :gutter="16" class="stat-row">
       <a-col :span="8">
         <div class="stat-card">
-          <div class="stat-label">总 SKU 数</div>
+          <div class="stat-label">{{ $t('wms.dashboard.lbl1880') }}</div>
           <div class="stat-value primary">{{ stats.totalSku }}</div>
         </div>
       </a-col>
       <a-col :span="8">
         <div class="stat-card">
-          <div class="stat-label">预警物料数</div>
+          <div class="stat-label">{{ $t('wms.dashboard.lbl1881') }}</div>
           <div class="stat-value warning">{{ stats.alertCount }}</div>
         </div>
       </a-col>
       <a-col :span="8">
         <div class="stat-card">
-          <div class="stat-label">今日入库量</div>
+          <div class="stat-label">{{ $t('wms.dashboard.lbl1882') }}</div>
           <div class="stat-value success">{{ stats.todayInbound }}</div>
         </div>
       </a-col>
@@ -38,7 +38,7 @@
     <a-row :gutter="16" class="chart-row">
       <a-col :span="12">
         <div class="chart-card">
-          <div class="card-title">库存热力图（按库区）</div>
+          <div class="card-title">{{ $t('wms.dashboard.lbl1883') }}</div>
           <div v-if="heatmapData.length > 0" ref="heatmapRef" class="chart-container"></div>
           <div v-else class="fallback-table">
             <a-table
@@ -53,7 +53,7 @@
       </a-col>
       <a-col :span="12">
         <div class="chart-card">
-          <div class="card-title">收发存趋势（近 7 天）</div>
+          <div class="card-title">{{ $t('wms.dashboard.lbl1884') }}</div>
           <div ref="trendRef" class="chart-container"></div>
         </div>
       </a-col>
@@ -62,8 +62,8 @@
     <!-- 第三行：预警物料列表 -->
     <div class="chart-card alert-card">
       <div class="card-title">
-        预警物料列表
-        <a-tag color="red" size="small" style="margin-left: 8px">{{ alertList.length }} 条</a-tag>
+        {{ $t('wms.dashboard.alertMaterialList') }}
+        <a-tag color="red" size="small" style="margin-left: 8px">{{ $t('wms.dashboard.items', {length: alertList.length}) }}</a-tag>
       </div>
       <a-table
         :data="alertList"
@@ -75,7 +75,7 @@
       >
         <template #alertLevel="{ record }">
           <a-tag :color="record.qty <= 5 ? 'red' : 'orange'">
-            {{ record.qty <= 5 ? '严重' : '警告' }}
+            {{ record.qty <= 5 ? $t('wms.dashboard.lbl1885') : $t('wms.dashboard.lbl1886') }}
           </a-tag>
         </template>
       </a-table>
@@ -96,7 +96,7 @@ import {
   LegendComponent,
 } from 'echarts/components'
 import { CanvasRenderer } from 'echarts/renderers'
-import request from '@/utils/request'
+import { request } from '@/utils/request'
 
 echarts.use([
   HeatmapChart,
@@ -278,7 +278,7 @@ function initTrend() {
   trendChart.setOption({
     ...buildBaseOption(),
     legend: {
-      data: ['入库', '出库', '净变化'],
+      data: [t('wms.dashboard.lbl1887'), t('wms.dashboard.lbl1888'), t('wms.dashboard.lbl1889')],
       textStyle: { color: '#8B949E' },
       top: 0,
     },
@@ -296,7 +296,7 @@ function initTrend() {
     },
     series: [
       {
-        name: '入库',
+        name: t('wms.dashboard.lbl1890'),
         type: 'line',
         data: inbound,
         smooth: true,
@@ -306,7 +306,7 @@ function initTrend() {
         itemStyle: { color: '#00B578' },
       },
       {
-        name: '出库',
+        name: t('wms.dashboard.lbl1891'),
         type: 'line',
         data: outbound,
         smooth: true,
@@ -316,7 +316,7 @@ function initTrend() {
         itemStyle: { color: '#FF6B35' },
       },
       {
-        name: '净变化',
+        name: t('wms.dashboard.lbl1892'),
         type: 'line',
         data: net,
         smooth: true,

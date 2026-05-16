@@ -4,27 +4,27 @@
       <a-space wrap>
         <a-input v-model="query.keyword" :placeholder="$t('erp.customer.index.客户名称编码')" allow-clear style="width: 200px" @keyup.enter="loadData" />
         <a-select v-model="query.status" :placeholder="$t('common.status')" allow-clear style="width: 120px">
-          <a-option value="ACTIVE">启用</a-option>
-          <a-option value="INACTIVE">停用</a-option>
+          <a-option value="ACTIVE">{{ $t('erp.customer.status.active') }}</a-option>
+          <a-option value="INACTIVE">{{ $t('erp.customer.status.inactive') }}</a-option>
         </a-select>
         <a-button type="primary" @click="loadData">{{ $t('common.search') }}</a-button>
         <a-button @click="resetQuery">{{ $t('common.reset') }}</a-button>
       </a-space>
       <template #extra>
-        <a-button type="primary" @click="openDrawer(null)">新建客户</a-button>
+        <a-button type="primary" @click="openDrawer(null)">{{ $t('erp.customer.lbl1178') }}</a-button>
       </template>
     </a-card>
     <a-card :bordered="false">
       <MTable :columns="columns" :data="tableData" :loading="loading" :total="total" :page-size="20" @change="onTableChange">
         <template #status="{ record }">
-          <a-tag :color="record.status === 'ACTIVE' ? 'green' : 'gray'">{{ record.status === 'ACTIVE' ? '启用' : '停用' }}</a-tag>
+          <a-tag :color="record.status === 'ACTIVE' ? 'green' : 'gray'">{{ record.status === 'ACTIVE' ? $t('erp.customer.enable') : $t('erp.customer.disable') }}</a-tag>
         </template>
         <template #action="{ record }">
           <a-link @click="openDrawer(record as unknown as ErpCustomer)">{{ $t('common.edit') }}</a-link>
         </template>
       </MTable>
     </a-card>
-    <a-drawer v-model:visible="drawerVisible" :title="editing ? '编辑客户' : '新建客户'" :width="520" @cancel="drawerVisible = false">
+    <a-drawer v-model:visible="drawerVisible" ::title="t('erp.customer.lbl1179')" :width="520" @cancel="drawerVisible = false">
       <MForm :schema="formSchema" v-model="formData" :loading="saving" :submit-text="$t('erp.customer.index.保存')" @submit="handleSave" @cancel="drawerVisible = false" />
     </a-drawer>
   </div>
@@ -51,15 +51,15 @@ const columns: MTableColumn[] = [
   { key: 'action', title: t('erp.customer.index.操作'), slotName: 'action', width: 80 },
 ]
 const formSchema: MFormField[] = [
-  { field: 'name', label: '客户名称', type: 'input', required: true },
-  { field: 'code', label: '客户编码', type: 'input' },
-  { field: 'type', label: '客户类型', type: 'select', options: [{ label: '企业', value: 'ENTERPRISE' }, { label: '个人', value: 'INDIVIDUAL' }] },
-  { field: 'creditLimit', label: '信用额度', type: 'number', props: { min: 0, precision: 2 } },
-  { field: 'contactName', label: '联系人', type: 'input' },
-  { field: 'contactPhone', label: '联系电话', type: 'input' },
-  { field: 'email', label: '邮箱', type: 'input' },
-  { field: 'taxNo', label: '税号', type: 'input' },
-  { field: 'status', label: '状态', type: 'select', options: [{ label: '启用', value: 'ACTIVE' }, { label: '停用', value: 'INACTIVE' }] },
+  { field: 'name', label: t('erp.customer.lbl1180'), type: 'input', required: true },
+  { field: 'code', label: t('erp.customer.lbl1181'), type: 'input' },
+  { field: 'type', label: t('erp.customer.lbl1182'), type: 'select', options: [{ label: t('erp.customer.lbl1183'), value: 'ENTERPRISE' }, { label: t('erp.customer.lbl1184'), value: 'INDIVIDUAL' }] },
+  { field: 'creditLimit', label: t('erp.customer.lbl1185'), type: 'number', props: { min: 0, precision: 2 } },
+  { field: 'contactName', label: t('erp.customer.lbl1186'), type: 'input' },
+  { field: 'contactPhone', label: t('erp.customer.lbl1187'), type: 'input' },
+  { field: 'email', label: t('erp.customer.lbl1188'), type: 'input' },
+  { field: 'taxNo', label: t('erp.customer.lbl1189'), type: 'input' },
+  { field: 'status', label: t('erp.customer.status'), type: 'select', options: [{ label: t('erp.customer.enable'), value: 'ACTIVE' }, { label: t('erp.customer.disable'), value: 'INACTIVE' }] },
 ]
 async function loadData() {
   loading.value = true
@@ -73,8 +73,8 @@ function openDrawer(item: ErpCustomer | null) { editing.value = item; formData.v
 async function handleSave(data: Record<string, unknown>) {
   saving.value = true
   try {
-    if (editing.value) { await erpExtApi.updateCustomer(editing.value.id, data); Message.success('更新成功') }
-    else { await erpExtApi.createCustomer(data); Message.success('创建成功') }
+    if (editing.value) { await erpExtApi.updateCustomer(editing.value.id, data); Message.success(t('erp.更新成功')) }
+    else { await erpExtApi.createCustomer(data); Message.success(t('erp.创建成功')) }
     drawerVisible.value = false; loadData()
   } catch { /* handled */ } finally { saving.value = false }
 }

@@ -7,7 +7,7 @@
         <a-input v-model="query.resourceId" :placeholder="$t('aps.schedule.index.资源ID')" allow-clear style="width: 180px" />
         <a-button type="primary" @click="handleSearch">{{ $t('common.search') }}</a-button>
         <a-button @click="handleReset">{{ $t('common.reset') }}</a-button>
-        <a-button type="outline" style="margin-left: auto" @click="scheduleModal = true">触发排程</a-button>
+        <a-button type="outline" style="margin-left: auto" @click="scheduleModal = true">{{ $t('aps.schedule.lbl1017') }}</a-button>
       </a-space>
 
       <MTable
@@ -18,7 +18,7 @@
         @change="handleTableChange"
       >
         <template #status="{ record }">
-          <a-tag :color="statusColor(record.status as string)">{{ record.status }}</a-tag>
+          <a-tag :color="statusColor(record.status as string)">{{ statusLabel(record.status as string) }}</a-tag>
         </template>
       </MTable>
     </a-card>
@@ -64,12 +64,24 @@ const columns: MTableColumn[] = [
 
 function statusColor(status: string) {
   const map: Record<string, string> = {
-    scheduled: 'blue',
-    in_progress: 'orange',
-    completed: 'green',
-    cancelled: 'gray',
+    SCHEDULED: 'blue',
+    CONFIRMED: 'cyan',
+    STARTED: 'orange',
+    COMPLETED: 'green',
+    CANCELLED: 'gray',
   }
   return map[status] ?? 'gray'
+}
+
+function statusLabel(status: string) {
+  const map: Record<string, string> = {
+    SCHEDULED: t('aps.schedule.lbl1018'),
+    CONFIRMED: t('aps.schedule.lbl1019'),
+    STARTED: t('aps.schedule.lbl1020'),
+    COMPLETED: t('aps.schedule.completed'),
+    CANCELLED: t('aps.schedule.lbl1021')
+  }
+  return map[status] ?? status
 }
 
 async function loadData() {
@@ -107,7 +119,7 @@ function handleTableChange(e: MTableChangeEvent) {
 
 async function handleTrigger() {
   if (!scheduleForm.startDate) {
-    Message.warning('请选择开始日期')
+    Message.warning(t('aps.schedule.index.请选择开始日期'))
     return
   }
   triggering.value = true
@@ -116,7 +128,7 @@ async function handleTrigger() {
       
       startDate: scheduleForm.startDate,
     })
-    Message.success('排程已触发')
+    Message.success(t('aps.schedule.index.排程已触发'))
     scheduleModal.value = false
     scheduleForm.startDate = ''
     loadData()
@@ -127,4 +139,3 @@ async function handleTrigger() {
 
 onMounted(loadData)
 </script>
-

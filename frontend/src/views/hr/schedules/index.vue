@@ -27,11 +27,11 @@
           <a-space>
             <a-button type="primary" @click="() => showCreateModal()">
               <template #icon><icon-plus /></template>
-              新建排班
+              {{ $t('hr.schedules.createSchedule') }}
             </a-button>
             <a-button @click="showBatchModal">
               <template #icon><icon-apps /></template>
-              批量排班
+              {{ $t('hr.schedules.batchSchedule') }}
             </a-button>
           </a-space>
         </a-col>
@@ -42,12 +42,12 @@
     <a-row :gutter="16" style="margin-bottom: 16px">
       <a-col :span="4" v-for="item in shiftStats" :key="item.shiftCode">
         <a-card :bordered="false" size="small">
-          <a-statistic :title="item.shiftName" :value="item.count" suffix="人" />
+          <a-statistic :title="item.shiftName" :value="item.count" :suffix="$t('hr.schedules.人')" />
         </a-card>
       </a-col>
       <a-col :span="4">
         <a-card :bordered="false" size="small">
-          <a-statistic :title="$t('hr.schedules.index.未排班员工')" :value="stats.unscheduledCount" suffix="人" :value-style="{ color: '#f53f3f' }" />
+          <a-statistic :title="$t('hr.schedules.index.未排班员工')" :value="stats.unscheduledCount" :suffix="$t('hr.schedules.人')" :value-style="{ color: '#f53f3f' }" />
         </a-card>
       </a-col>
     </a-row>
@@ -73,7 +73,7 @@
                 {{ s.empName }} · {{ s.shiftName }}
               </a-tag>
               <span v-if="getDaySchedules(date).length > 2" class="more-hint">
-                +{{ getDaySchedules(date).length - 2 }} 人
+                +{{ $t('hr.schedules.r33028', {length: getDaySchedules(date).length - 2}) }}
               </span>
             </div>
           </div>
@@ -84,14 +84,14 @@
     <!-- 侧边抽屉：当天排班明细 -->
     <a-drawer
       v-model:visible="drawerVisible"
-      :title="`${selectedDateStr} 排班明细`"
+      ::title="t('hr.schedules.lbl1267')"
       width="480"
       :footer="false"
     >
       <div style="margin-bottom: 12px">
         <a-button type="primary" size="small" @click="() => showCreateModal(selectedDate)">
           <template #icon><icon-plus /></template>
-          新增排班
+          {{ $t('hr.schedules.addSchedule') }}
         </a-button>
       </div>
       <a-list :data="selectedDaySchedules" :bordered="false">
@@ -108,7 +108,7 @@
             </a-list-item-meta>
             <template #actions>
               <a-popconfirm
-                :content="isPastDate(selectedDate) ? '历史排班不可删除' : '确定删除此排班？'"
+                :content="isPastDate(selectedDate) ? t('hr.schedules.历史排班不可删除') : t('hr.schedules.确定删除此排班')"
                 :ok-button-props="{ disabled: isPastDate(selectedDate) }"
                 @ok="handleDeleteSchedule(item)"
               >
@@ -118,7 +118,7 @@
                   status="danger"
                   :disabled="isPastDate(selectedDate)"
                 >
-                  删除
+                  {{ $t('hr.schedules.delete') }}
                 </a-button>
               </a-popconfirm>
             </template>
@@ -175,7 +175,7 @@
       @cancel="batchModalVisible = false"
     >
       <a-alert type="info" style="margin-bottom: 16px">
-        单次批量最多 500 条，同一员工同一天已有排班将自动跳过。
+        {{ $t('hr.schedules.batchScheduleHint') }}
       </a-alert>
       <a-form :model="batchForm" :rules="batchRules" ref="batchFormRef" layout="vertical">
         <a-form-item :label="$t('hr.schedules.index.选择员工')" field="empIds">
@@ -215,6 +215,9 @@ import {
 } from '@/api/hr'
 import { getEmployees } from '@/api/hr'
 
+
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 // ── 状态 ──────────────────────────────────────────────────────────────────
 const calendarDate = ref(new Date())
 const filter = reactive({ workCenter: '', month: new Date() })
@@ -241,9 +244,9 @@ const submitLoading = ref(false)
 const createFormRef = ref()
 const createForm = reactive({ empId: '', scheduleDate: '', shiftCode: '', workCenter: '', remark: '' })
 const createRules = {
-  empId: [{ required: true, message: '请选择员工' }],
-  scheduleDate: [{ required: true, message: '请选择排班日期' }],
-  shiftCode: [{ required: true, message: '请选择班次' }],
+  empId: [{ required: true, message: t('hr.schedules.请选择员工') }],
+  scheduleDate: [{ required: true, message: t('hr.schedules.请选择排班日期') }],
+  shiftCode: [{ required: true, message: t('hr.schedules.请选择班次') }],
 }
 
 // 批量弹窗
@@ -252,9 +255,9 @@ const batchLoading = ref(false)
 const batchFormRef = ref()
 const batchForm = reactive({ empIds: [], dateRange: [], shiftCode: '', workCenter: '' })
 const batchRules = {
-  empIds: [{ required: true, message: '请选择员工' }],
-  dateRange: [{ required: true, message: '请选择日期范围' }],
-  shiftCode: [{ required: true, message: '请选择班次' }],
+  empIds: [{ required: true, message: t('hr.schedules.请选择员工') }],
+  dateRange: [{ required: true, message: t('hr.schedules.请选择日期范围') }],
+  shiftCode: [{ required: true, message: t('hr.schedules.请选择班次') }],
 }
 
 // ── 初始化 ────────────────────────────────────────────────────────────────
@@ -269,7 +272,7 @@ async function fetchShifts() {
     const res = await getShifts()
     shifts.value = (res as any).list ?? (res as any).data ?? []
   } catch (e: any) {
-    Message.error(e.message || '加载班次失败')
+    Message.error(e.message || t('hr.schedules.加载班次失败'))
   }
 }
 
@@ -283,23 +286,21 @@ async function fetchEmployees() {
       name: e.name,
     }))
   } catch (e: any) {
-    Message.error(e.message || '加载员工失败')
+    Message.error(e.message || t('hr.schedules.加载员工失败'))
   }
 }
 
 async function fetchSchedules() {
   const year = calendarDate.value.getFullYear()
   const month = calendarDate.value.getMonth() + 1
+  const startDate = `${year}-${String(month).padStart(2, '0')}-01`
+  const lastDay = new Date(year, month, 0).getDate()
+  const endDate = `${year}-${String(month).padStart(2, '0')}-${lastDay}`
   try {
-    const res = await getSchedules({
-      year,
-      month,
-      workCenter: filter.workCenter || undefined,
-      pageSize: 500,
-    })
+    const res = await getSchedules({ startDate, endDate, pageSize: 500 })
     schedules.value = (res as any).list ?? (res as any).items ?? []
   } catch (e: any) {
-    Message.error(e.message || '加载排班失败')
+    Message.error(e.message || t('hr.schedules.加载排班失败'))
   }
 }
 
@@ -310,11 +311,11 @@ async function fetchStats() {
   const lastDay = new Date(year, month, 0).getDate()
   const endDate = `${year}-${String(month).padStart(2, '0')}-${lastDay}`
   try {
-    const res = await getScheduleStats({ startDate, endDate, workCenter: filter.workCenter || undefined })
+    const res = await getScheduleStats({ startDate, endDate })
     shiftStats.value = (res as any).shiftStats ?? []
     stats.unscheduledCount = (res as any).unscheduledCount ?? 0
   } catch (e: any) {
-    Message.error(e.message || '加载统计失败')
+    Message.error(e.message || t('hr.schedules.加载统计失败'))
   }
 }
 
@@ -369,8 +370,14 @@ async function handleCreateSubmit() {
   try {
     await createFormRef.value?.validate()
     submitLoading.value = true
-    await createSchedule(createForm)
-    Message.success('排班创建成功')
+    const payload: any = { ...createForm }
+    payload.empId = Number(payload.empId)
+    // shiftCode → shiftId mapping
+    const shift = shifts.value.find((s: any) => s.code === createForm.shiftCode)
+    if (shift) payload.shiftId = shift.id
+    delete payload.shiftCode
+    await createSchedule(payload)
+    Message.success(t('hr.schedules.排班创建成功'))
     createModalVisible.value = false
     fetchSchedules()
     fetchStats()
@@ -391,14 +398,18 @@ async function handleBatchSubmit() {
   try {
     await batchFormRef.value?.validate()
     batchLoading.value = true
-    await batchCreateSchedule({
-      empIds: batchForm.empIds,
-      startDate: batchForm.dateRange[0],
-      endDate: batchForm.dateRange[1],
-      shiftCode: batchForm.shiftCode,
-      workCenter: batchForm.workCenter || undefined,
-    })
-    Message.success('批量排班成功')
+    const shift = shifts.value.find((s: any) => s.code === batchForm.shiftCode)
+    if (!shift) { Message.error(t('hr.schedules.请选择班次')); return }
+    for (const empId of batchForm.empIds) {
+      await batchCreateSchedule({
+        empId: Number(empId),
+        shiftId: shift.id,
+        startDate: batchForm.dateRange[0],
+        endDate: batchForm.dateRange[1],
+        workCenterId: undefined,
+      })
+    }
+    Message.success(t('hr.schedules.批量排班成功'))
     batchModalVisible.value = false
     fetchSchedules()
     fetchStats()
@@ -414,11 +425,11 @@ async function handleDeleteSchedule(item: any) {
   if (isPastDate(selectedDate.value)) return
   try {
     await deleteSchedule(item.id)
-    Message.success('删除成功')
+    Message.success(t('hr.schedules.删除成功'))
     fetchSchedules()
     fetchStats()
   } catch (e: any) {
-    Message.error(e.message || '删除失败')
+    Message.error(e.message || t('hr.schedules.删除失败'))
   }
 }
 </script>

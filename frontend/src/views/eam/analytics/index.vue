@@ -24,7 +24,9 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { ref, reactive, onMounted, onUnmounted, nextTick } from 'vue'
+const { t } = useI18n()
 import * as echarts from 'echarts/core'
 import { BarChart, LineChart } from 'echarts/charts'
 import { GridComponent, TooltipComponent, LegendComponent } from 'echarts/components'
@@ -53,14 +55,14 @@ async function loadData() {
       costChart.setOption({
         backgroundColor: 'transparent',
         tooltip: { trigger: 'axis', backgroundColor: '#161B22', borderColor: '#30363D', textStyle: { color: '#E6EDF3' } },
-        legend: { data: ['人工成本', '备件成本', '外委成本'], textStyle: { color: '#8B949E' }, top: 0 },
+        legend: { data: [t('eam.analytics.lbl1040'), t('eam.analytics.lbl1041'), t('eam.analytics.lbl1042')], textStyle: { color: '#8B949E' }, top: 0 },
         grid: { top: 40, right: 20, bottom: 30, left: 60 },
         xAxis: { type: 'category', data: trend.map(d => d.month), axisLabel: { color: '#8B949E' }, axisLine: { lineStyle: { color: '#30363D' } } },
         yAxis: { type: 'value', axisLabel: { color: '#8B949E' }, splitLine: { lineStyle: { color: '#21262D' } } },
         series: [
-          { name: '人工成本', type: 'bar', stack: 'cost', data: trend.map(d => d.labor), itemStyle: { color: '#1B4FD8' } },
-          { name: '备件成本', type: 'bar', stack: 'cost', data: trend.map(d => d.parts), itemStyle: { color: '#00D4C8' } },
-          { name: '外委成本', type: 'bar', stack: 'cost', data: trend.map(d => d.outsource), itemStyle: { color: '#FF6B35' } },
+          { name: t('eam.analytics.lbl1043'), type: 'bar', stack: 'cost', data: trend.map(d => d.labor), itemStyle: { color: '#1B4FD8' } },
+          { name: t('eam.analytics.lbl1044'), type: 'bar', stack: 'cost', data: trend.map(d => d.parts), itemStyle: { color: '#00D4C8' } },
+          { name: t('eam.analytics.lbl1045'), type: 'bar', stack: 'cost', data: trend.map(d => d.outsource), itemStyle: { color: '#FF6B35' } },
         ],
       })
     }
@@ -72,16 +74,16 @@ async function loadData() {
       paretoChart.setOption({
         backgroundColor: 'transparent',
         tooltip: { trigger: 'axis', backgroundColor: '#161B22', borderColor: '#30363D', textStyle: { color: '#E6EDF3' } },
-        legend: { data: ['故障次数', '累计占比'], textStyle: { color: '#8B949E' }, top: 0 },
+        legend: { data: [t('eam.analytics.lbl1046'), t('eam.analytics.lbl1047')], textStyle: { color: '#8B949E' }, top: 0 },
         grid: { top: 40, right: 60, bottom: 30, left: 60 },
         xAxis: { type: 'category', data: pareto.map(d => d.type), axisLabel: { color: '#8B949E', rotate: 30 }, axisLine: { lineStyle: { color: '#30363D' } } },
         yAxis: [
-          { type: 'value', name: '次数', axisLabel: { color: '#8B949E' }, splitLine: { lineStyle: { color: '#21262D' } } },
-          { type: 'value', name: '累计占比', min: 0, max: 100, axisLabel: { color: '#8B949E', formatter: '{value}%' }, splitLine: { show: false } },
+          { type: 'value', name: t('eam.analytics.lbl1048'), axisLabel: { color: '#8B949E' }, splitLine: { lineStyle: { color: '#21262D' } } },
+          { type: 'value', name: t('eam.analytics.lbl1049'), min: 0, max: 100, axisLabel: { color: '#8B949E', formatter: '{value}%' }, splitLine: { show: false } },
         ],
         series: [
-          { name: '故障次数', type: 'bar', data: pareto.map(d => d.count), itemStyle: { color: '#1B4FD8', borderRadius: [4, 4, 0, 0] } },
-          { name: '累计占比', type: 'line', yAxisIndex: 1, data: pareto.map(d => (d.cumRate * 100).toFixed(1)), smooth: false, lineStyle: { color: '#FF6B35', width: 2 }, itemStyle: { color: '#FF6B35' } },
+          { name: t('eam.analytics.lbl1050'), type: 'bar', data: pareto.map(d => d.count), itemStyle: { color: '#1B4FD8', borderRadius: [4, 4, 0, 0] } },
+          { name: t('eam.analytics.lbl1051'), type: 'line', yAxisIndex: 1, data: pareto.map(d => (d.cumRate * 100).toFixed(1)), smooth: false, lineStyle: { color: '#FF6B35', width: 2 }, itemStyle: { color: '#FF6B35' } },
         ],
       })
     }

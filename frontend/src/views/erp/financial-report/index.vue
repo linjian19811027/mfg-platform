@@ -3,7 +3,7 @@
     <a-card :bordered="false" style="margin-bottom: 16px">
       <a-space wrap>
         <a-date-picker v-model="query.period" :placeholder="$t('erp.financial-report.index.会计期间')" picker="month" style="width: 140px" />
-        <a-button type="primary" :loading="loading" @click="loadData">生成报表</a-button>
+        <a-button type="primary" :loading="loading" @click="loadData">{{ $t('erp.financial-report.generateReport') }}</a-button>
       </a-space>
     </a-card>
     <a-card :bordered="false">
@@ -25,7 +25,6 @@
   </div>
 </template>
 <script setup lang="ts">
-
 import { ref, reactive, computed, onMounted } from 'vue'
 import { erpExtApi } from '@/api/erp-ext'
 const loading = ref(false); const activeTab = ref('balance'); const query = reactive({ period: '' })

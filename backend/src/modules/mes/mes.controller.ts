@@ -190,6 +190,22 @@ export class MesController {
     return this.reportSvc.findAll(query);
   }
 
+  @Get('labor-records')
+  @ApiOperation({ summary: '工时记录查询' })
+  getLaborRecords(
+    @Query()
+    query: {
+      operatorId?: string;
+      woId?: string;
+      startDate?: string;
+      endDate?: string;
+      page?: number;
+      pageSize?: number;
+    },
+  ) {
+    return this.reportSvc.findAllLabor(query);
+  }
+
   @Put('production-reports/:id/correct')
   @ApiOperation({ summary: '报工修正（仅班长/质检员）' })
   correctReport(

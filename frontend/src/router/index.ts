@@ -111,6 +111,9 @@ const routes: RouteRecordRaw[] = [
       // BASE
       { path: 'base/batch', name: 'BaseBatch', component: () => import('@/views/base/batch/index.vue') },
       { path: 'base/file', name: 'BaseFile', component: () => import('@/views/base/file/index.vue') },
+      { path: 'base/shifts', name: 'BaseShift', component: () => import('@/views/base/shifts/index.vue') },
+      { path: 'base/certification-types', name: 'BaseCertType', component: () => import('@/views/base/certification-types/index.vue') },
+      { path: 'base/work-centers', name: 'BaseWorkCenter', component: () => import('@/views/base/work-center/index.vue') },
       // SYS
       { path: 'sys/user', name: 'SysUser', component: () => import('@/views/sys/user/index.vue') },
       { path: 'sys/role', name: 'SysRole', component: () => import('@/views/sys/role/index.vue') },

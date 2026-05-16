@@ -6,19 +6,19 @@
         <a-card :bordered="false" :loading="loading" class="stat-card">
           <div class="stat-header">
             <icon-cloud style="color: #165dff; font-size: 24px" />
-            <span class="stat-title">系统状态</span>
+            <span class="stat-title">{{ $t('sys.monitor.lbl1689') }}</span>
           </div>
           <a-tag :color="health.status === 'UP' ? 'green' : 'red'" size="large" style="margin-top: 8px">
-            {{ health.status === 'UP' ? '● 运行正常' : '● 异常' }}
+            {{ health.status === 'UP' ? $t('sys.monitor.lbl1690') : $t('sys.monitor.lbl1691') }}
           </a-tag>
-          <div class="stat-sub">运行模式：{{ health.mode }}</div>
+          <div class="stat-sub">{{ $t('sys.monitor.r22013', {mode: health.mode}) }}</div>
         </a-card>
       </a-col>
       <a-col :span="6">
         <a-card :bordered="false" :loading="loading" class="stat-card">
           <div class="stat-header">
             <icon-computer style="color: #00b42a; font-size: 24px" />
-            <span class="stat-title">CPU 使用率</span>
+            <span class="stat-title">{{ $t('sys.monitor.lbl1692') }}</span>
           </div>
           <a-progress
             :percent="metrics.cpu?.usagePercent ?? 0"
@@ -26,14 +26,14 @@
             :stroke-width="8"
             style="margin-top: 8px"
           />
-          <div class="stat-sub">{{ metrics.cpu?.cores }} 核 · 负载 {{ metrics.cpu?.loadAvg1m }}</div>
+          <div class="stat-sub">{{ $t('sys.monitor.r33067', {cores: metrics.cpu?.cores}) }} · {{ $t('sys.monitor.r33068', {loadAvg1m: metrics.cpu?.loadAvg1m}) }}</div>
         </a-card>
       </a-col>
       <a-col :span="6">
         <a-card :bordered="false" :loading="loading" class="stat-card">
           <div class="stat-header">
             <icon-storage style="color: #ff7d00; font-size: 24px" />
-            <span class="stat-title">内存使用率</span>
+            <span class="stat-title">{{ $t('sys.monitor.lbl1693') }}</span>
           </div>
           <a-progress
             :percent="metrics.memory?.usagePercent ?? 0"
@@ -48,10 +48,10 @@
         <a-card :bordered="false" :loading="loading" class="stat-card">
           <div class="stat-header">
             <icon-apps style="color: #722ed1; font-size: 24px" />
-            <span class="stat-title">数据库连接</span>
+            <span class="stat-title">{{ $t('sys.monitor.lbl1694') }}</span>
           </div>
           <div class="stat-big">{{ metrics.database?.connections ?? 0 }}</div>
-          <div class="stat-sub">活跃 {{ metrics.database?.activeConnections ?? 0 }} · 慢查询 {{ metrics.database?.slowQueries ?? 0 }}</div>
+          <div class="stat-sub">{{ $t('sys.monitor.r22014', {activeConnections: metrics.database?.activeConnections ?? 0}) }}</div>
         </a-card>
       </a-col>
     </a-row>
@@ -137,6 +137,8 @@ import { Message } from '@arco-design/web-vue'
 import { IconCloud, IconComputer, IconStorage, IconApps, IconRefresh } from '@arco-design/web-vue/es/icon'
 import * as echarts from 'echarts'
 import { getHealth, getMetrics, getMetricsTrend } from '@/api/monitor'
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 
 const loading = ref(false)
 const health = ref<any>({ status: 'UP', mode: 'DEGRADED' })
@@ -167,7 +169,7 @@ function formatUptime(sec?: number) {
   const d = Math.floor(sec / 86400)
   const h = Math.floor((sec % 86400) / 3600)
   const m = Math.floor((sec % 3600) / 60)
-  return d > 0 ? `${d}天 ${h}小时` : h > 0 ? `${h}小时 ${m}分` : `${m}分钟`
+  return d > 0 ? t('sys.monitor.uptimeDays', { d, h }) : h > 0 ? t('sys.monitor.uptimeHours', { h, m }) : t('sys.monitor.uptimeMinutes', { m })
 }
 
 async function refresh() {
@@ -179,7 +181,7 @@ async function refresh() {
     trend.value = ((t as any).data ?? t)?.points ?? []
     renderCharts()
   } catch (e: any) {
-    Message.error(e.message || '加载失败')
+    Message.error(e.message || t('sys.加载失败'))
   } finally {
     loading.value = false
   }
@@ -198,14 +200,14 @@ function renderTrend() {
   const times = trend.value.map(p => p.time)
   trendChart.setOption({
     tooltip: { trigger: 'axis' },
-    legend: { data: ['操作', '登录', '错误'], bottom: 0 },
+    legend: { data: [t('sys.monitor.action'), t('sys.monitor.lbl1695'), t('sys.monitor.lbl1696')], bottom: 0 },
     grid: { left: 40, right: 20, top: 20, bottom: 40 },
     xAxis: { type: 'category', data: times, axisLabel: { interval: 9, fontSize: 11 } },
     yAxis: { type: 'value', minInterval: 1 },
     series: [
-      { name: '操作', type: 'line', smooth: true, data: trend.value.map(p => p.operations), itemStyle: { color: '#165dff' }, areaStyle: { opacity: 0.1 } },
-      { name: '登录', type: 'line', smooth: true, data: trend.value.map(p => p.logins), itemStyle: { color: '#00b42a' }, areaStyle: { opacity: 0.1 } },
-      { name: '错误', type: 'line', smooth: true, data: trend.value.map(p => p.errors), itemStyle: { color: '#f53f3f' }, areaStyle: { opacity: 0.1 } },
+      { name: t('sys.monitor.action'), type: 'line', smooth: true, data: trend.value.map(p => p.operations), itemStyle: { color: '#165dff' }, areaStyle: { opacity: 0.1 } },
+      { name: t('sys.monitor.lbl1697'), type: 'line', smooth: true, data: trend.value.map(p => p.logins), itemStyle: { color: '#00b42a' }, areaStyle: { opacity: 0.1 } },
+      { name: t('sys.monitor.lbl1698'), type: 'line', smooth: true, data: trend.value.map(p => p.errors), itemStyle: { color: '#f53f3f' }, areaStyle: { opacity: 0.1 } },
     ],
   })
 }
@@ -220,10 +222,10 @@ function renderMem() {
     series: [{
       type: 'pie', radius: ['45%', '70%'], center: ['50%', '50%'],
       data: [
-        { name: '进程堆', value: proc.heapUsedMB ?? 0, itemStyle: { color: '#165dff' } },
-        { name: '进程RSS', value: Math.max(0, (proc.rssMB ?? 0) - (proc.heapUsedMB ?? 0)), itemStyle: { color: '#722ed1' } },
-        { name: '系统空闲', value: m.freeMB ?? 0, itemStyle: { color: '#e5e6eb' } },
-        { name: '其他占用', value: Math.max(0, (m.usedMB ?? 0) - (proc.rssMB ?? 0)), itemStyle: { color: '#ff7d00' } },
+        { name: t('sys.monitor.lbl1699'), value: proc.heapUsedMB ?? 0, itemStyle: { color: '#165dff' } },
+        { name: t('sys.monitor.lbl1700'), value: Math.max(0, (proc.rssMB ?? 0) - (proc.heapUsedMB ?? 0)), itemStyle: { color: '#722ed1' } },
+        { name: t('sys.monitor.lbl1701'), value: m.freeMB ?? 0, itemStyle: { color: '#e5e6eb' } },
+        { name: t('sys.monitor.lbl1702'), value: Math.max(0, (m.usedMB ?? 0) - (proc.rssMB ?? 0)), itemStyle: { color: '#ff7d00' } },
       ],
       label: { fontSize: 11 },
     }],
@@ -237,7 +239,7 @@ function renderCpu() {
   cpuChart.setOption({
     tooltip: { trigger: 'axis' },
     grid: { left: 50, right: 20, top: 20, bottom: 30 },
-    xAxis: { type: 'category', data: ['1分钟', '5分钟', '15分钟'] },
+    xAxis: { type: 'category', data: [t('sys.monitor.lbl1703'), t('sys.monitor.lbl1704'), t('sys.monitor.lbl1705')] },
     yAxis: { type: 'value', max: Math.max(cpu.cores ?? 1, cpu.loadAvg15m ?? 1) * 1.2 },
     series: [{
       type: 'bar', barWidth: '40%',
@@ -260,9 +262,9 @@ function renderLogPie() {
     series: [{
       type: 'pie', radius: '70%', center: ['50%', '50%'],
       data: [
-        { name: '操作', value: logs.operations ?? 0, itemStyle: { color: '#165dff' } },
-        { name: '登录', value: logs.logins ?? 0, itemStyle: { color: '#00b42a' } },
-        { name: '错误', value: logs.errors ?? 0, itemStyle: { color: '#f53f3f' } },
+        { name: t('sys.monitor.action'), value: logs.operations ?? 0, itemStyle: { color: '#165dff' } },
+        { name: t('sys.monitor.lbl1706'), value: logs.logins ?? 0, itemStyle: { color: '#00b42a' } },
+        { name: t('sys.monitor.lbl1707'), value: logs.errors ?? 0, itemStyle: { color: '#f53f3f' } },
       ],
       label: { fontSize: 11 },
     }],

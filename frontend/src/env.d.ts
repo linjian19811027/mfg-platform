@@ -2,12 +2,18 @@
 
 declare module '*.vue' {
   import type { DefineComponent } from 'vue'
-  const component: DefineComponent<Record<string, unknown>, Record<string, unknown>, unknown>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const component: DefineComponent<object, object, any>
   export default component
 }
 
 interface ImportMetaEnv {
-  readonly VITE_API_BASE_URL: string
+  /** API 代理前缀 */
+  readonly VITE_API_BASE: string
+  /** 应用标题 */
+  readonly VITE_APP_TITLE: string
+  /** OSS 文件存储域名 */
+  readonly VITE_OSS_DOMAIN: string
 }
 
 interface ImportMeta {

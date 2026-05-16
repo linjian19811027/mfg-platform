@@ -14,7 +14,7 @@
           <MTable :columns="qualColumns" :data="qualData" :loading="qualLoading" :total="qualData.length" :show-column-config="false">
             <template #status="{ record }">
               <a-tag :color="record.status === 'EXPIRED' ? 'red' : record.status === 'EXPIRING' ? 'orange' : 'green'">
-                {{ record.status === 'EXPIRED' ? '已过期' : record.status === 'EXPIRING' ? '即将到期' : '有效' }}
+                {{ record.status === 'EXPIRED' ? t('scm.supplier-performance.r33065') : record.status === 'EXPIRING' ? $t('scm.supplier-performance.expiring') : $t('scm.supplier-performance.valid') }}
               </a-tag>
             </template>
           </MTable>
@@ -70,7 +70,7 @@ async function loadPerformance() {
           axisLabel: { color: '#8B949E', rotate: 30, fontSize: 11 },
           axisLine: { lineStyle: { color: '#30363D' } },
         },
-        yAxis: { type: 'value', max: 100, axisLabel: { color: '#8B949E', formatter: '{value}分' }, splitLine: { lineStyle: { color: '#21262D' } } },
+        yAxis: { type: 'value', max: 100, axisLabel: { color: '#8B949E', formatter: t('scm.supplier-performance.lbl1644') }, splitLine: { lineStyle: { color: '#21262D' } } },
         series: [{
           type: 'bar',
           data: ranking.map(r => ({ value: r.score, itemStyle: { color: r.score >= 80 ? '#00B578' : r.score >= 60 ? '#FF6B35' : '#F53F3F', borderRadius: [4, 4, 0, 0] } })),

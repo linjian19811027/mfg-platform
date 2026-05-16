@@ -8,9 +8,9 @@
       </a-space>
       <template #extra>
         <a-space>
-          <a-button type="primary" @click="openDrawer(null)">新建备件</a-button>
-          <a-button @click="openInOutModal('IN')">入库</a-button>
-          <a-button @click="openInOutModal('OUT')">出库</a-button>
+          <a-button type="primary" @click="openDrawer(null)">{{ $t('eam.spare-part.index.新建备件') }}</a-button>
+          <a-button @click="openInOutModal('IN')">{{ $t('eam.spare-part.index.入库') }}</a-button>
+          <a-button @click="openInOutModal('OUT')">{{ $t('eam.spare-part.index.出库') }}</a-button>
         </a-space>
       </template>
     </a-card>
@@ -19,25 +19,25 @@
       <MTable :columns="columns" :data="tableData" :loading="loading" :total="total" :page-size="20" @change="onTableChange">
         <template #stockStatus="{ record }">
           <a-tag :color="(record.qty as number) < (record.safetyQty as number) ? 'red' : 'green'">
-            {{ (record.qty as number) < (record.safetyQty as number) ? '库存不足' : '正常' }}
+            {{ (record.qty as number) < (record.safetyQty as number) ? $t('common.sparePart.stockLow') : $t('common.status.normal') }}
           </a-tag>
         </template>
         <template #action="{ record }">
           <a-space>
             <a-link @click="openDrawer(record as unknown as SparePart)">{{ $t('common.edit') }}</a-link>
-            <a-link @click="openTransactionDrawer(record.id as string)">流水</a-link>
+            <a-link @click="openTransactionDrawer(record.id as string)">{{ $t('eam.spare-part.index.流水') }}</a-link>
           </a-space>
         </template>
       </MTable>
     </a-card>
 
     <!-- 新建/编辑抽屉 -->
-    <a-drawer v-model:visible="drawerVisible" :title="editing ? '编辑备件' : '新建备件'" :width="480" @cancel="drawerVisible = false">
+    <a-drawer v-model:visible="drawerVisible" :title="editing ? $t('eam.spare-part.index.编辑备件') : $t('eam.spare-part.index.新建备件')" :width="480" @cancel="drawerVisible = false">
       <MForm :schema="formSchema" v-model="formData" :loading="saving" :submit-text="$t('eam.spare-part.index.保存')" @submit="handleSave" @cancel="drawerVisible = false" />
     </a-drawer>
 
     <!-- 入库/出库弹窗 -->
-    <a-modal v-model:visible="inOutModalVisible" :title="inOutType === 'IN' ? '备件入库' : '备件出库'" :ok-loading="inOutting" @ok="handleInOut" @cancel="inOutModalVisible = false">
+    <a-modal v-model:visible="inOutModalVisible" :title="inOutType === 'IN' ? $t('eam.spare-part.index.备件入库') : $t('eam.spare-part.index.备件出库')" :ok-loading="inOutting" @ok="handleInOut" @cancel="inOutModalVisible = false">
       <a-form layout="vertical">
         <a-form-item :label="$t('eam.spare-part.index.备件ID')" required><a-input v-model="inOutForm.sparePartId" /></a-form-item>
         <a-form-item :label="$t('eam.spare-part.index.数量')" required><a-input-number v-model="inOutForm.qty" :min="1" style="width:100%" /></a-form-item>
@@ -50,7 +50,7 @@
       <a-table :columns="txColumns" :data="transactions" :loading="txLoading" :pagination="false" row-key="id" size="small">
         <template #type="{ record }">
           <a-tag :color="record.type === 'IN' ? 'green' : record.type === 'OUT' ? 'red' : 'orange'">
-            {{ { IN: '入库', OUT: '出库', ISSUE: '领用' }[record.type as string] ?? record.type }}
+            {{ { IN: t('common.sparePart.type.in'), OUT: t('common.sparePart.type.out'), ISSUE: t('common.sparePart.type.issue') }[record.type as string] ?? record.type }}
           </a-tag>
         </template>
       </a-table>
@@ -93,11 +93,11 @@ const txColumns = [
 ]
 
 const formSchema: MFormField[] = [
-  { field: 'code', label: '备件编码', type: 'input', required: true },
-  { field: 'name', label: '备件名称', type: 'input', required: true },
-  { field: 'spec', label: '规格型号', type: 'input' },
-  { field: 'safetyQty', label: '安全库存', type: 'number', required: true, props: { min: 0 } },
-  { field: 'unit', label: '单位', type: 'input', required: true },
+  { field: 'code', label: t('eam.spare-part.index.备件编码'), type: 'input', required: true },
+  { field: 'name', label: t('eam.spare-part.index.备件名称'), type: 'input', required: true },
+  { field: 'spec', label: t('eam.spare-part.index.规格'), type: 'input' },
+  { field: 'safetyQty', label: t('eam.spare-part.index.安全库存'), type: 'number', required: true, props: { min: 0 } },
+  { field: 'unit', label: t('eam.spare-part.index.单位'), type: 'uom-select', required: true },
 ]
 
 async function loadData() {
@@ -126,8 +126,8 @@ function openDrawer(item: SparePart | null) {
 async function handleSave(data: Record<string, unknown>) {
   saving.value = true
   try {
-    if (editing.value) { await eamApi.updateSparePart(editing.value.id, data); Message.success('更新成功') }
-    else { await eamApi.createSparePart(data); Message.success('创建成功') }
+    if (editing.value) { await eamApi.updateSparePart(editing.value.id, data); Message.success(t('common.msg.updateSuccess')) }
+    else { await eamApi.createSparePart(data); Message.success(t('common.msg.createSuccess')) }
     drawerVisible.value = false; loadData()
   } catch { /* handled */ } finally { saving.value = false }
 }
@@ -147,7 +147,7 @@ function openInOutModal(type: 'IN' | 'OUT') {
 }
 
 async function handleInOut() {
-  if (!inOutForm.sparePartId || !inOutForm.qty) { Message.warning('请填写备件ID和数量'); return }
+  if (!inOutForm.sparePartId || !inOutForm.qty) { Message.warning(t('common.sparePart.msg.fillIdQty')); return }
   inOutting.value = true
   try {
     if (inOutType.value === 'IN') {
@@ -155,7 +155,7 @@ async function handleInOut() {
     } else {
       await eamApi.issueSparePart(inOutForm.sparePartId, { qty: inOutForm.qty, remark: inOutForm.remark })
     }
-    Message.success(inOutType.value === 'IN' ? '入库成功' : '出库成功')
+    Message.success(inOutType.value === 'IN' ? t('common.sparePart.msg.inSuccess') : t('common.sparePart.msg.outSuccess'))
     inOutModalVisible.value = false
     loadData()
   } catch { /* handled */ } finally { inOutting.value = false }

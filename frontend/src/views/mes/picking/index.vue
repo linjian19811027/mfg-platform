@@ -21,10 +21,10 @@
       <!-- 工单信息 -->
       <a-card :bordered="false" style="margin-bottom: 16px">
         <a-descriptions :column="4" :data="[
-          { label: '工单号', value: currentWo.code },
-          { label: '物料名称', value: currentWo.materialName ?? currentWo.materialId },
-          { label: '计划数量', value: currentWo.plannedQty },
-          { label: '状态', value: currentWo.status },
+          { label: t('mes.picking.workOrderCode'), value: currentWo.code },
+          { label: t('mes.picking.lbl1295'), value: currentWo.materialName ?? currentWo.materialId },
+          { label: t('mes.picking.lbl1296'), value: currentWo.plannedQty },
+          { label: t('mes.picking.status'), value: currentWo.status },
         ]" />
       </a-card>
 
@@ -33,7 +33,7 @@
         <a-table :columns="kitColumns" :data="kitItems" :pagination="false" row-key="materialId">
           <template #sufficient="{ record }">
             <a-tag :color="record.sufficient ? 'green' : 'red'">
-              {{ record.sufficient ? '齐套' : `缺料 ${record.required - record.available}` }}
+              {{ record.sufficient ? t('mes.picking.lbl1297') : `${t('mes.picking.r33029')} ${record.required - record.available}` }}
             </a-tag>
           </template>
         </a-table>
@@ -41,11 +41,11 @@
 
       <!-- 领料记录 -->
       <a-card :bordered="false">
-        <template #title>领料记录</template>
+        <template #title>{{ $t('mes.picking.lbl1298') }}</template>
         <template #extra>
           <a-space>
-            <a-button type="primary" @click="openIssueModal">扫码领料</a-button>
-            <a-button @click="openReturnModal">退料</a-button>
+            <a-button type="primary" @click="openIssueModal">{{ $t('mes.picking.lbl1299') }}</a-button>
+            <a-button @click="openReturnModal">{{ $t('mes.picking.lbl1300') }}</a-button>
           </a-space>
         </template>
         <MTable :columns="issueColumns" :data="issueList" :loading="issueLoading" :total="issueTotal" @change="onIssueChange" />
@@ -128,12 +128,12 @@ const issueColumns: MTableColumn[] = [
 ]
 
 async function searchWorkOrder() {
-  if (!woCode.value.trim()) { Message.warning('请输入工单号'); return }
+  if (!woCode.value.trim()) { Message.warning(t('mes.请输入工单号')); return }
   woLoading.value = true
   try {
     const res = await mesApi.getMesWorkOrders({ code: woCode.value.trim(), pageSize: 1 })
     const wo = res.list?.[0]
-    if (!wo) { Message.warning('未找到工单'); return }
+    if (!wo) { Message.warning(t('mes.未找到工单')); return }
     currentWo.value = wo
     loadKitCheck(wo.id)
     loadIssues(wo.id)
@@ -178,14 +178,14 @@ function focusQty() { nextTick(() => qtyInputRef.value?.focus()) }
 
 async function handleIssue() {
   if (!currentWo.value) return
-  if (!issueForm.materialCode || !issueForm.qty) { Message.warning('请填写物料编码和数量'); return }
+  if (!issueForm.materialCode || !issueForm.qty) { Message.warning(t('mes.请填写物料编码和数量')); return }
   issuing.value = true
   try {
     await mesApi.issueMaterials(currentWo.value.id, {
       items: [{ materialId: issueForm.materialCode, batchId: issueForm.batchId || undefined, qty: issueForm.qty, uomId: issueForm.unit }],
       operatorId: authStore.userId ?? 'system',
     })
-    Message.success('领料成功')
+    Message.success(t('mes.领料成功'))
     issueModalVisible.value = false
     loadIssues(currentWo.value.id)
   } catch { /* handled */ } finally { issuing.value = false }
@@ -200,14 +200,14 @@ function openReturnModal() { Object.assign(returnForm, { materialCode: '', qty: 
 
 async function handleReturn() {
   if (!currentWo.value) return
-  if (!returnForm.materialCode || !returnForm.qty) { Message.warning('请填写物料编码和数量'); return }
+  if (!returnForm.materialCode || !returnForm.qty) { Message.warning(t('mes.请填写物料编码和数量')); return }
   returning.value = true
   try {
     await mesApi.returnMaterials(currentWo.value.id, {
       items: [{ materialId: returnForm.materialCode, qty: returnForm.qty }],
       operatorId: authStore.userId ?? 'system',
     })
-    Message.success('退料成功')
+    Message.success(t('mes.退料成功'))
     returnModalVisible.value = false
     loadIssues(currentWo.value.id)
   } catch { /* handled */ } finally { returning.value = false }

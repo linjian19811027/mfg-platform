@@ -22,8 +22,8 @@ export class PermissionsGuard implements CanActivate {
     const request = context.switchToHttp().getRequest<{ user: JwtPayload }>();
     const user = request.user;
 
-    // ADMIN 角色拥有全部权限
-    if (user?.roles?.includes('ADMIN')) return true;
+    // SUPER_ADMIN / TENANT_ADMIN 角色拥有全部权限
+    if (user?.roles?.includes('SUPER_ADMIN') || user?.roles?.includes('TENANT_ADMIN')) return true;
 
     const hasPermission = required.every((p) => user?.permissions?.includes(p));
     if (!hasPermission) {

@@ -9,9 +9,9 @@
     </a-card>
 
     <a-card :bordered="false">
-      <template #title>在制品（WIP）</template>
+      <template #title>{{ $t('mes.wip.wip') }}</template>
       <template #extra>
-        <a-tag color="blue">共 {{ total }} 条在制工单</a-tag>
+        <a-tag color="blue">{{ $t('mes.wip.r22007', {total: total}) }}</a-tag>
       </template>
       <MTable
         :columns="columns"

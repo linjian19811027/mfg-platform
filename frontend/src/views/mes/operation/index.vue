@@ -10,7 +10,7 @@
     </a-card>
 
     <a-card v-if="currentWo" :bordered="false">
-      <template #title>{{ currentWo.code }} — 工序列表</template>
+      <template #title>{{ currentWo.code }} — {{ $t('mes.operation.opList') }}</template>
       <a-table :columns="opColumns" :data="operations" :pagination="false" row-key="id" :loading="loading">
         <template #status="{ record }">
           <a-tag :color="opStatusColor(record.status as string)">{{ opStatusLabel(record.status as string) }}</a-tag>
@@ -21,10 +21,10 @@
         </template>
         <template #action="{ record }">
           <a-space>
-            <a-button v-if="record.status === 'pending'" type="primary" size="mini" @click="openStartModal(record as WorkOrderOperation)">开工</a-button>
+            <a-button v-if="record.status === 'pending'" type="primary" size="mini" @click="openStartModal(record as WorkOrderOperation)">{{ $t('mes.operation.lbl1287') }}</a-button>
             <template v-if="record.status === 'in_progress'">
-              <a-button status="success" size="mini" @click="openCompleteModal(record as WorkOrderOperation)">完工</a-button>
-              <a-button status="warning" size="mini" @click="openExceptionModal(record as WorkOrderOperation)">异常</a-button>
+              <a-button status="success" size="mini" @click="openCompleteModal(record as WorkOrderOperation)">{{ $t('mes.operation.lbl1288') }}</a-button>
+              <a-button status="warning" size="mini" @click="openExceptionModal(record as WorkOrderOperation)">{{ $t('mes.operation.lbl1289') }}</a-button>
             </template>
           </a-space>
         </template>
@@ -47,7 +47,7 @@
             style="width: 100%"
             @search="searchEquipments"
           >
-            <a-option v-for="e in equipmentOptions" :key="e.id" :value="e.id" :label="`${e.code} - ${e.name}`" />
+            <a-option v-for="e in equipmentOptions" :key="e.id" :value="e.id" :label="`${e.equipmentCode} - ${e.equipmentName}`" />
           </a-select>
         </a-form-item>
         <a-form-item :label="$t('mes.operation.index.物料已确认')"><a-switch v-model="startForm.materialConfirmed" /></a-form-item>
@@ -70,10 +70,10 @@
       <a-form :model="exceptionForm" layout="vertical">
         <a-form-item :label="$t('mes.operation.index.异常类型')" required>
           <a-select v-model="exceptionForm.exceptionType">
-            <a-option value="EQUIPMENT_FAILURE">设备故障</a-option>
-            <a-option value="QUALITY_ISSUE">质量问题</a-option>
-            <a-option value="MATERIAL_SHORTAGE">物料短缺</a-option>
-            <a-option value="OTHER">其他</a-option>
+            <a-option value="EQUIPMENT_FAILURE">{{ $t('mes.operation.lbl1290') }}</a-option>
+            <a-option value="QUALITY_ISSUE">{{ $t('mes.operation.lbl1291') }}</a-option>
+            <a-option value="MATERIAL_SHORTAGE">{{ $t('mes.operation.lbl1292') }}</a-option>
+            <a-option value="OTHER">{{ $t('mes.operation.lbl1293') }}</a-option>
           </a-select>
         </a-form-item>
         <a-form-item :label="$t('mes.operation.index.异常原因')" required>
@@ -109,16 +109,16 @@ const opColumns = [
 ]
 
 function opStatusColor(s: string) { return s === 'completed' ? 'green' : s === 'in_progress' ? 'orange' : 'gray' }
-function opStatusLabel(s: string) { return s === 'completed' ? '已完成' : s === 'in_progress' ? '进行中' : '待开始' }
+function opStatusLabel(s: string) { return s === 'completed' ? t('mes.operation.completed') : s === 'in_progress' ? t('mes.operation.inProgress') : t('mes.operation.lbl1294') }
 function calcPercent(done: number, total: number) { return total ? Math.min(100, Math.round(done / total * 100)) : 0 }
 
 async function searchWorkOrder() {
-  if (!woCode.value.trim()) { Message.warning('请输入工单号'); return }
+  if (!woCode.value.trim()) { Message.warning(t('mes.请输入工单号')); return }
   loading.value = true
   try {
     const res = await mesApi.getMesWorkOrders({ code: woCode.value.trim(), pageSize: 1 })
     const wo = res.list?.[0]
-    if (!wo) { Message.warning('未找到工单'); return }
+    if (!wo) { Message.warning(t('mes.未找到工单')); return }
     const detail = await mesApi.getMesWorkOrder(wo.id)
     currentWo.value = detail
     operations.value = detail.operations ?? []
@@ -157,7 +157,7 @@ async function handleStart() {
   operating.value = true
   try {
     await mesApi.startOperation(currentOp.value.id, { ...startForm })
-    Message.success('开工成功')
+    Message.success(t('mes.开工成功'))
     startModalVisible.value = false
     if (currentWo.value) { const d = await mesApi.getMesWorkOrder(currentWo.value.id); operations.value = d.operations ?? [] }
   } catch { /* handled */ } finally { operating.value = false }
@@ -168,11 +168,11 @@ const completeModalVisible = ref(false)
 const completeForm = reactive({ completedQty: 1, scrapQty: 0, actualHours: 0, outputBatchId: '' })
 function openCompleteModal(op: WorkOrderOperation) { currentOp.value = op; Object.assign(completeForm, { completedQty: op.plannedQty, scrapQty: 0, actualHours: 0, outputBatchId: '' }); completeModalVisible.value = true }
 async function handleComplete() {
-  if (!currentOp.value || !completeForm.completedQty) { Message.warning('请填写完成数量'); return }
+  if (!currentOp.value || !completeForm.completedQty) { Message.warning(t('mes.请填写完成数量')); return }
   operating.value = true
   try {
     await mesApi.completeOperation(currentOp.value.id, { completedQty: completeForm.completedQty, scrapQty: completeForm.scrapQty, actualHours: completeForm.actualHours || undefined, outputBatchId: completeForm.outputBatchId || undefined })
-    Message.success('完工登记成功')
+    Message.success(t('mes.完工登记成功'))
     completeModalVisible.value = false
     if (currentWo.value) { const d = await mesApi.getMesWorkOrder(currentWo.value.id); operations.value = d.operations ?? [] }
   } catch { /* handled */ } finally { operating.value = false }
@@ -183,11 +183,11 @@ const exceptionModalVisible = ref(false)
 const exceptionForm = reactive({ exceptionType: '', reason: '', equipmentId: '' })
 function openExceptionModal(op: WorkOrderOperation) { currentOp.value = op; Object.assign(exceptionForm, { exceptionType: '', reason: '', equipmentId: '' }); exceptionModalVisible.value = true }
 async function handleException() {
-  if (!currentOp.value || !exceptionForm.exceptionType || !exceptionForm.reason) { Message.warning('请填写异常类型和原因'); return }
+  if (!currentOp.value || !exceptionForm.exceptionType || !exceptionForm.reason) { Message.warning(t('mes.请填写异常类型和原因')); return }
   operating.value = true
   try {
     await mesApi.reportException(currentOp.value.id, { exceptionType: exceptionForm.exceptionType, reason: exceptionForm.reason, equipmentId: exceptionForm.equipmentId || undefined })
-    Message.success('异常报工已记录')
+    Message.success(t('mes.异常报工已记录'))
     exceptionModalVisible.value = false
   } catch { /* handled */ } finally { operating.value = false }
 }

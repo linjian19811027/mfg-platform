@@ -2,10 +2,10 @@
   <div class="page-container">
     <a-card :bordered="false" style="margin-bottom: 16px">
       <a-space wrap>
-        <a-input v-model="query.supplierId" :placeholder="$t('qms.supplier-quality.index.供应商ID')" allow-clear style="width: 180px" @keyup.enter="loadData" />
+        <SupplierSelect v-model="query.supplierId" :placeholder="$t('qms.supplier-quality.index.供应商')" allow-clear style="width: 180px" @change="loadData" />
         <a-select v-model="query.result" :placeholder="$t('qms.supplier-quality.index.检验结果')" allow-clear style="width: 120px">
-          <a-option value="PASS">合格</a-option>
-          <a-option value="FAIL">不合格</a-option>
+          <a-option value="PASS">{{ $t('qms.supplier-quality.qualified') }}</a-option>
+          <a-option value="FAIL">{{ $t('qms.supplier-quality.unqualified') }}</a-option>
         </a-select>
         <a-button type="primary" @click="loadData">{{ $t('common.search') }}</a-button>
         <a-button @click="resetQuery">{{ $t('common.reset') }}</a-button>
@@ -13,11 +13,11 @@
     </a-card>
 
     <a-card :bordered="false">
-      <template #title>供应商质量记录（IQC）</template>
+      <template #title>{{ $t('qms.supplier-quality.lbl1552') }}</template>
       <MTable :columns="columns" :data="tableData" :loading="loading" :total="total" :page-size="20" @change="onTableChange">
         <template #result="{ record }">
           <a-tag :color="record.result === 'PASS' ? 'green' : record.result === 'FAIL' ? 'red' : 'gray'">
-            {{ record.result === 'PASS' ? '合格' : record.result === 'FAIL' ? '不合格' : '待检' }}
+            {{ record.result === 'PASS' ? t('qms.supplier-quality.r33055') : record.result === 'FAIL' ? $t('qms.supplier-quality.unqualified') : $t('qms.supplier-quality.uninspected') }}
           </a-tag>
         </template>
         <template #passRate="{ record }">
@@ -38,6 +38,7 @@ import { ref, reactive, onMounted } from 'vue'
 import MTable from '@/components/MTable/index.vue'
 import type { MTableColumn } from '@/components/MTable/index.vue'
 import { qmsApi } from '@/api/qms'
+import SupplierSelect from '@/components/BusinessSelect/SupplierSelect.vue'
 
 const loading = ref(false)
 const tableData = ref<any[]>([])

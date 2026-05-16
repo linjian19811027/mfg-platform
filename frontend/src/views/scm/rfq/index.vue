@@ -3,16 +3,16 @@
     <a-card :bordered="false" style="margin-bottom: 16px">
       <a-space wrap>
         <a-select v-model="query.status" :placeholder="$t('common.status')" allow-clear style="width: 130px">
-          <a-option value="DRAFT">草稿</a-option>
-          <a-option value="SENT">已发送</a-option>
-          <a-option value="QUOTED">已报价</a-option>
-          <a-option value="CLOSED">已关闭</a-option>
+          <a-option value="DRAFT">{{ $t('scm.rfq.draft') }}</a-option>
+          <a-option value="SENT">{{ $t('scm.rfq.lbl1623') }}</a-option>
+          <a-option value="QUOTED">{{ $t('scm.rfq.lbl1624') }}</a-option>
+          <a-option value="CLOSED">{{ $t('scm.rfq.closed') }}</a-option>
         </a-select>
         <a-button type="primary" @click="loadData">{{ $t('common.search') }}</a-button>
         <a-button @click="resetQuery">{{ $t('common.reset') }}</a-button>
       </a-space>
       <template #extra>
-        <a-button type="primary" @click="openDrawer">新建询价单</a-button>
+        <a-button type="primary" @click="openDrawer">{{ $t('scm.rfq.lbl1625') }}</a-button>
       </template>
     </a-card>
 
@@ -24,9 +24,9 @@
         <template #action="{ record }">
           <a-space>
             <a-popconfirm v-if="record.status === 'DRAFT'" :content="$t('scm.rfq.index.确认发送询价')" @ok="handleSend(record.id as string)">
-              <a-link>发送</a-link>
+              <a-link>{{ $t('scm.rfq.lbl1626') }}</a-link>
             </a-popconfirm>
-            <a-link v-if="record.status === 'SENT' || record.status === 'QUOTED'" @click="openCompareDrawer(record.id as string)">比价</a-link>
+            <a-link v-if="record.status === 'SENT' || record.status === 'QUOTED'" @click="openCompareDrawer(record.id as string)">{{ $t('scm.rfq.lbl1627') }}</a-link>
           </a-space>
         </template>
       </MTable>
@@ -42,7 +42,7 @@
       <a-table :columns="compareColumns" :data="compareLines" :loading="compareLoading" :pagination="false" row-key="id">
         <template #action="{ record }">
           <a-popconfirm :content="$t('scm.rfq.index.确认选择该供应商')" @ok="handleSelectSupplier(record.supplierId as string)">
-            <a-button type="primary" size="mini">选择</a-button>
+            <a-button type="primary" size="mini">{{ $t('scm.rfq.lbl1628') }}</a-button>
           </a-popconfirm>
         </template>
       </a-table>
@@ -67,8 +67,8 @@ const total = ref(0)
 const query = reactive({ status: '', page: 1, pageSize: 20 })
 
 const STATUS_MAP: Record<string, { label: string; color: string }> = {
-  DRAFT: { label: '草稿', color: 'gray' }, SENT: { label: '已发送', color: 'blue' },
-  QUOTED: { label: '已报价', color: 'orange' }, CLOSED: { label: '已关闭', color: 'green' },
+  DRAFT: { label: t('scm.rfq.draft'), color: 'gray' }, SENT: { label: t('scm.rfq.lbl1629'), color: 'blue' },
+  QUOTED: { label: t('scm.rfq.lbl1630'), color: 'orange' }, CLOSED: { label: t('scm.rfq.closed'), color: 'green' },
 }
 
 const columns: MTableColumn[] = [
@@ -90,8 +90,8 @@ const compareColumns = [
 ]
 
 const formSchema: MFormField[] = [
-  { field: 'materialId', label: '物料ID', type: 'input', required: true },
-  { field: 'qty', label: '询价数量', type: 'number', required: true, props: { min: 0.001 } },
+  { field: 'materialId', label: t('scm.rfq.material'), type: 'material-select', required: true },
+  { field: 'qty', label: t('scm.rfq.lbl1631'), type: 'number', required: true, props: { min: 0.001 } },
 ]
 
 function statusColor(s: string) { return STATUS_MAP[s]?.color ?? 'gray' }
@@ -117,12 +117,12 @@ const formData = ref<Record<string, unknown>>({})
 function openDrawer() { formData.value = {}; drawerVisible.value = true }
 async function handleCreate(data: Record<string, unknown>) {
   saving.value = true
-  try { await scmApi.createRfq(data); Message.success('创建成功'); drawerVisible.value = false; loadData() }
+  try { await scmApi.createRfq(data); Message.success(t('scm.创建成功')); drawerVisible.value = false; loadData() }
   catch { /* handled */ } finally { saving.value = false }
 }
 
 async function handleSend(id: string) {
-  try { await scmApi.sendRfq(id); Message.success('询价已发送'); loadData() }
+  try { await scmApi.sendRfq(id); Message.success(t('scm.询价已发送')); loadData() }
   catch { /* handled */ }
 }
 
@@ -144,7 +144,7 @@ async function openCompareDrawer(id: string) {
 async function handleSelectSupplier(supplierId: string) {
   try {
     await scmApi.selectSupplier(currentRfqId.value, supplierId)
-    Message.success('供应商已选定')
+    Message.success(t('scm.供应商已选定'))
     compareDrawerVisible.value = false
     loadData()
   } catch { /* handled */ }

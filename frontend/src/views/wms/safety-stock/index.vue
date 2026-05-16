@@ -4,14 +4,14 @@
       <a-space wrap>
         <a-input v-model="query.keyword" :placeholder="$t('wms.safety-stock.index.物料编码名称')" allow-clear style="width: 200px" @keyup.enter="loadData" />
         <a-select v-model="query.alertOnly" :placeholder="$t('wms.safety-stock.index.显示范围')" style="width: 130px">
-          <a-option :value="false">全部</a-option>
-          <a-option :value="true">仅预警</a-option>
+          <a-option :value="false">{{ $t('wms.safety-stock.lbl1936') }}</a-option>
+          <a-option :value="true">{{ $t('wms.safety-stock.lbl1937') }}</a-option>
         </a-select>
         <a-button type="primary" @click="loadData">{{ $t('common.search') }}</a-button>
         <a-button @click="resetQuery">{{ $t('common.reset') }}</a-button>
       </a-space>
       <template #extra>
-        <a-button type="primary" @click="openDrawer(null)">新建安全库存</a-button>
+        <a-button type="primary" @click="openDrawer(null)">{{ $t('wms.safety-stock.lbl1938') }}</a-button>
       </template>
     </a-card>
 
@@ -19,9 +19,9 @@
       <MTable :columns="columns" :data="tableData" :loading="loading" :total="total" :page-size="20" @change="onTableChange">
         <template #alert="{ record }">
           <a-tag v-if="(record.currentQty as number) < (record.safetyQty as number)" color="red">
-            低于安全库存 {{ ((record.safetyQty as number) - (record.currentQty as number)).toFixed(2) }}
+            {{ $t('wms.safety-stock.r33101', {toFixedn2n: ((record.safetyQty as number) - (record.currentQty as number)).toFixed(2)}) }}
           </a-tag>
-          <a-tag v-else color="green">正常</a-tag>
+          <a-tag v-else color="green">{{ $t('wms.safety-stock.normal') }}</a-tag>
         </template>
         <template #action="{ record }">
           <a-space>
@@ -34,7 +34,7 @@
       </MTable>
     </a-card>
 
-    <a-drawer v-model:visible="drawerVisible" :title="editing ? '编辑安全库存' : '新建安全库存'" :width="480" @cancel="drawerVisible = false">
+    <a-drawer v-model:visible="drawerVisible" ::title="t('wms.safety-stock.lbl1939')" :width="480" @cancel="drawerVisible = false">
       <MForm :schema="formSchema" v-model="formData" :loading="saving" :submit-text="$t('wms.safety-stock.index.保存')" @submit="handleSave" @cancel="drawerVisible = false" />
     </a-drawer>
   </div>
@@ -68,10 +68,10 @@ const columns: MTableColumn[] = [
 ]
 
 const formSchema: MFormField[] = [
-  { field: 'materialId', label: '物料ID', type: 'input', required: true },
-  { field: 'warehouseId', label: '仓库ID（可选）', type: 'input' },
-  { field: 'safetyQty', label: '安全库存量', type: 'number', required: true, props: { min: 0, precision: 4 } },
-  { field: 'unit', label: '单位', type: 'input', required: true },
+  { field: 'materialId', label: t('wms.safety-stock.material'), type: 'material-select', required: true },
+  { field: 'warehouseId', label: t('wms.safety-stock.lbl1940'), type: 'warehouse-select' },
+  { field: 'safetyQty', label: t('wms.safety-stock.lbl1941'), type: 'number', required: true, props: { min: 0, precision: 4 } },
+  { field: 'unit', label: t('wms.safety-stock.lbl1942'), type: 'input', required: true },
 ]
 
 async function loadData() {
@@ -104,15 +104,15 @@ function openDrawer(item: SafetyStock | null) {
 async function handleSave(data: Record<string, unknown>) {
   saving.value = true
   try {
-    if (editing.value) { await wmsApi.updateSafetyStock(editing.value.id, data); Message.success('更新成功') }
-    else { await wmsApi.createSafetyStock(data); Message.success('创建成功') }
+    if (editing.value) { await wmsApi.updateSafetyStock(editing.value.id, data); Message.success(t('wms.更新成功')) }
+    else { await wmsApi.createSafetyStock(data); Message.success(t('wms.创建成功')) }
     drawerVisible.value = false
     loadData()
   } catch { /* handled */ } finally { saving.value = false }
 }
 
 async function handleDelete(id: string) {
-  try { await wmsApi.deleteSafetyStock(id); Message.success('删除成功'); loadData() }
+  try { await wmsApi.deleteSafetyStock(id); Message.success(t('wms.删除成功')); loadData() }
   catch { /* handled */ }
 }
 

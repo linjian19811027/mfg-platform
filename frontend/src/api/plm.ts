@@ -158,19 +158,13 @@ export const plmApi = {
     } catch { return null as unknown as Material }
   },
   createMaterial: async (data: object) => {
-    try {
-      return await request.post<Material>('/v1/plm/materials', data)
-    } catch { return null as unknown as Material }
+    return await request.post<Material>('/v1/plm/materials', data)
   },
   updateMaterial: async (id: string, data: object) => {
-    try {
-      return await request.put<Material>(`/v1/plm/materials/${id}`, data)
-    } catch { return null as unknown as Material }
+    return await request.put<Material>(`/v1/plm/materials/${id}`, data)
   },
   changeMaterialStatus: async (id: string, status: string) => {
-    try {
-      return await request.patch<Material>(`/v1/plm/materials/${id}/status`, { status })
-    } catch { return null as unknown as Material }
+    return await request.patch<Material>(`/v1/plm/materials/${id}/status`, { status })
   },
 
   // BOM
@@ -185,29 +179,19 @@ export const plmApi = {
     } catch { return null as unknown as Bom }
   },
   createBom: async (data: { bom: object; lines?: object[]; copyFromBomId?: string }) => {
-    try {
-      return await request.post<Bom>('/v1/plm/boms', data)
-    } catch { return null as unknown as Bom }
+    return await request.post<Bom>('/v1/plm/boms', data)
   },
   deleteBom: async (id: string) => {
-    try {
-      return await request.delete<void>(`/v1/plm/boms/${id}`)
-    } catch { return }
+    return await request.delete<void>(`/v1/plm/boms/${id}`)
   },
   activateBom: async (id: string) => {
-    try {
-      return await request.post<void>(`/v1/plm/boms/${id}/activate`, {})
-    } catch { return }
+    return await request.post<void>(`/v1/plm/boms/${id}/activate`, {})
   },
   deactivateBom: async (id: string) => {
-    try {
-      return await request.post<void>(`/v1/plm/boms/${id}/deactivate`, {})
-    } catch { return }
+    return await request.post<void>(`/v1/plm/boms/${id}/deactivate`, {})
   },
   obsoleteBom: async (id: string) => {
-    try {
-      return await request.post<void>(`/v1/plm/boms/${id}/obsolete`, {})
-    } catch { return }
+    return await request.post<void>(`/v1/plm/boms/${id}/obsolete`, {})
   },
   expandBomTree: async (id: string) => {
     try {
@@ -215,19 +199,13 @@ export const plmApi = {
     } catch { return null as unknown as BomNode }
   },
   addBomLine: async (bomId: string, data: object) => {
-    try {
-      return await request.post<BomLine>(`/v1/plm/boms/${bomId}/lines`, data)
-    } catch { return null as unknown as BomLine }
+    return await request.post<BomLine>(`/v1/plm/boms/${bomId}/lines`, data)
   },
   updateBomLine: async (_bomId: string, lineId: string, data: object) => {
-    try {
-      return await request.put<BomLine>(`/v1/plm/boms/lines/${lineId}`, data)
-    } catch { return null as unknown as BomLine }
+    return await request.put<BomLine>(`/v1/plm/boms/lines/${lineId}`, data)
   },
   deleteBomLine: async (_bomId: string, lineId: string) => {
-    try {
-      return await request.delete<void>(`/v1/plm/boms/lines/${lineId}`)
-    } catch { return }
+    return await request.delete<void>(`/v1/plm/boms/lines/${lineId}`)
   },
   compareBoms: async (v1: string, v2: string) => {
     try {
@@ -259,49 +237,31 @@ export const plmApi = {
     } catch { return null as unknown as Routing }
   },
   createRouting: async (data: object) => {
-    try {
-      return await request.post<Routing>('/v1/plm/routings', data)
-    } catch { return null as unknown as Routing }
+    return await request.post<Routing>('/v1/plm/routings', data)
   },
   updateRouting: async (id: string, data: object) => {
-    try {
-      return await request.put<Routing>(`/v1/plm/routings/${id}`, data)
-    } catch { return null as unknown as Routing }
+    return await request.put<Routing>(`/v1/plm/routings/${id}`, data)
   },
   activateRouting: async (id: string) => {
-    try {
-      return await request.post<void>(`/v1/plm/routings/${id}/activate`, {})
-    } catch { return }
+    return await request.post<void>(`/v1/plm/routings/${id}/activate`, {})
   },
   retireRouting: async (id: string) => {
-    try {
-      return await request.post<void>(`/v1/plm/routings/${id}/retire`, {})
-    } catch { return }
+    return await request.post<void>(`/v1/plm/routings/${id}/retire`, {})
   },
   copyRouting: async (id: string, data?: object) => {
-    try {
-      return await request.post<Routing>(`/v1/plm/routings/${id}/copy`, data ?? {})
-    } catch { return null as unknown as Routing }
+    return await request.post<Routing>(`/v1/plm/routings/${id}/copy`, data ?? {})
   },
   deleteRouting: async (id: string) => {
-    try {
-      return await request.delete<void>(`/v1/plm/routings/${id}`)
-    } catch { return }
+    return await request.delete<void>(`/v1/plm/routings/${id}`)
   },
   addOperation: async (routingId: string, data: object) => {
-    try {
-      return await request.post<RoutingOperation>(`/v1/plm/routings/${routingId}/operations`, data)
-    } catch { return null as unknown as RoutingOperation }
+    return await request.post<RoutingOperation>(`/v1/plm/routings/${routingId}/operations`, data)
   },
   updateOperation: async (opId: string, data: object) => {
-    try {
-      return await request.put<RoutingOperation>(`/v1/plm/routings/operations/${opId}`, data)
-    } catch { return null as unknown as RoutingOperation }
+    return await request.put<RoutingOperation>(`/v1/plm/routings/operations/${opId}`, data)
   },
   deleteOperation: async (opId: string) => {
-    try {
-      return await request.delete<void>(`/v1/plm/routings/operations/${opId}`)
-    } catch { return }
+    return await request.delete<void>(`/v1/plm/routings/operations/${opId}`)
   },
 
   // Legacy aliases
@@ -323,29 +283,19 @@ export const plmApi = {
     } catch { return null as unknown as Ecr }
   },
   createEcr: async (data: object) => {
-    try {
-      return await request.post<Ecr>('/v1/plm/ecrs', data)
-    } catch { return null as unknown as Ecr }
+    return await request.post<Ecr>('/v1/plm/ecrs', data)
   },
   updateEcr: async (id: string, data: object) => {
-    try {
-      return await request.put<Ecr>(`/v1/plm/ecrs/${id}`, data)
-    } catch { return null as unknown as Ecr }
+    return await request.put<Ecr>(`/v1/plm/ecrs/${id}`, data)
   },
   submitEcr: async (id: string, operatorId: string) => {
-    try {
-      return await request.patch<void>(`/v1/plm/ecrs/${id}/submit`, { operatorId })
-    } catch { return }
+    return await request.patch<void>(`/v1/plm/ecrs/${id}/submit`, { operatorId })
   },
   approveEcr: async (id: string, operatorId: string) => {
-    try {
-      return await request.patch<void>(`/v1/plm/ecrs/${id}/approve`, { operatorId })
-    } catch { return }
+    return await request.patch<void>(`/v1/plm/ecrs/${id}/approve`, { operatorId })
   },
   rejectEcr: async (id: string, operatorId: string) => {
-    try {
-      return await request.patch<void>(`/v1/plm/ecrs/${id}/reject`, { operatorId })
-    } catch { return }
+    return await request.patch<void>(`/v1/plm/ecrs/${id}/reject`, { operatorId })
   },
 
   // ECN
@@ -360,14 +310,10 @@ export const plmApi = {
     } catch { return null as unknown as Ecn }
   },
   issueEcn: async (data: object) => {
-    try {
-      return await request.post<Ecn>('/v1/plm/ecns', data)
-    } catch { return null as unknown as Ecn }
+    return await request.post<Ecn>('/v1/plm/ecns', data)
   },
   completeEcn: async (id: string) => {
-    try {
-      return await request.patch<void>(`/v1/plm/ecns/${id}/complete`, {})
-    } catch { return }
+    return await request.patch<void>(`/v1/plm/ecns/${id}/complete`, {})
   },
 
   // 物料分类
@@ -377,19 +323,13 @@ export const plmApi = {
     } catch { return [] as MaterialCategory[] }
   },
   createCategory: async (data: object) => {
-    try {
-      return await request.post<MaterialCategory>('/v1/plm/materials/categories', data)
-    } catch { return null as unknown as MaterialCategory }
+    return await request.post<MaterialCategory>('/v1/plm/materials/categories', data)
   },
   updateCategory: async (id: string, data: object) => {
-    try {
-      return await request.put<MaterialCategory>(`/v1/plm/materials/categories/${id}`, data)
-    } catch { return null as unknown as MaterialCategory }
+    return await request.put<MaterialCategory>(`/v1/plm/materials/categories/${id}`, data)
   },
   deleteCategory: async (id: string) => {
-    try {
-      return await request.delete<void>(`/v1/plm/materials/categories/${id}`)
-    } catch { return }
+    return await request.delete<void>(`/v1/plm/materials/categories/${id}`)
   },
 
   // 物料编码规则
@@ -399,14 +339,10 @@ export const plmApi = {
     } catch { return { list: [], total: 0 } }
   },
   createCodeRule: async (data: object) => {
-    try {
-      return await request.post<MaterialCodeRule>('/v1/plm/materials/code-rules', data)
-    } catch { return null as unknown as MaterialCodeRule }
+    return await request.post<MaterialCodeRule>('/v1/plm/materials/code-rules', data)
   },
   updateCodeRule: async (id: string, data: object) => {
-    try {
-      return await request.put<MaterialCodeRule>(`/v1/plm/materials/code-rules/${id}`, data)
-    } catch { return null as unknown as MaterialCodeRule }
+    return await request.put<MaterialCodeRule>(`/v1/plm/materials/code-rules/${id}`, data)
   },
 
   // PLM 文档
@@ -416,14 +352,10 @@ export const plmApi = {
     } catch { return { list: [], total: 0 } }
   },
   uploadDocument: async (formData: FormData) => {
-    try {
-      return await request.post<PlmDocument>('/v1/plm/documents', formData)
-    } catch { return null as unknown as PlmDocument }
+    return await request.post<PlmDocument>('/v1/plm/documents', formData)
   },
   deleteDocument: async (id: string) => {
-    try {
-      return await request.delete<void>(`/v1/plm/documents/${id}`)
-    } catch { return }
+    return await request.delete<void>(`/v1/plm/documents/${id}`)
   },
 
   // 标准工序库
@@ -438,19 +370,13 @@ export const plmApi = {
     } catch { return null as unknown as StandardOperation }
   },
   createStandardOperation: async (data: object) => {
-    try {
-      return await request.post<StandardOperation>('/v1/plm/standard-operations', data)
-    } catch { return null as unknown as StandardOperation }
+    return await request.post<StandardOperation>('/v1/plm/standard-operations', data)
   },
   updateStandardOperation: async (id: string, data: object) => {
-    try {
-      return await request.put<StandardOperation>(`/v1/plm/standard-operations/${id}`, data)
-    } catch { return null as unknown as StandardOperation }
+    return await request.put<StandardOperation>(`/v1/plm/standard-operations/${id}`, data)
   },
   deleteStandardOperation: async (id: string) => {
-    try {
-      return await request.delete<void>(`/v1/plm/standard-operations/${id}`)
-    } catch { return }
+    return await request.delete<void>(`/v1/plm/standard-operations/${id}`)
   },
 }
 

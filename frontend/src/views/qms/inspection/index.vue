@@ -10,7 +10,7 @@
           <a-option v-for="s in statusOptions" :key="s.value" :value="s.value">{{ s.label }}</a-option>
         </a-select>
         <a-button type="primary" @click="loadData">{{ $t('common.search') }}</a-button>
-        <a-button style="margin-left:auto" type="primary" @click="openCreate">新建检验</a-button>
+        <a-button style="margin-left:auto" type="primary" @click="openCreate">{{ $t('qms.inspection.lbl1495') }}</a-button>
       </div>
 
       <MTable :columns="columns" :data="list" :loading="loading" :total="total" @change="onTableChange">
@@ -18,7 +18,7 @@
           <a-tag :color="statusColor(record.status as string)">{{ statusLabel(record.status as string) }}</a-tag>
         </template>
         <template #action="{ record }">
-          <a-button type="text" size="small" @click="openResult(record as InspectionRecord)">录入结果</a-button>
+          <a-button type="text" size="small" @click="openResult(record as InspectionRecord)">{{ $t('qms.inspection.lbl1496') }}</a-button>
         </template>
       </MTable>
     </a-card>
@@ -51,12 +51,12 @@ const inspectionTypes = [
   { label: 'FQC', value: 'FQC' }, { label: 'OQC', value: 'OQC' }, { label: 'FIRST', value: 'FIRST' },
 ]
 const statusOptions = [
-  { label: '合格', value: 'PASSED' }, { label: '不合格', value: 'FAILED' },
-  { label: '让步接收', value: 'CONCESSION' },
+  { label: t('qms.inspection.qualified'), value: 'PASSED' }, { label: t('qms.inspection.unqualified'), value: 'FAILED' },
+  { label: t('qms.inspection.lbl1497'), value: 'CONCESSION' },
 ]
 
 const statusColorMap: Record<string, string> = { PASSED: 'green', FAILED: 'red', CONCESSION: 'orange' }
-const statusLabelMap: Record<string, string> = { PASSED: '合格', FAILED: '不合格', CONCESSION: '让步接收' }
+const statusLabelMap: Record<string, string> = { PASSED: t('qms.inspection.qualified'), FAILED: t('qms.inspection.unqualified'), CONCESSION: t('qms.inspection.lbl1498') }
 const statusColor = (s: string) => statusColorMap[s] ?? 'gray'
 const statusLabel = (s: string) => statusLabelMap[s] ?? s
 
@@ -71,15 +71,15 @@ const columns: MTableColumn[] = [
 ]
 
 const createSchema: MFormField[] = [
-  { field: 'materialId', label: '物料ID', type: 'input', required: true },
-  { field: 'batchId', label: '批次号', type: 'input' },
-  { field: 'inspectionType', label: '检验类型', type: 'select', required: true, options: inspectionTypes },
-  { field: 'standardId', label: '检验标准ID', type: 'input' },
+  { field: 'materialId', label: t('qms.inspection.material'), type: 'material-select', required: true },
+  { field: 'batchId', label: t('qms.inspection.lbl1499'), type: 'input' },
+  { field: 'inspectionType', label: t('qms.inspection.lbl1500'), type: 'select', required: true, options: inspectionTypes },
+  { field: 'standardId', label: t('qms.inspection.lbl1501'), type: 'input' },
 ]
 
 const resultSchema: MFormField[] = [
-  { field: 'result', label: '检验结果', type: 'radio', required: true,
-    options: [{ label: 'PASS（合格）', value: 'PASS' }, { label: 'FAIL（不合格）', value: 'FAIL' }] },
+  { field: 'result', label: t('qms.inspection.lbl1502'), type: 'radio', required: true,
+    options: [{ label: t('qms.inspection.lbl1503'), value: 'PASS' }, { label: t('qms.inspection.lbl1504'), value: 'FAIL' }] },
 ]
 
 const query = reactive({ inspectionType: '', result: '' })
@@ -120,20 +120,22 @@ async function handleCreate(data: Record<string, unknown>) {
   submitting.value = true
   try {
     await qmsApi.createInspection(data as Parameters<typeof qmsApi.createInspection>[0])
-    Message.success('创建成功')
+    Message.success(t('qms.创建成功'))
     createVisible.value = false
     loadData()
-  } finally { submitting.value = false }
+  } catch { Message.error(t('qms.创建失败')) }
+  finally { submitting.value = false }
 }
 
 async function handleResult(data: Record<string, unknown>) {
   submitting.value = true
   try {
     await qmsApi.submitResult(currentId.value, data as { result: 'PASS' | 'FAIL' })
-    Message.success('录入成功')
+    Message.success(t('qms.录入成功'))
     resultVisible.value = false
     loadData()
-  } finally { submitting.value = false }
+  } catch { Message.error(t('qms.录入失败')) }
+  finally { submitting.value = false }
 }
 
 loadData()

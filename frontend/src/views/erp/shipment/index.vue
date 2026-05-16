@@ -3,24 +3,24 @@
     <a-card :bordered="false" style="margin-bottom: 16px">
       <a-space wrap>
         <a-select v-model="query.status" :placeholder="$t('common.status')" allow-clear style="width: 130px">
-          <a-option value="PENDING">待发货</a-option><a-option value="SHIPPED">已发货</a-option><a-option value="DELIVERED">已签收</a-option>
+          <a-option value="PENDING">{{ $t('erp.shipment.lbl1235') }}</a-option><a-option value="SHIPPED">{{ $t('erp.shipment.lbl1236') }}</a-option><a-option value="DELIVERED">{{ $t('erp.shipment.lbl1237') }}</a-option>
         </a-select>
         <a-button type="primary" @click="loadData">{{ $t('common.search') }}</a-button>
         <a-button @click="resetQuery">{{ $t('common.reset') }}</a-button>
       </a-space>
-      <template #extra><a-button type="primary" @click="openDrawer">新建发货单</a-button></template>
+      <template #extra><a-button type="primary" @click="openDrawer">{{ $t('erp.shipment.lbl1238') }}</a-button></template>
     </a-card>
     <a-card :bordered="false">
       <MTable :columns="columns" :data="tableData" :loading="loading" :total="total" :page-size="20" @change="onTableChange">
         <template #status="{ record }">
           <a-tag :color="record.status === 'DELIVERED' ? 'green' : record.status === 'SHIPPED' ? 'blue' : 'gray'">
-            {{ record.status === 'DELIVERED' ? '已签收' : record.status === 'SHIPPED' ? '已发货' : '待发货' }}
+            {{ record.status === 'DELIVERED' ? t('erp.shipment.r33024') : record.status === 'SHIPPED' ? $t('erp.shipment.lbl1239') : $t('erp.shipment.lbl1240') }}
           </a-tag>
         </template>
         <template #action="{ record }">
           <a-space>
-            <a-popconfirm v-if="record.status === 'PENDING'" :content="$t('erp.shipment.index.确认发货')" @ok="handleShip(record.id as string)"><a-link>发货</a-link></a-popconfirm>
-            <a-link v-if="record.status === 'SHIPPED'" @click="openLogisticsModal(record.id as string)">更新物流</a-link>
+            <a-popconfirm v-if="record.status === 'PENDING'" :content="$t('erp.shipment.index.确认发货')" @ok="handleShip(record.id as string)"><a-link>{{ $t('erp.shipment.r33025') }}</a-link></a-popconfirm>
+            <a-link v-if="record.status === 'SHIPPED'" @click="openLogisticsModal(record.id as string)">{{ $t('erp.shipment.lbl1241') }}</a-link>
           </a-space>
         </template>
       </MTable>
@@ -58,9 +58,9 @@ const columns: MTableColumn[] = [
   { key: 'action', title: t('erp.shipment.index.操作'), slotName: 'action', width: 160 },
 ]
 const formSchema: MFormField[] = [
-  { field: 'salesOrderId', label: '销售订单ID', type: 'input', required: true },
-  { field: 'carrier', label: '承运商', type: 'input' },
-  { field: 'trackingNo', label: '运单号', type: 'input' },
+  { field: 'salesOrderId', label: t('erp.shipment.lbl1242'), type: 'select', required: true, placeholder: t('erp.shipment.r33026') },
+  { field: 'carrier', label: t('erp.shipment.lbl1243'), type: 'input' },
+  { field: 'trackingNo', label: t('erp.shipment.lbl1244'), type: 'input' },
 ]
 async function loadData() {
   loading.value = true
@@ -73,15 +73,15 @@ const drawerVisible = ref(false); const saving = ref(false); const formData = re
 function openDrawer() { formData.value = {}; drawerVisible.value = true }
 async function handleCreate(data: Record<string, unknown>) {
   saving.value = true
-  try { await erpExtApi.createShipment(data); Message.success('创建成功'); drawerVisible.value = false; loadData() }
+  try { await erpExtApi.createShipment(data); Message.success(t('erp.创建成功')); drawerVisible.value = false; loadData() }
   catch { /* handled */ } finally { saving.value = false }
 }
-async function handleShip(id: string) { try { await erpExtApi.ship(id); Message.success('已发货'); loadData() } catch { /* handled */ } }
+async function handleShip(id: string) { try { await erpExtApi.ship(id); Message.success(t('erp.已发货')); loadData() } catch { /* handled */ } }
 const logisticsModalVisible = ref(false); const updating = ref(false); const currentShipId = ref(''); const logisticsForm = reactive({ carrier: '', trackingNo: '' })
 function openLogisticsModal(id: string) { currentShipId.value = id; logisticsForm.carrier = ''; logisticsForm.trackingNo = ''; logisticsModalVisible.value = true }
 async function handleUpdateLogistics() {
   updating.value = true
-  try { await erpExtApi.updateLogistics(currentShipId.value, logisticsForm); Message.success('物流信息已更新'); logisticsModalVisible.value = false; loadData() }
+  try { await erpExtApi.updateLogistics(currentShipId.value, logisticsForm); Message.success(t('erp.物流信息已更新')); logisticsModalVisible.value = false; loadData() }
   catch { /* handled */ } finally { updating.value = false }
 }
 onMounted(loadData)

@@ -1,4 +1,4 @@
-import request from '@/utils/request'
+import { request } from '@/utils/request'
 
 export function getOutsourcingDashboard() {
   return request.get('/v1/outsourcing/dashboard')

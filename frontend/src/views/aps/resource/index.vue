@@ -8,9 +8,10 @@
           <a-option value="WORKCENTER">{{ $t('aps.resource.type.workcenter') }}</a-option>
         </a-select>
         <a-select v-model="query.status" :placeholder="$t('common.status')" allow-clear style="width: 120px">
-          <a-option value="ACTIVE">{{ $t('common.enable') }}</a-option>
-          <a-option value="INACTIVE">{{ $t('common.disable') }}</a-option>
+          <a-option value="AVAILABLE">{{ $t('aps.resource.status.available') }}</a-option>
           <a-option value="MAINTENANCE">{{ $t('aps.resource.status.maintenance') }}</a-option>
+          <a-option value="REPAIR">{{ $t('aps.resource.status.repair') }}</a-option>
+          <a-option value="BREAKDOWN">{{ $t('aps.resource.status.breakdown') }}</a-option>
         </a-select>
         <a-button type="primary" @click="loadData">{{ $t('common.search') }}</a-button>
         <a-button @click="resetQuery">{{ $t('common.reset') }}</a-button>
@@ -20,9 +21,7 @@
     <a-card :bordered="false">
       <MTable :columns="columns" :data="tableData" :loading="loading" :total="total" :page-size="20" @change="onTableChange">
         <template #status="{ record }">
-          <a-tag :color="record.status === 'ACTIVE' ? 'green' : record.status === 'MAINTENANCE' ? 'orange' : 'gray'">
-            {{ { ACTIVE: $t('common.enable'), INACTIVE: $t('common.disable'), MAINTENANCE: $t('aps.resource.status.maintenance') }[record.status as string] ?? record.status }}
-          </a-tag>
+          <a-tag :color="resourceStatusColor(record.status as string)">{{ resourceStatusLabel(record.status as string) }}</a-tag>
         </template>
         <template #action="{ record }">
           <a-space>
@@ -30,12 +29,13 @@
             <a-select
               :model-value="record.status as string"
               size="mini"
-              style="width: 90px"
+              style="width: 100px"
               @change="(v: string) => handleStatusChange(record.id as string, v)"
             >
-              <a-option value="ACTIVE">{{ $t('common.enable') }}</a-option>
-              <a-option value="INACTIVE">{{ $t('common.disable') }}</a-option>
+              <a-option value="AVAILABLE">{{ $t('aps.resource.status.available') }}</a-option>
               <a-option value="MAINTENANCE">{{ $t('aps.resource.status.maintenance') }}</a-option>
+              <a-option value="REPAIR">{{ $t('aps.resource.status.repair') }}</a-option>
+              <a-option value="BREAKDOWN">{{ $t('aps.resource.status.breakdown') }}</a-option>
             </a-select>
           </a-space>
         </template>
@@ -47,8 +47,8 @@
   </div>
 </template>
 <script setup lang="ts">
-const { t } = useI18n()
 import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 import { ref, reactive, onMounted } from 'vue'
 import { Message } from '@arco-design/web-vue'
 import MTable from '@/components/MTable/index.vue'
@@ -75,8 +75,31 @@ const formSchema: MFormField[] = [
   ]},
   { field: 'capacity', label: t('aps.resource.index.产能'), type: 'number', props: { min: 0, precision: 2 } },
   { field: 'efficiency', label: t('aps.resource.index.效率系数'), type: 'number', props: { min: 0, max: 1, precision: 2 } },
-  { field: 'status', label: t('aps.resource.index.状态'), type: 'select', options: [{ label: t('common.enable'), value: 'ACTIVE' }, { label: t('common.disable'), value: 'INACTIVE' }] },
+  { field: 'status', label: t('aps.resource.index.状态'), type: 'select', options: [
+    { label: t('aps.resource.status.available'), value: 'AVAILABLE' },
+    { label: t('aps.resource.status.maintenance'), value: 'MAINTENANCE' },
+    { label: t('aps.resource.status.repair'), value: 'REPAIR' },
+    { label: t('aps.resource.status.breakdown'), value: 'BREAKDOWN' },
+  ]},
 ]
+const resourceStatusColor = (status: string): string => {
+    const map: Record<string, string> = {
+      AVAILABLE: 'green',
+      MAINTENANCE: 'orange',
+      REPAIR: 'red',
+      BREAKDOWN: 'red',
+    }
+    return map[status] ?? 'gray'
+  }
+const resourceStatusLabel = (status: string): string => {
+    const map: Record<string, string> = {
+      AVAILABLE: t('aps.resource.status.available'),
+      MAINTENANCE: t('aps.resource.status.maintenance'),
+      REPAIR: t('aps.resource.status.repair'),
+      BREAKDOWN: t('aps.resource.status.breakdown'),
+    }
+    return map[status] ?? status
+  }
 async function loadData() {
   loading.value = true
   try { const res = await apsApi.getResources(query); tableData.value = (res.list ?? []) as any[]; total.value = res.total ?? 0 }
@@ -85,7 +108,7 @@ async function loadData() {
 function resetQuery() { query.type = ''; query.status = ''; query.page = 1; loadData() }
 function onTableChange(e: { page: number; pageSize: number }) { query.page = e.page; query.pageSize = e.pageSize; loadData() }
 const drawerVisible = ref(false); const saving = ref(false); const editing = ref<ApsResource | null>(null); const formData = ref<Record<string, unknown>>({})
-function openDrawer(item: ApsResource | null) { editing.value = item; formData.value = item ? { ...item } : { status: 'ACTIVE', efficiency: 1 }; drawerVisible.value = true }
+function openDrawer(item: ApsResource | null) { editing.value = item; formData.value = item ? { ...item } : { status: 'AVAILABLE', efficiency: 1 }; drawerVisible.value = true }
 async function handleSave(data: Record<string, unknown>) {
   saving.value = true
   try {

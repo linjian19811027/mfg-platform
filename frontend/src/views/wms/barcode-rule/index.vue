@@ -4,21 +4,21 @@
       <a-space wrap>
         <a-input v-model="query.keyword" :placeholder="$t('wms.barcode-rule.index.编码名称')" allow-clear style="width: 200px" @keyup.enter="loadData" />
         <a-select v-model="query.status" :placeholder="$t('common.status')" allow-clear style="width: 120px">
-          <a-option value="ACTIVE">启用</a-option>
-          <a-option value="INACTIVE">停用</a-option>
+          <a-option value="ACTIVE">{{ $t('wms.barcode-rule.enable') }}</a-option>
+          <a-option value="INACTIVE">{{ $t('wms.barcode-rule.disable') }}</a-option>
         </a-select>
         <a-button type="primary" @click="loadData">{{ $t('common.search') }}</a-button>
         <a-button @click="resetQuery">{{ $t('common.reset') }}</a-button>
       </a-space>
       <template #extra>
-        <a-button type="primary" @click="openDrawer(null)">新建条码规则</a-button>
+        <a-button type="primary" @click="openDrawer(null)">{{ $t('wms.barcode-rule.action.create') }}</a-button>
       </template>
     </a-card>
 
     <a-card :bordered="false">
       <MTable :columns="columns" :data="tableData" :loading="loading" :total="total" :page-size="20" @change="onTableChange">
         <template #status="{ record }">
-          <a-tag :color="record.status === 'ACTIVE' ? 'green' : 'gray'">{{ record.status === 'ACTIVE' ? '启用' : '停用' }}</a-tag>
+          <a-tag :color="record.status === 'ACTIVE' ? 'green' : 'gray'">{{ record.status === 'ACTIVE' ? $t('common.status.active') : $t('common.status.inactive') }}</a-tag>
         </template>
         <template #action="{ record }">
           <a-link @click="openDrawer(record as unknown as BarcodeRule)">{{ $t('common.edit') }}</a-link>
@@ -26,7 +26,7 @@
       </MTable>
     </a-card>
 
-    <a-drawer v-model:visible="drawerVisible" :title="editing ? '编辑条码规则' : '新建条码规则'" :width="520" @cancel="drawerVisible = false">
+    <a-drawer v-model:visible="drawerVisible" :title="editing ? $t('wms.barcode-rule.action.edit') : $t('wms.barcode-rule.action.create')" :width="520" @cancel="drawerVisible = false">
       <MForm :schema="formSchema" v-model="formData" :loading="saving" :submit-text="$t('wms.barcode-rule.index.保存')" @submit="handleSave" @cancel="drawerVisible = false" />
     </a-drawer>
   </div>
@@ -58,14 +58,14 @@ const columns: MTableColumn[] = [
 ]
 
 const formSchema: MFormField[] = [
-  { field: 'code', label: '规则编码', type: 'input', required: true },
-  { field: 'name', label: '规则名称', type: 'input', required: true },
-  { field: 'objectType', label: '对象类型', type: 'select', required: true, options: [
-    { label: '物料批次', value: 'BATCH' }, { label: '容器', value: 'CONTAINER' },
-    { label: '货位', value: 'LOCATION' }, { label: '其他', value: 'OTHER' },
+  { field: 'code', label: t('wms.barcode-rule.lbl1871'), type: 'input', required: true },
+  { field: 'name', label: t('wms.barcode-rule.lbl1872'), type: 'input', required: true },
+  { field: 'objectType', label: t('wms.barcode-rule.lbl1873'), type: 'select', required: true, options: [
+    { label: t('wms.barcode-rule.lbl1874'), value: 'BATCH' }, { label: t('wms.barcode-rule.lbl1875'), value: 'CONTAINER' },
+    { label: t('wms.barcode-rule.lbl1876'), value: 'LOCATION' }, { label: t('wms.barcode-rule.lbl1877'), value: 'OTHER' },
   ]},
-  { field: 'pattern', label: '条码模板', type: 'input', required: true, placeholder: '如 {PREFIX}{DATE}{SEQ6}' },
-  { field: 'status', label: '状态', type: 'select', required: true, options: [{ label: '启用', value: 'ACTIVE' }, { label: '停用', value: 'INACTIVE' }] },
+  { field: 'pattern', label: t('wms.barcode-rule.lbl1878'), type: 'input', required: true, placeholder: t('wms.barcode-rule.r33100') },
+  { field: 'status', label: t('wms.barcode-rule.status'), type: 'select', required: true, options: [{ label: t('wms.barcode-rule.enable'), value: 'ACTIVE' }, { label: t('wms.barcode-rule.disable'), value: 'INACTIVE' }] },
 ]
 
 async function loadData() {
@@ -97,8 +97,8 @@ function openDrawer(rule: BarcodeRule | null) {
 async function handleSave(data: Record<string, unknown>) {
   saving.value = true
   try {
-    if (editing.value) { await wmsApi.updateBarcodeRule(editing.value.id, data); Message.success('更新成功') }
-    else { await wmsApi.createBarcodeRule(data); Message.success('创建成功') }
+    if (editing.value) { await wmsApi.updateBarcodeRule(editing.value.id, data); Message.success(t('common.message.update')) }
+    else { await wmsApi.createBarcodeRule(data); Message.success(t('common.message.create')) }
     drawerVisible.value = false
     loadData()
   } catch { /* handled */ } finally { saving.value = false }

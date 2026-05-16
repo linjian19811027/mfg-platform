@@ -44,12 +44,12 @@
           </a-tag>
         </template>
         <template #qty="{ record }">
-          <span>{{ record.currentQty }} / {{ record.initialQty }} {{ record.uomName }}</span>
+          <span>{{ record.currentQty }} / {{ record.initialQty }}, {{ record.uomName }}</span>
         </template>
         <template #action="{ record }">
           <a-space>
             <a-button type="text" size="small" @click="openDetail(record as unknown as MaterialBatch)">
-              详情
+              {{ $t('base.batch.detail') }}
             </a-button>
             <a-button
               type="text"
@@ -57,7 +57,7 @@
               status="warning"
               @click="openChangeStatus(record as unknown as MaterialBatch)"
             >
-              变更状态
+              {{ $t('base.batch.changeStatus') }}
             </a-button>
           </a-space>
         </template>
@@ -76,7 +76,7 @@
       </div>
       <template v-else-if="detailBatch">
         <!-- 基本信息 -->
-        <div class="detail-section-title">基本信息</div>
+        <div class="detail-section-title">{{ $t('base.batch.lbl1022') }}</div>
         <a-descriptions :column="2" bordered size="small">
           <a-descriptions-item :label="$t('base.batch.index.批次号')">{{ detailBatch.batchNo }}</a-descriptions-item>
           <a-descriptions-item :label="$t('base.batch.index.质量状态')">
@@ -86,8 +86,8 @@
           </a-descriptions-item>
           <a-descriptions-item :label="$t('base.batch.index.物料编码')">{{ detailBatch.materialCode }}</a-descriptions-item>
           <a-descriptions-item :label="$t('base.batch.index.物料名称')">{{ detailBatch.materialName }}</a-descriptions-item>
-          <a-descriptions-item :label="$t('base.batch.index.初始数量')">{{ detailBatch.initialQty }} {{ detailBatch.uomName }}</a-descriptions-item>
-          <a-descriptions-item :label="$t('base.batch.index.当前数量')">{{ detailBatch.currentQty }} {{ detailBatch.uomName }}</a-descriptions-item>
+          <a-descriptions-item :label="$t('base.batch.index.初始数量')">{{ detailBatch.initialQty }}, {{ detailBatch.uomName }}</a-descriptions-item>
+          <a-descriptions-item :label="$t('base.batch.index.当前数量')">{{ detailBatch.currentQty }}, {{ detailBatch.uomName }}</a-descriptions-item>
           <a-descriptions-item :label="$t('base.batch.index.供应商')">{{ detailBatch.supplierName ?? '—' }}</a-descriptions-item>
           <a-descriptions-item :label="$t('base.batch.index.供应商批次号')">{{ detailBatch.supplierBatchNo ?? '—' }}</a-descriptions-item>
           <a-descriptions-item :label="$t('base.batch.index.合格证编号')">{{ detailBatch.certificateNo ?? '—' }}</a-descriptions-item>
@@ -98,7 +98,7 @@
         </a-descriptions>
 
         <!-- 质量检验记录 -->
-        <div class="detail-section-title" style="margin-top: 24px">质量检验记录</div>
+        <div class="detail-section-title" style="margin-top: 24px">{{ $t('base.batch.lbl1023') }}</div>
         <a-table
           :columns="inspectionColumns"
           :data="inspections"
@@ -109,13 +109,13 @@
         >
           <template #result="{ record }">
             <a-tag :color="record.result === 'QUALIFIED' ? 'green' : 'red'" size="small">
-              {{ record.result === 'QUALIFIED' ? '合格' : '不合格' }}
+              {{ record.result === 'QUALIFIED' ? $t('base.batch.qualified') : $t('base.batch.unqualified') }}
             </a-tag>
           </template>
         </a-table>
 
         <!-- 库存流水 -->
-        <div class="detail-section-title" style="margin-top: 24px">库存流水</div>
+        <div class="detail-section-title" style="margin-top: 24px">{{ $t('base.batch.lbl1024') }}</div>
         <a-table
           :columns="ledgerColumns"
           :data="ledgers"
@@ -149,7 +149,7 @@
         <a-form-item
           field="newStatus"
           :label="$t('base.batch.index.变更为')"
-          :rules="[{ required: true, message: '请选择新状态' }]"
+          :rules="[{ required: true, message: t('base.batch.select') }]"
         >
           <a-select v-model="statusForm.newStatus" :placeholder="$t('base.batch.index.请选择目标状态')">
             <a-option
@@ -164,7 +164,7 @@
         <a-form-item
           field="reason"
           :label="$t('base.batch.index.变更原因')"
-          :rules="[{ required: true, message: '请填写变更原因' }]"
+          :rules="[{ required: true, message: t('base.batch.lbl1025') }]"
           validate-trigger="blur"
         >
           <a-textarea
@@ -179,10 +179,10 @@
       <template #footer>
         <a-button @click="changeStatusVisible = false">{{ $t('common.cancel') }}</a-button>
         <a-popconfirm
-          :content="`确认将批次 ${changingBatch?.batchNo} 的质量状态变更为「${getStatusLabel(statusForm.newStatus as QualityStatus)}」？`"
+          :content="`${t('base.batch.confirmBatch')} ${changingBatch?.batchNo} ${t('base.batch.qualityStatusChangeTo')}「${getStatusLabel(statusForm.newStatus as QualityStatus)}」？`"
           @ok="handleChangeStatus"
         >
-          <a-button type="primary" :loading="statusSubmitting">确认变更</a-button>
+          <a-button type="primary" :loading="statusSubmitting">{{ $t('base.batch.lbl1026') }}</a-button>
         </a-popconfirm>
       </template>
     </a-modal>
@@ -207,17 +207,17 @@ import {
 // ---- 常量 ----
 
 const QUALITY_STATUS_OPTIONS = [
-  { value: 'UNINSPECTED', label: '待检', color: 'orange' },
-  { value: 'QUALIFIED', label: '合格', color: 'green' },
-  { value: 'UNQUALIFIED', label: '不合格', color: 'red' },
-  { value: 'FROZEN', label: '冻结', color: 'gray' },
+  { value: 'UNINSPECTED', label: t('base.batch.uninspected'), color: 'orange' },
+  { value: 'QUALIFIED', label: t('base.batch.qualified'), color: 'green' },
+  { value: 'UNQUALIFIED', label: t('base.batch.unqualified'), color: 'red' },
+  { value: 'FROZEN', label: t('base.batch.lbl1027'), color: 'gray' },
 ]
 
 const SOURCE_TYPE_MAP: Record<string, string> = {
-  PURCHASE: '采购入库',
-  PRODUCTION: '生产入库',
-  RETURN: '退货入库',
-  ADJUST: '调整',
+  PURCHASE: t('base.batch.lbl1028'),
+  PRODUCTION: t('base.batch.lbl1029'),
+  RETURN: t('base.batch.lbl1030'),
+  ADJUST: t('base.batch.lbl1031')
 }
 
 function getStatusColor(status: QualityStatus): string {
@@ -376,11 +376,11 @@ async function handleChangeStatus() {
       newStatus: statusForm.newStatus as QualityStatus,
       reason: statusForm.reason,
     })
-    Message.success('质量状态已变更')
+    Message.success(t('base.质量状态已变更'))
     changeStatusVisible.value = false
     loadData()
   } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : '操作失败'
+    const msg = e instanceof Error ? e.message : t('base.batch.lbl1032')
     Message.error(msg)
   } finally {
     statusSubmitting.value = false

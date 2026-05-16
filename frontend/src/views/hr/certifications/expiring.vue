@@ -35,7 +35,7 @@
       <div class="action-bar">
         <a-button @click="handleExport" :loading="exportLoading">
           <template #icon><icon-download /></template>
-          导出清单
+          {{ $t('hr.certifications.exportList') }}
         </a-button>
       </div>
 
@@ -52,10 +52,10 @@
             row-key="id"
           >
             <template #daysLeft="{ record }">
-              <a-tag color="orange">{{ record.daysLeft }} 天</a-tag>
+              <a-tag color="orange">{{ $t('hr.certifications.days', {daysLeft: record.daysLeft}) }}</a-tag>
             </template>
             <template #action="{ record }">
-              <a-button type="text" size="small" @click="handleRenew(record)">续期</a-button>
+              <a-button type="text" size="small" @click="handleRenew(record)">{{ $t('hr.certifications.lbl1265') }}</a-button>
             </template>
           </a-table>
         </a-tab-pane>
@@ -74,7 +74,7 @@
               <a-tag color="red">{{ record.expireDate }}</a-tag>
             </template>
             <template #action="{ record }">
-              <a-button type="text" size="small" @click="handleRenew(record)">续期</a-button>
+              <a-button type="text" size="small" @click="handleRenew(record)">{{ $t('hr.certifications.lbl1266') }}</a-button>
             </template>
           </a-table>
         </a-tab-pane>
@@ -160,7 +160,7 @@ async function fetchAlert() {
     alertData.expiringSoonCount = (res as any).expiringSoonCount ?? 0
     alertData.expiredCount = (res as any).expiredCount ?? 0
   } catch (e: any) {
-    Message.error(e.message || '加载统计失败')
+    Message.error(e.message || t('hr.certifications.expiring.加载统计失败'))
   } finally {
     alertLoading.value = false
   }
@@ -171,7 +171,6 @@ async function fetchList() {
   try {
     if (activeTab.value === 'expiring') {
       const res = await getExpiringCertifications({
-        type: 'expiring',
         page: expiringPagination.current,
         pageSize: expiringPagination.pageSize,
       })
@@ -179,7 +178,6 @@ async function fetchList() {
       expiringPagination.total = (res as any).total ?? 0
     } else {
       const res = await getExpiringCertifications({
-        type: 'expired',
         page: expiredPagination.current,
         pageSize: expiredPagination.pageSize,
       })
@@ -187,7 +185,7 @@ async function fetchList() {
       expiredPagination.total = (res as any).total ?? 0
     }
   } catch (e: any) {
-    Message.error(e.message || '加载失败')
+    Message.error(e.message || t('hr.certifications.expiring.加载失败'))
   } finally {
     loading.value = false
   }
@@ -211,18 +209,18 @@ function handleRenew(record: any) {
 
 async function handleRenewSubmit() {
   if (!renewForm.newExpireDate) {
-    Message.warning('请选择新有效期')
+    Message.warning(t('hr.certifications.expiring.请选择新有效期'))
     return
   }
   renewLoading.value = true
   try {
     await renewCertification(renewTarget.id, { expireDate: renewForm.newExpireDate })
-    Message.success('续期成功')
+    Message.success(t('hr.certifications.expiring.续期成功'))
     renewModalVisible.value = false
     fetchAlert()
     fetchList()
   } catch (e: any) {
-    Message.error(e.message || '续期失败')
+    Message.error(e.message || t('hr.certifications.expiring.续期失败'))
   } finally {
     renewLoading.value = false
   }
@@ -231,17 +229,17 @@ async function handleRenewSubmit() {
 async function handleExport() {
   exportLoading.value = true
   try {
-    const res = await exportCertifications({ type: activeTab.value })
+    const res = await exportCertifications(activeTab.value === 'expiring' ? { expiringSoon: 1 } : { expired: 1 })
     const blob = new Blob([res.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
     const url = window.URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `认证预警清单_${new Date().getTime()}.xlsx`
+    a.download = `${t('hr.certifications.certExpiringList')}_${new Date().getTime()}.xlsx`
     a.click()
     window.URL.revokeObjectURL(url)
-    Message.success('导出成功')
+    Message.success(t('hr.certifications.expiring.导出成功'))
   } catch (e: any) {
-    Message.error(e.message || '导出失败')
+    Message.error(e.message || t('hr.certifications.expiring.导出失败'))
   } finally {
     exportLoading.value = false
   }

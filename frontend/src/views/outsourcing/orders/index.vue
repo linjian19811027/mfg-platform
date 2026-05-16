@@ -15,12 +15,12 @@
       <a-form :model="searchForm" layout="inline" class="search-form" @keyup.enter="handleSearch">
         <a-form-item :label="$t('common.status')">
           <a-select v-model="searchForm.status" :placeholder="$t('outsourcing.orders.index.全部')" allow-clear style="width: 120px">
-            <a-option value="DRAFT">草稿</a-option>
-            <a-option value="CONFIRMED">已确认</a-option>
-            <a-option value="ISSUED">已发料</a-option>
-            <a-option value="RECEIPTED">已收货</a-option>
-            <a-option value="SETTLED">已结算</a-option>
-            <a-option value="CANCELLED">已取消</a-option>
+            <a-option value="DRAFT">{{ $t('outsourcing.orders.draft') }}</a-option>
+            <a-option value="CONFIRMED">{{ $t('outsourcing.orders.lbl1344') }}</a-option>
+            <a-option value="ISSUED">{{ $t('outsourcing.orders.lbl1345') }}</a-option>
+            <a-option value="RECEIPTED">{{ $t('outsourcing.orders.lbl1346') }}</a-option>
+            <a-option value="SETTLED">{{ $t('outsourcing.orders.lbl1347') }}</a-option>
+            <a-option value="CANCELLED">{{ $t('outsourcing.orders.lbl1348') }}</a-option>
           </a-select>
         </a-form-item>
         <a-form-item :label="$t('outsourcing.orders.index.供应商')">
@@ -39,11 +39,11 @@
         <a-space>
           <a-button type="primary" @click="handleCreate">
             <template #icon><icon-plus /></template>
-            新建外协工单
+            {{ $t('outsourcing.orders.createOutsourcingOrder') }}
           </a-button>
           <a-button @click="handleExport" :loading="exportLoading">
             <template #icon><icon-download /></template>
-            导出
+            {{ $t('outsourcing.orders.export') }}
           </a-button>
         </a-space>
       </div>
@@ -58,15 +58,15 @@
           <a-tag :color="statusColor(record.status)">{{ statusLabel(record.status) }}</a-tag>
         </template>
         <template #isOverdue="{ record }">
-          <a-tag v-if="record.isOverdue" color="red">逾期</a-tag>
-          <a-tag v-else-if="record.isDueSoon" color="orange">即将到期</a-tag>
+          <a-tag v-if="record.isOverdue" color="red">{{ $t('outsourcing.orders.lbl1349') }}</a-tag>
+          <a-tag v-else-if="record.isDueSoon" color="orange">{{ $t('outsourcing.orders.expiring') }}</a-tag>
           <span v-else>-</span>
         </template>
         <template #action="{ record }">
           <a-space>
-            <a-button type="text" size="small" @click="handleView(record)">详情</a-button>
+            <a-button type="text" size="small" @click="handleView(record)">{{ $t('outsourcing.orders.detail') }}</a-button>
             <a-button v-if="record.status === 'DRAFT'" type="text" size="small"
-              @click="handleConfirm(record)">确认</a-button>
+              @click="handleConfirm(record)">{{ $t('outsourcing.orders.confirm') }}</a-button>
             <a-popconfirm v-if="['DRAFT','CONFIRMED'].includes(record.status)"
               :content="$t('outsourcing.orders.index.确定取消此外协工单')" @ok="handleCancel(record)">
               <a-button type="text" size="small" status="danger">{{ $t('common.cancel') }}</a-button>
@@ -148,12 +148,12 @@ const dashboard = ref<any>(null)
 const searchForm = reactive({ status: undefined as string | undefined, supplierId: '' })
 
 const dashboardCards = [
-  { key: 'draftCount', label: '草稿' },
-  { key: 'confirmedCount', label: '已确认' },
-  { key: 'issuedCount', label: '已发料' },
-  { key: 'overdueCount', label: '逾期', color: '#f53f3f' },
-  { key: 'dueSoonCount', label: '即将到期', color: '#ff7d00' },
-  { key: 'monthSettlementAmount', label: '本月结算金额' },
+  { key: 'draftCount', label: t('outsourcing.orders.draft') },
+  { key: 'confirmedCount', label: t('outsourcing.orders.lbl1350') },
+  { key: 'issuedCount', label: t('outsourcing.orders.lbl1351') },
+  { key: 'overdueCount', label: t('outsourcing.orders.lbl1352'), color: '#f53f3f' },
+  { key: 'dueSoonCount', label: t('outsourcing.orders.expiring'), color: '#ff7d00' },
+  { key: 'monthSettlementAmount', label: t('outsourcing.orders.lbl1353') },
 ]
 
 const columns = [
@@ -176,11 +176,11 @@ const createForm = reactive({
   plannedDeliveryDate: '', unitPrice: 0, mesWoId: '', remark: '',
 })
 const createRules = {
-  supplierId: [{ required: true, message: '请输入供应商ID' }],
-  processName: [{ required: true, message: '请输入工序名称' }],
-  materialId: [{ required: true, message: '请输入物料ID' }],
-  plannedQty: [{ required: true, message: '请输入计划数量' }],
-  plannedDeliveryDate: [{ required: true, message: '请选择计划交期' }],
+  supplierId: [{ required: true, message: t('outsourcing.orders.inputID') }],
+  processName: [{ required: true, message: t('outsourcing.orders.input') }],
+  materialId: [{ required: true, message: t('outsourcing.orders.inputID2') }],
+  plannedQty: [{ required: true, message: t('outsourcing.orders.input2') }],
+  plannedDeliveryDate: [{ required: true, message: t('outsourcing.orders.select') }],
 }
 
 onMounted(() => { fetchDashboard(); fetchData() })
@@ -196,7 +196,7 @@ async function fetchData() {
     const res = await getOutsourcingOrders({ ...searchForm, page: pagination.current, pageSize: pagination.pageSize })
     tableData.value = (res as any).list ?? (res as any).items ?? []
     pagination.total = (res as any).total ?? 0
-  } catch (e: any) { Message.error(e.message || '加载失败') }
+  } catch (e: any) { Message.error(e.message || t('outsourcing.加载失败')) }
   finally { loading.value = false }
 }
 
@@ -215,7 +215,7 @@ async function handleSubmit() {
     await createFormRef.value?.validate()
     submitLoading.value = true
     await createOutsourcingOrder(createForm)
-    Message.success('创建成功')
+    Message.success(t('outsourcing.创建成功'))
     createVisible.value = false
     fetchData()
   } catch (e: any) { if (e.message) Message.error(e.message) }
@@ -223,13 +223,13 @@ async function handleSubmit() {
 }
 
 async function handleConfirm(record: any) {
-  try { await confirmOutsourcingOrder(record.id); Message.success('确认成功'); fetchData() }
-  catch (e: any) { Message.error(e.message || '操作失败') }
+  try { await confirmOutsourcingOrder(record.id); Message.success(t('outsourcing.确认成功')); fetchData() }
+  catch (e: any) { Message.error(e.message || t('outsourcing.操作失败')) }
 }
 
 async function handleCancel(record: any) {
-  try { await cancelOutsourcingOrder(record.id, {}); Message.success('取消成功'); fetchData() }
-  catch (e: any) { Message.error(e.message || '操作失败') }
+  try { await cancelOutsourcingOrder(record.id, {}); Message.success(t('outsourcing.取消成功')); fetchData() }
+  catch (e: any) { Message.error(e.message || t('outsourcing.操作失败')) }
 }
 
 async function handleExport() {
@@ -238,15 +238,15 @@ async function handleExport() {
     const res = await exportOutsourcingOrders(searchForm)
     const blob = new Blob([res.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
     const url = window.URL.createObjectURL(blob)
-    const a = document.createElement('a'); a.href = url; a.download = `外协工单_${Date.now()}.xlsx`; a.click()
+    const a = document.createElement('a'); a.href = url; a.download = `${t('outsourcing.orders.outsourceOrder')}_${Date.now()}.xlsx`; a.click()
     window.URL.revokeObjectURL(url)
-    Message.success('导出成功')
-  } catch (e: any) { Message.error(e.message || '导出失败') }
+    Message.success(t('outsourcing.导出成功'))
+  } catch (e: any) { Message.error(e.message || t('outsourcing.导出失败')) }
   finally { exportLoading.value = false }
 }
 
 function statusLabel(s: string) {
-  const m: Record<string, string> = { DRAFT: '草稿', CONFIRMED: '已确认', ISSUED: '已发料', RECEIPTED: '已收货', SETTLED: '已结算', CANCELLED: '已取消' }
+  const m: Record<string, string> = { DRAFT: t('outsourcing.orders.draft'), CONFIRMED: t('outsourcing.orders.lbl1354'), ISSUED: t('outsourcing.orders.lbl1355'), RECEIPTED: t('outsourcing.orders.lbl1356'), SETTLED: t('outsourcing.orders.lbl1357'), CANCELLED: t('outsourcing.orders.lbl1358') }
   return m[s] ?? s
 }
 function statusColor(s: string) {

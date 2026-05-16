@@ -15,13 +15,14 @@ export interface Customer {
 
 export interface Quotation {
   id: string
-  code: string
+  quotationNo: string
   customerId: string
   customerName?: string
   status: string  // DRAFT/SENT/ACCEPTED/REJECTED/EXPIRED
   totalAmount: number
   currency: string
   validUntil?: string
+  quotationDate?: string
   createdAt: string
 }
 
@@ -72,6 +73,7 @@ export interface Receivable {
 
 export interface Payable {
   id: string
+  payableNo: string
   supplierId: string
   supplierName?: string
   amount: number
@@ -79,6 +81,8 @@ export interface Payable {
   dueDate: string
   status: string
   currency: string
+  reconId?: string
+  paymentPlan?: Record<string, any>[]
 }
 
 export interface Account {
@@ -93,12 +97,12 @@ export interface Account {
 
 export interface Voucher {
   id: string
-  code: string
-  type: string
+  voucherNo: string
+  voucherType: string
   status: string
   totalDebit: number
   totalCredit: number
-  period: string
+  voucherDate: string
   description?: string
   createdAt: string
 }

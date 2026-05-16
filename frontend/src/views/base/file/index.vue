@@ -38,7 +38,7 @@
             <template #upload-button>
               <a-button type="primary" :loading="uploading">
                 <template #icon><icon-upload /></template>
-                上传文件
+                {{ $t('base.file.uploadFile') }}
               </a-button>
             </template>
           </a-upload>
@@ -95,7 +95,7 @@
               size="small"
               @click="openPreview(record as unknown as FileRecord)"
             >
-              预览
+              {{ $t('base.file.action.preview') }}
             </a-button>
             <a-button
               v-else
@@ -103,7 +103,7 @@
               size="small"
               @click="openFileInfo(record as unknown as FileRecord)"
             >
-              详情
+              {{ $t('base.file.action.detail') }}
             </a-button>
             <a-button
               type="text"
@@ -111,13 +111,13 @@
               :loading="downloadingId === record.id"
               @click="handleDownload(record as unknown as FileRecord)"
             >
-              下载
+              {{ $t('base.file.action.download') }}
             </a-button>
             <a-popconfirm
-              :content="`确认删除文件「${record.fileName}」？`"
+              :content="t('base.file.confirm.delete', { fileName: record.fileName })"
               @ok="handleDelete(record as unknown as FileRecord)"
             >
-              <a-button type="text" size="small" status="danger">删除</a-button>
+              <a-button type="text" size="small" status="danger">{{ $t('common.delete') }}</a-button>
             </a-popconfirm>
           </a-space>
         </template>
@@ -168,7 +168,7 @@
         <div style="margin-top: 16px; text-align: center">
           <a-button type="primary" @click="handleDownload(infoFile)">
             <template #icon><icon-download /></template>
-            下载文件
+            {{ $t('base.file.action.download') }}
           </a-button>
         </div>
       </template>
@@ -192,11 +192,11 @@ import { fileApi, type FileRecord, type FileType } from '@/api/base'
 // ---- 常量 ----
 
 const FILE_TYPE_OPTIONS = [
-  { value: 'image',       label: '图片',   color: 'green',      icon: 'IconImage' },
-  { value: 'document',    label: '文档',   color: 'arcoblue',   icon: 'IconFile' },
-  { value: 'spreadsheet', label: '表格',   color: 'lime',       icon: 'IconStorage' },
+  { value: 'image',       label: t('base.file.lbl1033'),   color: 'green',      icon: 'IconImage' },
+  { value: 'document',    label: t('base.file.lbl1034'),   color: 'arcoblue',   icon: 'IconFile' },
+  { value: 'spreadsheet', label: t('base.file.lbl1035'),   color: 'lime',       icon: 'IconStorage' },
   { value: 'pdf',         label: 'PDF',    color: 'red',        icon: 'IconFile' },
-  { value: 'other',       label: '其他',   color: 'gray',       icon: 'IconFile' },
+  { value: 'other',       label: t('base.file.lbl1036'),   color: 'gray',       icon: 'IconFile' },
 ]
 
 function getTypeColor(type: FileType): string {
@@ -316,7 +316,7 @@ async function handleUpload(option: { fileItem: { file: File }; onProgress: (p: 
     name: file.name,
     percent: 0,
     status: 'normal',
-    statusText: '上传中...',
+    statusText: t('base.file.lbl1037')
   }
   uploadQueue.value.push(queueItem)
   uploading.value = true
@@ -335,16 +335,16 @@ async function handleUpload(option: { fileItem: { file: File }; onProgress: (p: 
     clearInterval(timer)
     queueItem.percent = 100
     queueItem.status = 'success'
-    queueItem.statusText = '上传成功'
+    queueItem.statusText = t('base.file.lbl1038')
     option.onSuccess()
-    Message.success(`${file.name} 上传成功`)
+    Message.success(`${file.name} ${t('base.file.uploadSuccess')}`)
     loadData()
   } catch {
     clearInterval(timer)
     queueItem.status = 'danger'
-    queueItem.statusText = '上传失败'
+    queueItem.statusText = t('base.file.lbl1039')
     option.onError()
-    Message.error(`${file.name} 上传失败`)
+    Message.error(`${file.name} ${t('base.file.uploadFailed')}`)
   } finally {
     uploading.value = uploadQueue.value.some(i => i.status === 'normal')
     // 3秒后清除已完成项
@@ -362,9 +362,9 @@ async function handleDownload(file: FileRecord) {
   downloadingId.value = file.id
   try {
     await fileApi.downloadFile(file)
-    Message.success('下载成功')
+    Message.success(t('base.下载成功'))
   } catch {
-    Message.error('下载失败')
+    Message.error(t('base.下载失败'))
   } finally {
     downloadingId.value = null
   }
@@ -375,10 +375,10 @@ async function handleDownload(file: FileRecord) {
 async function handleDelete(file: FileRecord) {
   try {
     await fileApi.deleteFile(file.id)
-    Message.success('删除成功')
+    Message.success(t('base.删除成功'))
     loadData()
   } catch {
-    Message.error('删除失败')
+    Message.error(t('base.删除失败'))
   }
 }
 

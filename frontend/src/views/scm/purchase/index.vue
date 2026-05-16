@@ -3,15 +3,15 @@
     <a-card>
       <div class="search-bar">
         <a-select v-model="query.status" :placeholder="$t('common.status')" allow-clear style="width:140px">
-          <a-option value="DRAFT">草稿</a-option>
-          <a-option value="CONFIRMED">已确认</a-option>
-          <a-option value="PARTIAL">部分收货</a-option>
-          <a-option value="RECEIVED">已收货</a-option>
-          <a-option value="CLOSED">已关闭</a-option>
+          <a-option value="DRAFT">{{ $t('scm.purchase.draft') }}</a-option>
+          <a-option value="CONFIRMED">{{ $t('scm.purchase.lbl1575') }}</a-option>
+          <a-option value="PARTIAL">{{ $t('scm.purchase.lbl1576') }}</a-option>
+          <a-option value="RECEIVED">{{ $t('scm.purchase.lbl1577') }}</a-option>
+          <a-option value="CLOSED">{{ $t('scm.purchase.closed') }}</a-option>
         </a-select>
         <a-button type="primary" @click="loadData">{{ $t('common.search') }}</a-button>
         <a-button @click="resetQuery">{{ $t('common.reset') }}</a-button>
-        <a-button style="margin-left:auto" type="primary" @click="openCreate">新建采购订单</a-button>
+        <a-button style="margin-left:auto" type="primary" @click="openCreate">{{ $t('scm.purchase.lbl1578') }}</a-button>
       </div>
 
       <MTable :columns="columns" :data="list" :loading="loading" :total="total" @change="onTableChange">
@@ -20,8 +20,8 @@
         </template>
         <template #action="{ record }">
           <a-space>
-            <a-button type="text" size="small" @click="viewDetail(record as PurchaseOrder)">查看</a-button>
-            <a-button v-if="record.status === 'DRAFT'" type="text" size="small" status="success" @click="handleConfirm(record as PurchaseOrder)">确认</a-button>
+            <a-button type="text" size="small" @click="viewDetail(record as PurchaseOrder)">{{ $t('scm.purchase.view') }}</a-button>
+            <a-button v-if="record.status === 'DRAFT'" type="text" size="small" status="success" @click="handleConfirm(record as PurchaseOrder)">{{ $t('scm.purchase.confirm') }}</a-button>
           </a-space>
         </template>
       </MTable>
@@ -64,7 +64,7 @@
       </a-form>
     </a-drawer>
 
-    <a-drawer v-model:visible="detailVisible" :title="`采购订单：${currentOrder?.code}`" :width="520" @cancel="detailVisible=false">
+    <a-drawer v-model:visible="detailVisible" ::title="t('scm.purchase.lbl1579')" :width="520" @cancel="detailVisible=false">
       <a-descriptions :data="detailItems" layout="inline-vertical" bordered />
     </a-drawer>
   </div>
@@ -83,7 +83,7 @@ const statusColorMap: Record<string, string> = {
   DRAFT: 'gray', CONFIRMED: 'blue', PARTIAL: 'orange', RECEIVED: 'green', CLOSED: 'gray',
 }
 const statusLabelMap: Record<string, string> = {
-  DRAFT: '草稿', CONFIRMED: '已确认', PARTIAL: '部分收货', RECEIVED: '已收货', CLOSED: '已关闭',
+  DRAFT: t('scm.purchase.draft')
 }
 const statusColor = (s: string) => statusColorMap[s] ?? 'gray'
 const statusLabel = (s: string) => statusLabelMap[s] ?? s
@@ -124,10 +124,10 @@ const detailItems = computed(() => {
   const o = currentOrder.value
   if (!o) return []
   return [
-    { label: '订单编号', value: o.code }, { label: '供应商', value: o.supplierName },
-    { label: '状态', value: statusLabel(o.status) }, { label: '总金额', value: o.totalAmount },
-    { label: '币种', value: o.currency }, { label: '订单日期', value: o.orderDate },
-    { label: '预计到货', value: o.expectedDate },
+    { label: t('scm.purchase.lbl1580'), value: o.code }, { label: t('scm.purchase.lbl1581'), value: o.supplierName },
+    { label: t('scm.purchase.status'), value: statusLabel(o.status) }, { label: t('scm.purchase.lbl1582'), value: o.totalAmount },
+    { label: t('scm.purchase.lbl1583'), value: o.currency }, { label: t('scm.purchase.lbl1584'), value: o.orderDate },
+    { label: t('scm.purchase.lbl1585'), value: o.expectedDate },
   ]
 })
 
@@ -152,18 +152,18 @@ function viewDetail(o: PurchaseOrder) { currentOrder.value = o; detailVisible.va
 async function handleConfirm(o: PurchaseOrder) {
   try {
     await scmApi.confirmPurchaseOrder(o.id)
-    Message.success('确认成功')
+    Message.success(t('scm.确认成功'))
     loadData()
   } catch { /* handled by request interceptor */ }
 }
 
 async function handleCreate() {
-  if (!createFormData.supplierId) { Message.warning('请选择供应商'); return }
-  if (!createFormData.orderDate) { Message.warning('请选择订单日期'); return }
+  if (!createFormData.supplierId) { Message.warning(t('scm.请选择供应商')); return }
+  if (!createFormData.orderDate) { Message.warning(t('scm.请选择订单日期')); return }
   submitting.value = true
   try {
     await scmApi.createPurchaseOrder({ ...createFormData } as Parameters<typeof scmApi.createPurchaseOrder>[0])
-    Message.success('创建成功')
+    Message.success(t('scm.创建成功'))
     createVisible.value = false
     loadData()
   } finally { submitting.value = false }

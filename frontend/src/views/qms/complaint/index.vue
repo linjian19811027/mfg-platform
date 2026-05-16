@@ -3,21 +3,21 @@
     <a-card :bordered="false" style="margin-bottom: 16px">
       <a-space wrap>
         <a-select v-model="query.status" :placeholder="$t('common.status')" allow-clear style="width: 140px">
-          <a-option value="OPEN">开放</a-option>
-          <a-option value="INVESTIGATING">调查中</a-option>
-          <a-option value="RESOLVED">已解决</a-option>
-          <a-option value="CLOSED">已关闭</a-option>
+          <a-option value="OPEN">{{ $t('qms.complaint.lbl1462') }}</a-option>
+          <a-option value="INVESTIGATING">{{ $t('qms.complaint.lbl1463') }}</a-option>
+          <a-option value="RESOLVED">{{ $t('qms.complaint.lbl1464') }}</a-option>
+          <a-option value="CLOSED">{{ $t('qms.complaint.closed') }}</a-option>
         </a-select>
         <a-select v-model="query.severity" :placeholder="$t('qms.complaint.index.严重程度')" allow-clear style="width: 130px">
-          <a-option value="CRITICAL">严重</a-option>
-          <a-option value="MAJOR">重要</a-option>
-          <a-option value="MINOR">轻微</a-option>
+          <a-option value="CRITICAL">{{ $t('qms.complaint.lbl1465') }}</a-option>
+          <a-option value="MAJOR">{{ $t('qms.complaint.lbl1466') }}</a-option>
+          <a-option value="MINOR">{{ $t('qms.complaint.lbl1467') }}</a-option>
         </a-select>
         <a-button type="primary" @click="loadData">{{ $t('common.search') }}</a-button>
         <a-button @click="resetQuery">{{ $t('common.reset') }}</a-button>
       </a-space>
       <template #extra>
-        <a-button type="primary" @click="openDrawer(null)">新建投诉</a-button>
+        <a-button type="primary" @click="openDrawer(null)">{{ $t('qms.complaint.lbl1468') }}</a-button>
       </template>
     </a-card>
 
@@ -28,18 +28,18 @@
         </template>
         <template #severity="{ record }">
           <a-tag :color="record.severity === 'CRITICAL' ? 'red' : record.severity === 'MAJOR' ? 'orange' : 'gray'">
-            {{ record.severity === 'CRITICAL' ? '严重' : record.severity === 'MAJOR' ? '重要' : '轻微' }}
+            {{ record.severity === 'CRITICAL' ? t('qms.complaint.r33044') : record.severity === 'MAJOR' ? $t('qms.complaint.lbl1469') : $t('qms.complaint.lbl1470') }}
           </a-tag>
         </template>
         <template #action="{ record }">
           <a-space>
-            <a-link @click="openDrawer(record as unknown as CustomerComplaint)">处理</a-link>
+            <a-link @click="openDrawer(record as unknown as CustomerComplaint)">{{ $t('qms.complaint.lbl1471') }}</a-link>
           </a-space>
         </template>
       </MTable>
     </a-card>
 
-    <a-drawer v-model:visible="drawerVisible" :title="editing ? '处理投诉' : '新建投诉'" :width="520" @cancel="drawerVisible = false">
+    <a-drawer v-model:visible="drawerVisible" ::title="t('qms.complaint.lbl1472')" :width="520" @cancel="drawerVisible = false">
       <MForm :schema="formSchema" v-model="formData" :loading="saving" :submit-text="$t('qms.complaint.index.保存')" @submit="handleSave" @cancel="drawerVisible = false" />
     </a-drawer>
   </div>
@@ -62,8 +62,8 @@ const total = ref(0)
 const query = reactive({ status: '', severity: '', page: 1, pageSize: 20 })
 
 const STATUS_MAP: Record<string, { label: string; color: string }> = {
-  OPEN: { label: '开放', color: 'red' }, INVESTIGATING: { label: '调查中', color: 'orange' },
-  RESOLVED: { label: '已解决', color: 'blue' }, CLOSED: { label: '已关闭', color: 'green' },
+  OPEN: { label: t('qms.complaint.lbl1473'), color: 'red' }, INVESTIGATING: { label: t('qms.complaint.lbl1474'), color: 'orange' },
+  RESOLVED: { label: t('qms.complaint.lbl1475'), color: 'blue' }, CLOSED: { label: t('qms.complaint.closed'), color: 'green' },
 }
 
 const columns: MTableColumn[] = [
@@ -76,16 +76,16 @@ const columns: MTableColumn[] = [
 ]
 
 const formSchema: MFormField[] = [
-  { field: 'customerId', label: '客户ID', type: 'input' },
-  { field: 'description', label: '投诉描述', type: 'textarea', required: true, props: { autoSize: { minRows: 3 } } },
-  { field: 'severity', label: '严重程度', type: 'select', required: true, options: [
-    { label: '严重', value: 'CRITICAL' }, { label: '重要', value: 'MAJOR' }, { label: '轻微', value: 'MINOR' },
+  { field: 'customerId', label: t('qms.complaint.lbl1476'), type: 'input', required: true },
+  { field: 'description', label: t('qms.complaint.lbl1477'), type: 'textarea', required: true, props: { autoSize: { minRows: 3 } } },
+  { field: 'severity', label: t('qms.complaint.lbl1478'), type: 'select', required: true, options: [
+    { label: t('qms.complaint.lbl1479'), value: 'CRITICAL' }, { label: t('qms.complaint.lbl1480'), value: 'MAJOR' }, { label: t('qms.complaint.lbl1481'), value: 'MINOR' },
   ]},
-  { field: 'status', label: '状态', type: 'select', options: [
-    { label: '开放', value: 'OPEN' }, { label: '调查中', value: 'INVESTIGATING' },
-    { label: '已解决', value: 'RESOLVED' }, { label: '已关闭', value: 'CLOSED' },
+  { field: 'status', label: t('qms.complaint.status'), type: 'select', options: [
+    { label: t('qms.complaint.lbl1482'), value: 'OPEN' }, { label: t('qms.complaint.lbl1483'), value: 'INVESTIGATING' },
+    { label: t('qms.complaint.lbl1484'), value: 'RESOLVED' }, { label: t('qms.complaint.closed'), value: 'CLOSED' },
   ]},
-  { field: 'resolution', label: '处理结果', type: 'textarea', props: { autoSize: { minRows: 2 } } },
+  { field: 'resolution', label: t('qms.complaint.lbl1485'), type: 'textarea', props: { autoSize: { minRows: 2 } } },
 ]
 
 function statusColor(s: string) { return STATUS_MAP[s]?.color ?? 'gray' }
@@ -120,8 +120,8 @@ function openDrawer(item: CustomerComplaint | null) {
 async function handleSave(data: Record<string, unknown>) {
   saving.value = true
   try {
-    if (editing.value) { await qmsApi.updateComplaint(editing.value.id, data); Message.success('更新成功') }
-    else { await qmsApi.createComplaint(data); Message.success('创建成功') }
+    if (editing.value) { await qmsApi.updateComplaint(editing.value.id, data); Message.success(t('qms.更新成功')) }
+    else { await qmsApi.createComplaint(data); Message.success(t('qms.创建成功')) }
     drawerVisible.value = false
     loadData()
   } catch { /* handled */ } finally { saving.value = false }

@@ -46,7 +46,7 @@ const MOCK_USERS: SysUser[] = [
 ]
 
 let mockUsers = [...MOCK_USERS]
-let nextId = 8
+// let nextId = 8 // mock auto-increment
 
 function mockDelay<T>(data: T, ms = 300): Promise<T> {
   return new Promise(resolve => setTimeout(() => resolve(data), ms))
@@ -76,57 +76,22 @@ export const sysApi = {
 
   // 创建用户
   createUser: async (data: object): Promise<{ id: string }> => {
-    try {
-      return await request.post<{ id: string }>('/v1/sys/users', data)
-    } catch {
-      const d = data as Partial<SysUser> & { password?: string }
-      const newUser: SysUser = {
-        id: String(nextId++),
-        username: d.username ?? '',
-        realName: d.realName ?? '',
-        email: d.email,
-        phone: d.phone,
-        orgId: d.orgId,
-        orgName: d.orgName,
-        status: 'active',
-        roles: d.roles ?? [],
-        createdAt: new Date().toLocaleString('zh-CN').replace(/\//g, '-'),
-      }
-      mockUsers.unshift(newUser)
-      return mockDelay({ id: newUser.id })
-    }
+    return await request.post<{ id: string }>('/v1/sys/users', data)
   },
 
   // 更新用户
   updateUser: async (id: string, data: object): Promise<void> => {
-    try {
-      return await request.put<void>(`/v1/sys/users/${id}`, data)
-    } catch {
-      const d = data as Partial<SysUser>
-      const idx = mockUsers.findIndex(u => u.id === id)
-      if (idx !== -1) mockUsers[idx] = { ...mockUsers[idx], ...d }
-      return mockDelay(undefined)
-    }
+    return await request.put<void>(`/v1/sys/users/${id}`, data)
   },
 
   // 启用/禁用用户
   toggleUserStatus: async (id: string, status: 'active' | 'disabled'): Promise<void> => {
-    try {
-      return await request.patch<void>(`/v1/sys/users/${id}/status`, { status })
-    } catch {
-      const idx = mockUsers.findIndex(u => u.id === id)
-      if (idx !== -1) mockUsers[idx].status = status
-      return mockDelay(undefined)
-    }
+    return await request.patch<void>(`/v1/sys/users/${id}/status`, { status })
   },
 
   // 重置密码
   resetPassword: async (id: string): Promise<{ tempPassword: string }> => {
-    try {
-      return await request.post<{ tempPassword: string }>(`/v1/sys/users/${id}/reset-password`)
-    } catch {
-      return mockDelay({ tempPassword: 'Abc@' + Math.random().toString(36).slice(2, 8) })
-    }
+    return await request.post<{ tempPassword: string }>(`/v1/sys/users/${id}/reset-password`)
   },
 
   // 角色列表
@@ -160,6 +125,7 @@ export interface SysRoleDetail {
   id: string
   name: string
   code: string
+  type: 'CUSTOM' | 'TENANT_ADMIN' | 'SUPER_ADMIN'
   description?: string
   userCount: number
   status: 'active' | 'disabled'
@@ -173,124 +139,162 @@ export interface RoleListParams {
 }
 
 export interface PermissionNode {
-  key: string
-  title: string
+  code: string
+  name: string
   children?: PermissionNode[]
+}
+
+// ---- Mock 角色种子数据 ----
+const mockRoles: SysRoleDetail[] = [
+  {
+    id: '1',
+    name: '超级管理员',
+    code: 'SUPER_ADMIN',
+    type: 'SUPER_ADMIN',
+    description: '系统超级管理员，拥有全部权限',
+    userCount: 1,
+    status: 'active',
+    createdAt: '2024-01-01 00:00:00',
+  },
+  {
+    id: '2',
+    name: '租户管理员',
+    code: 'TENANT_ADMIN',
+    type: 'TENANT_ADMIN',
+    description: '租户管理员，拥有租户内全部权限',
+    userCount: 3,
+    status: 'active',
+    createdAt: '2024-01-01 00:00:00',
+  },
+  {
+    id: '3',
+    name: '运营人员',
+    code: 'operator',
+    type: 'CUSTOM',
+    description: '日常运营操作角色',
+    userCount: 5,
+    status: 'active',
+    createdAt: '2024-01-15 10:00:00',
+  },
+  {
+    id: '4',
+    name: '只读用户',
+    code: 'readonly',
+    type: 'CUSTOM',
+    description: '仅有查看权限',
+    userCount: 8,
+    status: 'disabled',
+    createdAt: '2024-02-01 14:30:00',
+  },
+]
+
+function filterMockRoles(params: RoleListParams) {
+  let list = [...mockRoles]
+  if (params.name) list = list.filter(r => r.name.includes(params.name!))
+  const page = params.page ?? 1
+  const pageSize = params.pageSize ?? 20
+  const total = list.length
+  const start = (page - 1) * pageSize
+  return { list: list.slice(start, start + pageSize), total }
 }
 
 // 权限树 mock 数据
 const PERMISSION_TREE: PermissionNode[] = [
   {
-    key: 'plm', title: 'PLM 产品管理',
+    code: 'plm', name: 'PLM 产品管理',
     children: [
-      { key: 'plm:view', title: '查看' },
-      { key: 'plm:create', title: '新建' },
-      { key: 'plm:edit', title: '编辑' },
-      { key: 'plm:delete', title: '删除' },
-      { key: 'plm:approve', title: '审批' },
+      { code: 'plm:view', name: '查看' },
+      { code: 'plm:create', name: '新建' },
+      { code: 'plm:edit', name: '编辑' },
+      { code: 'plm:delete', name: '删除' },
+      { code: 'plm:approve', name: '审批' },
     ],
   },
   {
-    key: 'mes', title: 'MES 生产执行',
+    code: 'mes', name: 'MES 生产执行',
     children: [
-      { key: 'mes:view', title: '查看' },
-      { key: 'mes:create', title: '新建' },
-      { key: 'mes:edit', title: '编辑' },
-      { key: 'mes:delete', title: '删除' },
-      { key: 'mes:approve', title: '审批' },
+      { code: 'mes:view', name: '查看' },
+      { code: 'mes:create', name: '新建' },
+      { code: 'mes:edit', name: '编辑' },
+      { code: 'mes:delete', name: '删除' },
+      { code: 'mes:approve', name: '审批' },
     ],
   },
   {
-    key: 'wms', title: 'WMS 仓储管理',
+    code: 'wms', name: 'WMS 仓储管理',
     children: [
-      { key: 'wms:view', title: '查看' },
-      { key: 'wms:create', title: '新建' },
-      { key: 'wms:edit', title: '编辑' },
-      { key: 'wms:delete', title: '删除' },
-      { key: 'wms:approve', title: '审批' },
+      { code: 'wms:view', name: '查看' },
+      { code: 'wms:create', name: '新建' },
+      { code: 'wms:edit', name: '编辑' },
+      { code: 'wms:delete', name: '删除' },
+      { code: 'wms:approve', name: '审批' },
     ],
   },
   {
-    key: 'qms', title: 'QMS 质量管理',
+    code: 'qms', name: 'QMS 质量管理',
     children: [
-      { key: 'qms:view', title: '查看' },
-      { key: 'qms:create', title: '新建' },
-      { key: 'qms:edit', title: '编辑' },
-      { key: 'qms:delete', title: '删除' },
-      { key: 'qms:approve', title: '审批' },
+      { code: 'qms:view', name: '查看' },
+      { code: 'qms:create', name: '新建' },
+      { code: 'qms:edit', name: '编辑' },
+      { code: 'qms:delete', name: '删除' },
+      { code: 'qms:approve', name: '审批' },
     ],
   },
   {
-    key: 'scm', title: 'SCM 供应链管理',
+    code: 'scm', name: 'SCM 供应链管理',
     children: [
-      { key: 'scm:view', title: '查看' },
-      { key: 'scm:create', title: '新建' },
-      { key: 'scm:edit', title: '编辑' },
-      { key: 'scm:delete', title: '删除' },
-      { key: 'scm:approve', title: '审批' },
+      { code: 'scm:view', name: '查看' },
+      { code: 'scm:create', name: '新建' },
+      { code: 'scm:edit', name: '编辑' },
+      { code: 'scm:delete', name: '删除' },
+      { code: 'scm:approve', name: '审批' },
     ],
   },
   {
-    key: 'erp', title: 'ERP 企业资源',
+    code: 'erp', name: 'ERP 企业资源',
     children: [
-      { key: 'erp:view', title: '查看' },
-      { key: 'erp:create', title: '新建' },
-      { key: 'erp:edit', title: '编辑' },
-      { key: 'erp:delete', title: '删除' },
-      { key: 'erp:approve', title: '审批' },
+      { code: 'erp:view', name: '查看' },
+      { code: 'erp:create', name: '新建' },
+      { code: 'erp:edit', name: '编辑' },
+      { code: 'erp:delete', name: '删除' },
+      { code: 'erp:approve', name: '审批' },
     ],
   },
   {
-    key: 'aps', title: 'APS 高级排程',
+    code: 'aps', name: 'APS 高级排程',
     children: [
-      { key: 'aps:view', title: '查看' },
-      { key: 'aps:create', title: '新建' },
-      { key: 'aps:edit', title: '编辑' },
-      { key: 'aps:delete', title: '删除' },
-      { key: 'aps:approve', title: '审批' },
+      { code: 'aps:view', name: '查看' },
+      { code: 'aps:create', name: '新建' },
+      { code: 'aps:edit', name: '编辑' },
+      { code: 'aps:delete', name: '删除' },
+      { code: 'aps:approve', name: '审批' },
     ],
   },
   {
-    key: 'eam', title: 'EAM 设备管理',
+    code: 'eam', name: 'EAM 设备管理',
     children: [
-      { key: 'eam:view', title: '查看' },
-      { key: 'eam:create', title: '新建' },
-      { key: 'eam:edit', title: '编辑' },
-      { key: 'eam:delete', title: '删除' },
-      { key: 'eam:approve', title: '审批' },
+      { code: 'eam:view', name: '查看' },
+      { code: 'eam:create', name: '新建' },
+      { code: 'eam:edit', name: '编辑' },
+      { code: 'eam:delete', name: '删除' },
+      { code: 'eam:approve', name: '审批' },
     ],
   },
   {
-    key: 'sys', title: '系统管理',
+    code: 'sys', name: '系统管理',
     children: [
-      { key: 'sys:user:view', title: '用户查看' },
-      { key: 'sys:user:manage', title: '用户管理' },
-      { key: 'sys:role:view', title: '角色查看' },
-      { key: 'sys:role:manage', title: '角色管理' },
-      { key: 'sys:org:view', title: '组织查看' },
-      { key: 'sys:org:manage', title: '组织管理' },
-      { key: 'sys:log:view', title: '日志查看' },
+      { code: 'sys:user:view', name: '用户查看' },
+      { code: 'sys:user:manage', name: '用户管理' },
+      { code: 'sys:role:view', name: '角色查看' },
+      { code: 'sys:role:manage', name: '角色管理' },
+      { code: 'sys:org:view', name: '组织查看' },
+      { code: 'sys:org:manage', name: '组织管理' },
+      { code: 'sys:log:view', name: '日志查看' },
+      { code: 'sys:permission:view', name: '权限管理' },
     ],
   },
 ]
 
-let mockRoles: SysRoleDetail[] = [
-  { id: '1', name: '管理员', code: 'admin', description: '系统全权管理员', userCount: 2, status: 'active', createdAt: '2024-01-01 08:00:00' },
-  { id: '2', name: '操作员', code: 'operator', description: '日常业务操作', userCount: 5, status: 'active', createdAt: '2024-01-05 09:00:00' },
-  { id: '3', name: '查看员', code: 'viewer', description: '只读权限', userCount: 8, status: 'active', createdAt: '2024-01-10 10:00:00' },
-  { id: '4', name: '审批员', code: 'approver', description: '审批流程权限', userCount: 3, status: 'active', createdAt: '2024-02-01 11:00:00' },
-  { id: '5', name: '仓库管理员', code: 'wms_admin', description: 'WMS模块管理', userCount: 2, status: 'disabled', createdAt: '2024-03-15 14:00:00' },
-]
-
-const mockRolePermissions: Record<string, string[]> = {
-  '1': PERMISSION_TREE.flatMap(m => [m.key, ...(m.children?.map(c => c.key) ?? [])]),
-  '2': ['plm:view', 'plm:create', 'plm:edit', 'mes:view', 'mes:create', 'mes:edit', 'wms:view', 'wms:create'],
-  '3': PERMISSION_TREE.map(m => m.key + ':view').concat(PERMISSION_TREE.map(m => m.key)),
-  '4': ['plm:view', 'plm:approve', 'mes:view', 'mes:approve', 'qms:view', 'qms:approve'],
-  '5': ['wms:view', 'wms:create', 'wms:edit', 'wms:delete', 'wms:approve'],
-}
-
-let nextRoleId = 6
 
 export const roleApi = {
   // 角色列表
@@ -298,67 +302,28 @@ export const roleApi = {
     try {
       return await request.get<{ list: SysRoleDetail[]; total: number }>('/v1/sys/roles/list', params)
     } catch {
-      let list = [...mockRoles]
-      if (params.name) list = list.filter(r => r.name.includes(params.name!))
-      const page = params.page ?? 1
-      const pageSize = params.pageSize ?? 20
-      const total = list.length
-      const start = (page - 1) * pageSize
-      return mockDelay({ list: list.slice(start, start + pageSize), total })
+      return mockDelay(filterMockRoles(params))
     }
   },
 
   // 创建角色
   createRole: async (data: object): Promise<{ id: string }> => {
-    try {
-      return await request.post<{ id: string }>('/v1/sys/roles', data)
-    } catch {
-      const d = data as Partial<SysRoleDetail>
-      const newRole: SysRoleDetail = {
-        id: String(nextRoleId++),
-        name: d.name ?? '',
-        code: d.code ?? '',
-        description: d.description,
-        userCount: 0,
-        status: 'active',
-        createdAt: new Date().toLocaleString('zh-CN').replace(/\//g, '-'),
-      }
-      mockRoles.unshift(newRole)
-      return mockDelay({ id: newRole.id })
-    }
+    return await request.post<{ id: string }>('/v1/sys/roles', data)
   },
 
   // 更新角色
   updateRole: async (id: string, data: object): Promise<void> => {
-    try {
-      return await request.put<void>(`/v1/sys/roles/${id}`, data)
-    } catch {
-      const d = data as Partial<SysRoleDetail>
-      const idx = mockRoles.findIndex(r => r.id === id)
-      if (idx !== -1) mockRoles[idx] = { ...mockRoles[idx], ...d }
-      return mockDelay(undefined)
-    }
+    return await request.put<void>(`/v1/sys/roles/${id}`, data)
   },
 
   // 删除角色
   deleteRole: async (id: string): Promise<void> => {
-    try {
-      return await request.delete<void>(`/v1/sys/roles/${id}`)
-    } catch {
-      mockRoles = mockRoles.filter(r => r.id !== id)
-      return mockDelay(undefined)
-    }
+    return await request.delete<void>(`/v1/sys/roles/${id}`)
   },
 
   // 切换角色状态
   toggleRoleStatus: async (id: string, status: 'active' | 'disabled'): Promise<void> => {
-    try {
-      return await request.patch<void>(`/v1/sys/roles/${id}/status`, { status })
-    } catch {
-      const idx = mockRoles.findIndex(r => r.id === id)
-      if (idx !== -1) mockRoles[idx].status = status
-      return mockDelay(undefined)
-    }
+    return await request.patch<void>(`/v1/sys/roles/${id}/status`, { status })
   },
 
   // 获取角色权限
@@ -366,18 +331,13 @@ export const roleApi = {
     try {
       return await request.get<string[]>(`/v1/sys/roles/${id}/permissions`)
     } catch {
-      return mockDelay(mockRolePermissions[id] ?? [])
+      return mockDelay([])
     }
   },
 
   // 更新角色权限
   updateRolePermissions: async (id: string, permissions: string[]): Promise<void> => {
-    try {
-      return await request.put<void>(`/v1/sys/roles/${id}/permissions`, { permissions })
-    } catch {
-      mockRolePermissions[id] = permissions
-      return mockDelay(undefined)
-    }
+    return await request.put<void>(`/v1/sys/roles/${id}/permissions`, { permissions })
   },
 
   // 获取权限树
@@ -560,35 +520,36 @@ let mockOrgTree: OrgNode[] = [
   },
 ]
 
-let nextOrgId = 12
-
-function flattenOrg(nodes: OrgNode[]): OrgNode[] {
-  const result: OrgNode[] = []
-  function walk(list: OrgNode[]) {
-    for (const n of list) {
-      result.push(n)
-      if (n.children?.length) walk(n.children)
-    }
-  }
-  walk(nodes)
-  return result
-}
-
-function findAndDelete(nodes: OrgNode[], id: string): boolean {
-  for (let i = 0; i < nodes.length; i++) {
-    if (nodes[i].id === id) { nodes.splice(i, 1); return true }
-    if (nodes[i].children && findAndDelete(nodes[i].children!, id)) return true
-  }
-  return false
-}
-
-function findAndUpdate(nodes: OrgNode[], id: string, data: Partial<OrgNode>): boolean {
-  for (const n of nodes) {
-    if (n.id === id) { Object.assign(n, data); return true }
-    if (n.children && findAndUpdate(n.children, id, data)) return true
-  }
-  return false
-}
+// let nextOrgId = 12 // mock auto-increment
+// 
+// function flattenOrg(nodes: OrgNode[]): OrgNode[] {
+//   const result: OrgNode[] = []
+//   function walk(list: OrgNode[]) {
+//     for (const n of list) {
+//       result.push(n)
+//       if (n.children?.length) walk(n.children)
+//     }
+//   }
+//   walk(nodes)
+//   return result
+// }
+// 
+// function findAndDelete(nodes: OrgNode[], id: string): boolean {
+//   for (let i = 0; i < nodes.length; i++) {
+//     if (nodes[i].id === id) { nodes.splice(i, 1); return true }
+//     if (nodes[i].children && findAndDelete(nodes[i].children!, id)) return true
+//   }
+//   return false
+// }
+// 
+// function findAndUpdate(nodes: OrgNode[], id: string, data: Partial<OrgNode>): boolean {
+//   for (const n of nodes) {
+//     if (n.id === id) { Object.assign(n, data); return true }
+//     if (n.children && findAndUpdate(n.children, id, data)) return true
+//   }
+//   return false
+// }
+// 
 
 function findNode(nodes: OrgNode[], id: string): OrgNode | null {
   for (const n of nodes) {
@@ -610,51 +571,17 @@ export const orgApi = {
 
   // 创建组织
   createOrg: async (data: OrgFormData): Promise<{ id: string }> => {
-    try {
-      return await request.post<{ id: string }>('/v1/sys/orgs', data)
-    } catch {
-      const flat = flattenOrg(mockOrgTree)
-      const parent = data.parentId ? flat.find(n => n.id === data.parentId) : null
-      const newNode: OrgNode = {
-        id: String(nextOrgId++),
-        name: data.name,
-        code: data.code,
-        parentId: data.parentId,
-        manager: data.manager,
-        phone: data.phone,
-        description: data.description,
-        level: parent ? parent.level + 1 : 1,
-        sort: 99,
-        children: [],
-      }
-      if (parent) {
-        if (!parent.children) parent.children = []
-        parent.children.push(newNode)
-      } else {
-        mockOrgTree.push(newNode)
-      }
-      return mockDelay({ id: newNode.id })
-    }
+    return await request.post<{ id: string }>('/v1/sys/orgs', data)
   },
 
   // 更新组织
   updateOrg: async (id: string, data: Partial<OrgFormData>): Promise<void> => {
-    try {
-      return await request.put<void>(`/v1/sys/orgs/${id}`, data)
-    } catch {
-      findAndUpdate(mockOrgTree, id, data)
-      return mockDelay(undefined)
-    }
+    return await request.put<void>(`/v1/sys/orgs/${id}`, data)
   },
 
   // 删除组织
   deleteOrg: async (id: string): Promise<void> => {
-    try {
-      return await request.delete<void>(`/v1/sys/orgs/${id}`)
-    } catch {
-      findAndDelete(mockOrgTree, id)
-      return mockDelay(undefined)
-    }
+    return await request.delete<void>(`/v1/sys/orgs/${id}`)
   },
 
   // 获取单个组织详情
@@ -731,7 +658,7 @@ let mockUoms: Uom[] = [
   { id: '22', name: '平方毫米', symbol: 'mm²', type: 'area', isBase: false, conversionFactor: 0.000001, status: 'active', createdAt: '2024-01-01 08:00:00' },
 ]
 
-let nextUomId = 23
+// let nextUomId = 23 // mock auto-increment
 
 function filterUoms(params: UomListParams) {
   let list = [...mockUoms]
@@ -756,54 +683,22 @@ export const uomApi = {
 
   // 创建单位
   createUom: async (data: UomFormData): Promise<{ id: string }> => {
-    try {
-      return await request.post<{ id: string }>('/v1/sys/uoms', data)
-    } catch {
-      const newUom: Uom = {
-        id: String(nextUomId++),
-        name: data.name,
-        symbol: data.symbol,
-        type: data.type,
-        isBase: data.isBase,
-        description: data.description,
-        status: 'active',
-        createdAt: new Date().toLocaleString('zh-CN').replace(/\//g, '-'),
-      }
-      mockUoms.unshift(newUom)
-      return mockDelay({ id: newUom.id })
-    }
+    return await request.post<{ id: string }>('/v1/sys/uoms', data)
   },
 
   // 更新单位
   updateUom: async (id: string, data: Partial<UomFormData>): Promise<void> => {
-    try {
-      return await request.put<void>(`/v1/sys/uoms/${id}`, data)
-    } catch {
-      const idx = mockUoms.findIndex(u => u.id === id)
-      if (idx !== -1) mockUoms[idx] = { ...mockUoms[idx], ...data }
-      return mockDelay(undefined)
-    }
+    return await request.put<void>(`/v1/sys/uoms/${id}`, data)
   },
 
   // 删除单位
   deleteUom: async (id: string): Promise<void> => {
-    try {
-      return await request.delete<void>(`/v1/sys/uoms/${id}`)
-    } catch {
-      mockUoms = mockUoms.filter(u => u.id !== id)
-      return mockDelay(undefined)
-    }
+    return await request.delete<void>(`/v1/sys/uoms/${id}`)
   },
 
   // 设置换算系数
   setConversion: async (id: string, conversionFactor: number): Promise<void> => {
-    try {
-      return await request.patch<void>(`/v1/sys/uoms/${id}/conversion`, { conversionFactor })
-    } catch {
-      const idx = mockUoms.findIndex(u => u.id === id)
-      if (idx !== -1) mockUoms[idx].conversionFactor = conversionFactor
-      return mockDelay(undefined)
-    }
+    return await request.patch<void>(`/v1/sys/uoms/${id}/conversion`, { conversionFactor })
   },
 }
 
@@ -889,7 +784,7 @@ let mockTenants: Tenant[] = [
   },
 ]
 
-let nextTenantId = 8
+// let nextTenantId = 8 // mock auto-increment
 
 function filterTenants(params: TenantListParams) {
   let list = [...mockTenants]
@@ -912,36 +807,14 @@ export const tenantApi = {
   },
 
   createTenant: async (data: TenantFormData): Promise<{ id: string }> => {
-    try {
-      return await request.post<{ id: string }>('/v1/sys/tenants', data)
-    } catch {
-      const newTenant: Tenant = {
-        id: String(nextTenantId++),
-        ...data,
-        createdAt: new Date().toLocaleString('zh-CN').replace(/\//g, '-'),
-      }
-      mockTenants.unshift(newTenant)
-      return mockDelay({ id: newTenant.id })
-    }
+    return await request.post<{ id: string }>('/v1/sys/tenants', data)
   },
 
   updateTenant: async (id: string, data: Partial<TenantFormData>): Promise<void> => {
-    try {
-      return await request.put<void>(`/v1/sys/tenants/${id}`, data)
-    } catch {
-      const idx = mockTenants.findIndex(t => t.id === id)
-      if (idx !== -1) mockTenants[idx] = { ...mockTenants[idx], ...data }
-      return mockDelay(undefined)
-    }
+    return await request.put<void>(`/v1/sys/tenants/${id}`, data)
   },
 
   toggleTenantStatus: async (id: string, status: TenantStatus): Promise<void> => {
-    try {
-      return await request.patch<void>(`/v1/sys/tenants/${id}/status`, { status })
-    } catch {
-      const idx = mockTenants.findIndex(t => t.id === id)
-      if (idx !== -1) mockTenants[idx].status = status
-      return mockDelay(undefined)
-    }
+    return await request.patch<void>(`/v1/sys/tenants/${id}/status`, { status })
   },
 }

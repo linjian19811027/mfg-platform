@@ -21,6 +21,9 @@ export interface PurchaseOrder {
   currency: string
   orderDate: string
   expectedDate?: string
+  deliveryAddress?: string
+  taxRate?: number
+  remark?: string
 }
 
 export interface PurchaseRequest {

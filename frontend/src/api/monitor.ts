@@ -1,4 +1,4 @@
-import request from '@/utils/request'
+import { request } from '@/utils/request'
 
 // baseURL 已经是 /api，所以这里路径不需要再加 /api 前缀
 export function getHealth() {

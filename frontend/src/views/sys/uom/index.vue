@@ -3,14 +3,14 @@
     <div class="uom-layout">
       <!-- 左侧分类面板 -->
       <a-card class="category-panel" :body-style="{ padding: '8px 0' }">
-        <div class="category-title">单位分类</div>
+        <div class="category-title">{{ $t('sys.uom.lbl1793') }}</div>
         <a-menu
           :selected-keys="[selectedType]"
           @menu-item-click="onTypeClick"
         >
           <a-menu-item key="all">
             <template #icon><icon-apps /></template>
-            全部
+            {{ $t('sys.uom.all') }}
           </a-menu-item>
           <a-menu-item v-for="cat in UOM_CATEGORIES" :key="cat.value">
             <template #icon><component :is="cat.icon" /></template>
@@ -34,7 +34,7 @@
           <a-button @click="resetQuery">{{ $t('common.reset') }}</a-button>
           <a-button style="margin-left: auto" type="primary" @click="openCreate">
             <template #icon><icon-plus /></template>
-            新建单位
+            {{ $t('sys.uom.createUnit') }}
           </a-button>
         </div>
 
@@ -47,7 +47,7 @@
         >
           <template #isBase="{ record }">
             <a-tag :color="record.isBase ? 'green' : 'arcoblue'" size="small">
-              {{ record.isBase ? '基准' : '非基准' }}
+              {{ record.isBase ? $t('sys.uom.lbl1794') : $t('sys.uom.lbl1795') }}
             </a-tag>
           </template>
           <template #type="{ record }">
@@ -55,16 +55,16 @@
           </template>
           <template #conversionFactor="{ record }">
             <span v-if="record.isBase" style="color: var(--color-text-3)">—</span>
-            <span v-else>{{ record.conversionFactor ?? '未设置' }}</span>
+            <span v-else>{{ record.conversionFactor ?? t('sys.uom.lbl1796') }}</span>
           </template>
           <template #status="{ record }">
             <a-tag :color="record.status === 'active' ? 'green' : 'red'" size="small">
-              {{ record.status === 'active' ? '启用' : '停用' }}
+              {{ record.status === 'active' ? $t('sys.uom.enable') : $t('sys.uom.disable') }}
             </a-tag>
           </template>
           <template #action="{ record }">
             <a-space>
-              <a-button type="text" size="small" @click="openEdit(record as unknown as Uom)">编辑</a-button>
+              <a-button type="text" size="small" @click="openEdit(record as unknown as Uom)">{{ $t('sys.uom.edit') }}</a-button>
               <a-button
                 v-if="!record.isBase"
                 type="text"
@@ -72,13 +72,13 @@
                 status="warning"
                 @click="openConversion(record as unknown as Uom)"
               >
-                换算
+                {{ $t('sys.uom.conversion') }}
               </a-button>
               <a-popconfirm
                 :content="$t('sys.uom.index.确认删除该计量单位')"
                 @ok="handleDelete(record as unknown as Uom)"
               >
-                <a-button type="text" size="small" status="danger" :loading="deleteLoadingId === record.id">删除</a-button>
+                <a-button type="text" size="small" status="danger" :loading="deleteLoadingId === record.id">{{ $t('sys.uom.delete') }}</a-button>
               </a-popconfirm>
             </a-space>
           </template>
@@ -89,7 +89,7 @@
     <!-- 新建/编辑抽屉 -->
     <a-drawer
       v-model:visible="drawerVisible"
-      :title="editingUom ? '编辑计量单位' : '新建计量单位'"
+      ::title="t('sys.uom.lbl1797')"
       :width="480"
       @cancel="drawerVisible = false"
     >
@@ -102,7 +102,7 @@
         <a-form-item
           field="name"
           :label="$t('sys.uom.index.单位名称')"
-          :rules="[{ required: true, message: '请输入单位名称' }]"
+          :rules="[{ required: true, message: t('sys.uom.input') }]"
           validate-trigger="blur"
         >
           <a-input v-model="formData.name" :placeholder="$t('sys.uom.index.如千克米升')" />
@@ -110,7 +110,7 @@
         <a-form-item
           field="symbol"
           :label="$t('sys.uom.index.单位符号')"
-          :rules="[{ required: true, message: '请输入单位符号' }]"
+          :rules="[{ required: true, message: t('sys.uom.input2') }]"
           validate-trigger="blur"
         >
           <a-input v-model="formData.symbol" :placeholder="$t('sys.uom.index.如kgmL')" />
@@ -118,7 +118,7 @@
         <a-form-item
           field="type"
           :label="$t('sys.uom.index.单位类型')"
-          :rules="[{ required: true, message: '请选择单位类型' }]"
+          :rules="[{ required: true, message: t('sys.uom.select') }]"
         >
           <a-select v-model="formData.type" :placeholder="$t('sys.uom.index.请选择类型')">
             <a-option v-for="cat in UOM_CATEGORIES" :key="cat.value" :value="cat.value">
@@ -129,7 +129,7 @@
         <a-form-item field="isBase" :label="$t('sys.uom.index.是否基准单位')">
           <a-switch v-model="formData.isBase" />
           <span style="margin-left: 8px; color: var(--color-text-3); font-size: 12px">
-            每种类型只应有一个基准单位，其他单位的换算系数相对于基准单位
+            {{ $t('sys.uom.baseUnitHint') }}
           </span>
         </a-form-item>
         <a-form-item field="description" :label="$t('common.description')">
@@ -152,7 +152,7 @@
       <div v-if="conversionUom" class="conversion-form">
         <a-alert type="info" style="margin-bottom: 16px">
           <template #content>
-            换算关系：1 <strong>{{ conversionUom.name }}（{{ conversionUom.symbol }}）</strong>
+            {{ $t('sys.uom.conversionRelation', { name: conversionUom.name, symbol: conversionUom.symbol }) }}
             = ? <strong>{{ getBaseUnitName(conversionUom.type) }}</strong>
           </template>
         </a-alert>
@@ -166,7 +166,7 @@
               style="width: 100%"
             />
             <div style="margin-top: 4px; color: var(--color-text-3); font-size: 12px">
-              例：1吨 = 1000千克，则换算系数填 1000
+              {{ $t('sys.uom.conversionExample') }}
             </div>
           </a-form-item>
         </a-form>
@@ -190,21 +190,21 @@ import { uomApi, type Uom, type UomType, type UomFormData } from '@/api/sys'
 
 // ---- 分类定义 ----
 const UOM_CATEGORIES = [
-  { value: 'length', label: '长度', icon: 'icon-minus' },
-  { value: 'weight', label: '重量', icon: 'icon-download' },
-  { value: 'volume', label: '体积', icon: 'icon-storage' },
-  { value: 'time', label: '时间', icon: 'icon-clock-circle' },
-  { value: 'quantity', label: '数量', icon: 'icon-list' },
-  { value: 'area', label: '面积', icon: 'icon-expand' },
+  { value: 'length', label: t('sys.uom.lbl1798'), icon: 'icon-minus' },
+  { value: 'weight', label: t('sys.uom.lbl1799'), icon: 'icon-download' },
+  { value: 'volume', label: t('sys.uom.lbl1800'), icon: 'icon-storage' },
+  { value: 'time', label: t('sys.uom.time'), icon: 'icon-clock-circle' },
+  { value: 'quantity', label: t('sys.uom.quantity'), icon: 'icon-list' },
+  { value: 'area', label: t('sys.uom.lbl1801'), icon: 'icon-expand' },
 ] as const
 
 const TYPE_LABEL_MAP: Record<string, string> = {
-  length: '长度',
-  weight: '重量',
-  volume: '体积',
-  time: '时间',
-  quantity: '数量',
-  area: '面积',
+  length: t('sys.uom.lbl1802'),
+  weight: t('sys.uom.lbl1803'),
+  volume: t('sys.uom.lbl1804'),
+  time: t('sys.uom.time'),
+  quantity: t('sys.uom.quantity'),
+  area: t('sys.uom.lbl1805')
 }
 
 function getTypeName(type: string) {
@@ -213,7 +213,7 @@ function getTypeName(type: string) {
 
 function getBaseUnitName(type: string) {
   const base = list.value.find(u => u.type === type && u.isBase)
-  return base ? `${base.name}（${base.symbol}）` : '基准单位'
+  return base ? `${base.name}（${base.symbol}）` : t('sys.uom.lbl1806')
 }
 
 // ---- 列定义 ----
@@ -328,13 +328,15 @@ async function handleSubmit() {
     }
     if (editingUom.value) {
       await uomApi.updateUom(editingUom.value.id, payload)
-      Message.success('保存成功')
+      Message.success(t('sys.保存成功'))
     } else {
       await uomApi.createUom(payload)
-      Message.success('创建成功')
+      Message.success(t('sys.创建成功'))
     }
     drawerVisible.value = false
     loadData()
+  } catch {
+    Message.error(t('sys.操作失败'))
   } finally {
     submitting.value = false
   }
@@ -347,8 +349,10 @@ async function handleDelete(uom: Uom) {
   deleteLoadingId.value = uom.id
   try {
     await uomApi.deleteUom(uom.id)
-    Message.success('删除成功')
+    Message.success(t('sys.删除成功'))
     loadData()
+  } catch {
+    Message.error(t('sys.删除失败'))
   } finally {
     deleteLoadingId.value = null
   }
@@ -371,9 +375,11 @@ async function handleSaveConversion() {
   conversionSubmitting.value = true
   try {
     await uomApi.setConversion(conversionUom.value.id, conversionFactor.value)
-    Message.success('换算系数已保存')
+    Message.success(t('sys.换算系数已保存'))
     conversionVisible.value = false
     loadData()
+  } catch {
+    Message.error(t('sys.保存失败'))
   } finally {
     conversionSubmitting.value = false
   }

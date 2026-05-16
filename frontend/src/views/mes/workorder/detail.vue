@@ -3,8 +3,8 @@
     <a-card :bordered="false" style="margin-bottom: 16px">
       <template #title>
         <a-space>
-          <a-link @click="router.back()">← 返回</a-link>
-          <span>工单详情</span>
+          <a-link @click="router.back()">{{ $t('mes.workorder.lbl1316') }}</a-link>
+          <span>{{ $t('mes.workorder.lbl1317') }}</span>
         </a-space>
       </template>
       <a-descriptions :data="descItems" :column="3" bordered />
@@ -55,11 +55,11 @@
         <!-- 工单树（多层级） -->
         <a-tab-pane key="tree" :title="$t('mes.workorder.detail.工单树')">
           <div v-if="treeData" style="padding: 8px 0">
-            <a-tag color="blue" style="margin-bottom: 12px">整体完成度：{{ treeData.completionPct?.toFixed(1) }}%</a-tag>
+            <a-tag color="blue" style="margin-bottom: 12px">{{ $t('mes.workorder.treeCompletion', {pct: treeData.completionPct?.toFixed(1)}) }}</a-tag>
             <a-tree :data="treeData.tree" :default-expand-all="true" block-node @select="onTreeNodeSelect">
               <template #title="node">
                 <a-space>
-                  <a-tag v-if="node.isCritical" color="red" size="small">关键</a-tag>
+                  <a-tag v-if="node.isCritical" color="red" size="small">{{ $t('mes.workorder.lbl1318') }}</a-tag>
                   <span>{{ node.title }}</span>
                   <a-tag size="small" :color="woStatusColor(node.status)">{{ node.status }}</a-tag>
                 </a-space>
@@ -73,7 +73,7 @@
         <a-tab-pane key="critical-path" :title="$t('mes.workorder.detail.关键路径')">
           <a-table :columns="criticalPathColumns" :data="criticalPath" :loading="criticalPathLoading" :pagination="false" row-key="id">
             <template #isCritical="{ record }">
-              <a-tag v-if="record.isCritical" color="red">关键</a-tag>
+              <a-tag v-if="record.isCritical" color="red">{{ $t('mes.workorder.lbl1319') }}</a-tag>
               <span v-else>-</span>
             </template>
           </a-table>
@@ -81,8 +81,8 @@
 
         <!-- 物料齐套 -->
         <a-tab-pane key="readiness" :title="$t('mes.workorder.detail.物料齐套')">
-          <a-alert v-if="readiness?.isAllReady" type="success" style="margin-bottom: 12px">所有物料已齐套</a-alert>
-          <a-alert v-else type="warning" style="margin-bottom: 12px">物料尚未完全齐套</a-alert>
+          <a-alert v-if="readiness?.isAllReady" type="success" style="margin-bottom: 12px">{{ $t('mes.workorder.lbl1320') }}</a-alert>
+          <a-alert v-else type="warning" style="margin-bottom: 12px">{{ $t('mes.workorder.lbl1321') }}</a-alert>
         </a-tab-pane>
       </a-tabs>
     </a-card>
@@ -91,14 +91,14 @@
     <a-modal v-model:visible="cancelModalVisible" :title="$t('mes.workorder.detail.取消工单')" :ok-loading="cancelLoading"
       @ok="submitCancel" @cancel="cancelModalVisible = false">
       <a-alert v-if="cancelPreview?.length" type="warning" style="margin-bottom: 12px">
-        此工单有 {{ cancelPreview.length }} 个子工单
+        {{ $t('mes.workorder.hasCancelItems', {n: cancelPreview.length}) }}
       </a-alert>
       <a-form :model="cancelForm" layout="vertical">
         <a-form-item :label="$t('mes.workorder.detail.取消原因')" required>
           <a-textarea v-model="cancelForm.reason" :rows="3" :placeholder="$t('mes.workorder.detail.请输入取消原因')" />
         </a-form-item>
         <a-form-item v-if="cancelPreview?.length">
-          <a-checkbox v-model="cancelForm.cascade">同时级联取消 {{ cancelPreview.length }} 个子工单</a-checkbox>
+          <a-checkbox v-model="cancelForm.cascade">{{ $t('mes.workorder.r22009', {length: cancelPreview.length}) }}</a-checkbox>
         </a-form-item>
       </a-form>
     </a-modal>
@@ -110,7 +110,7 @@ const { t } = useI18n()
 import { useI18n } from 'vue-i18n'
 import { ref, computed, onMounted, reactive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { mesApi, type WorkOrder, type WorkOrderOperation } from '@/api/mes'
+import { mesApi, type WorkOrder, type WorkOrderOperation, type ProductionReport } from '@/api/mes'
 import { getWorkOrderTree, getWorkOrderCriticalPath, getWorkOrderReadiness, cancelWorkOrder } from '@/api/mes'
 
 const route = useRoute()
@@ -118,7 +118,7 @@ const router = useRouter()
 const id = route.params.id as string
 
 const workOrder = ref<WorkOrder | null>(null)
-const reports = ref<any[]>([])
+const reports = ref<ProductionReport[]>([])
 const reportsLoading = ref(false)
 const reportsTotal = ref(0)
 
@@ -144,26 +144,26 @@ const criticalPathColumns = [
 ]
 
 const STATUS_LABEL: Record<string, string> = {
-  draft: '草稿', released: '已下达', in_progress: '生产中', completed: '已完工', closed: '已关闭',
+  draft: t('mes.workorder.draft')
 }
 
 const OP_STATUS: Record<string, { label: string; color: string }> = {
-  pending: { label: '待开始', color: 'gray' },
-  in_progress: { label: '进行中', color: 'orange' },
-  completed: { label: '已完成', color: 'green' },
+  pending: { label: t('mes.workorder.lbl1322'), color: 'gray' },
+  in_progress: { label: t('mes.workorder.inProgress'), color: 'orange' },
+  completed: { label: t('mes.workorder.completed'), color: 'green' },
 }
 
 const descItems = computed(() => {
   const wo = workOrder.value
   if (!wo) return []
   return [
-    { label: '工单编号', value: wo.code },
-    { label: '物料名称', value: wo.materialName ?? wo.materialId },
-    { label: '状态', value: STATUS_LABEL[wo.status] ?? wo.status },
-    { label: '计划数量', value: wo.plannedQty },
-    { label: '完成数量', value: wo.completedQty },
-    { label: '计划开始', value: wo.plannedStartDate ?? '-' },
-    { label: '计划结束', value: wo.plannedEndDate ?? '-' },
+    { label: t('mes.workorder.lbl1323'), value: wo.code },
+    { label: t('mes.workorder.lbl1324'), value: wo.materialName ?? wo.materialId },
+    { label: t('mes.workorder.status'), value: STATUS_LABEL[wo.status] ?? wo.status },
+    { label: t('mes.workorder.lbl1325'), value: wo.plannedQty },
+    { label: t('mes.workorder.lbl1326'), value: wo.completedQty },
+    { label: t('mes.workorder.lbl1327'), value: wo.plannedStartDate ?? '-' },
+    { label: t('mes.workorder.lbl1328'), value: wo.plannedEndDate ?? '-' },
   ]
 })
 
@@ -175,7 +175,7 @@ const currentStep = computed(() => {
 
 const reportColumns = [
   { title: t('mes.workorder.detail.报工时间'), dataIndex: 'reportTime', key: 'reportTime', width: 180 },
-  { title: t('mes.workorder.detail.操作类型'), dataIndex: 'action', key: 'action', width: 120 },
+  { title: t('mes.workorder.detail.操作类型'), dataIndex: 'reportType', key: 'reportType', width: 120 },
   { title: t('mes.workorder.detail.完成数量'), dataIndex: 'completedQty', key: 'completedQty', width: 100 },
   { title: t('mes.workorder.detail.报废数量'), dataIndex: 'scrapQty', key: 'scrapQty', width: 100 },
   { title: t('mes.workorder.detail.操作员'), dataIndex: 'operatorId', key: 'operatorId', width: 120 },
@@ -209,7 +209,7 @@ async function loadReports(page = 1) {
   reportsLoading.value = true
   try {
     const res = await mesApi.getProductionReports({ woId: id, page, pageSize: 20 })
-    reports.value = (res.list ?? []) as any[]
+    reports.value = (res.list ?? []) as ProductionReport[]
     reportsTotal.value = res.total ?? 0
   } finally {
     reportsLoading.value = false

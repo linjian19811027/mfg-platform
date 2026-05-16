@@ -3,9 +3,9 @@
     <a-page-header :title="$t('outsourcing.orders.detail.外协工单详情')" @back="router.back()">
       <template #extra>
         <a-space>
-          <a-button v-if="order.status === 'DRAFT'" type="primary" @click="handleConfirm" :loading="actionLoading">确认工单</a-button>
+          <a-button v-if="order.status === 'DRAFT'" type="primary" @click="handleConfirm" :loading="actionLoading">{{ $t('outsourcing.orders.lbl1330') }}</a-button>
           <a-popconfirm v-if="['DRAFT','CONFIRMED'].includes(order.status)" :content="$t('outsourcing.orders.detail.确定取消此工单')" @ok="handleCancel">
-            <a-button status="danger">取消工单</a-button>
+            <a-button status="danger">{{ $t('outsourcing.orders.lbl1331') }}</a-button>
           </a-popconfirm>
         </a-space>
       </template>
@@ -39,15 +39,15 @@
           <a-tab-pane key="issues" :title="$t('outsourcing.orders.detail.发料记录')">
             <div style="margin-bottom: 12px">
               <a-button type="primary" size="small" @click="showIssueModal" :disabled="!['CONFIRMED','ISSUED'].includes(order.status)">
-                <template #icon><icon-plus /></template>新建发料单
+<template #icon><icon-plus /></template>{{ $t('outsourcing.orders.createIssue') }}
               </a-button>
             </div>
             <a-table :columns="issueColumns" :data="issues" :loading="issueLoading" :pagination="false" row-key="id">
               <template #status="{ record }">
-                <a-tag :color="record.status === 'CONFIRMED' ? 'green' : 'gray'">{{ record.status === 'CONFIRMED' ? '已确认' : '草稿' }}</a-tag>
+                <a-tag :color="record.status === 'CONFIRMED' ? 'green' : 'gray'">{{ record.status === 'CONFIRMED' ? $t('outsourcing.orders.lbl1332') : $t('outsourcing.orders.draft') }}</a-tag>
               </template>
               <template #action="{ record }">
-                <a-button v-if="record.status === 'DRAFT'" type="text" size="small" @click="handleConfirmIssue(record)">确认发料</a-button>
+                <a-button v-if="record.status === 'DRAFT'" type="text" size="small" @click="handleConfirmIssue(record)">{{ $t('outsourcing.orders.lbl1333') }}</a-button>
               </template>
             </a-table>
           </a-tab-pane>
@@ -56,17 +56,17 @@
           <a-tab-pane key="receipts" :title="$t('outsourcing.orders.detail.收货记录')">
             <div style="margin-bottom: 12px">
               <a-button type="primary" size="small" @click="showReceiptModal" :disabled="order.status !== 'ISSUED'">
-                <template #icon><icon-plus /></template>新建收货单
+<template #icon><icon-plus /></template>{{ $t('outsourcing.orders.createReceipt') }}
               </a-button>
             </div>
             <a-table :columns="receiptColumns" :data="receipts" :loading="receiptLoading" :pagination="false" row-key="id">
               <template #status="{ record }">
                 <a-tag :color="record.status === 'CONFIRMED' ? 'green' : record.status === 'FAILED' ? 'red' : 'gray'">
-                  {{ ({ CONFIRMED: '已确认', FAILED: '不合格', DRAFT: '草稿' } as any)[record.status] ?? record.status }}
+                  {{ ({ CONFIRMED: t('outsourcing.orders.lbl1334'), FAILED: t('outsourcing.orders.unqualified'), DRAFT: t('outsourcing.orders.draft') } as any)[record.status] ?? record.status }}
                 </a-tag>
               </template>
               <template #action="{ record }">
-                <a-button v-if="record.status === 'DRAFT'" type="text" size="small" @click="handleConfirmReceipt(record)">确认收货</a-button>
+                <a-button v-if="record.status === 'DRAFT'" type="text" size="small" @click="handleConfirmReceipt(record)">{{ $t('outsourcing.orders.lbl1335') }}</a-button>
               </template>
             </a-table>
           </a-tab-pane>
@@ -75,15 +75,15 @@
           <a-tab-pane key="settlements" :title="$t('outsourcing.orders.detail.结算记录')">
             <div style="margin-bottom: 12px">
               <a-button type="primary" size="small" @click="showSettlementModal" :disabled="order.status !== 'RECEIPTED'">
-                <template #icon><icon-plus /></template>新建结算单
+<template #icon><icon-plus /></template>{{ $t('outsourcing.orders.createSettlement') }}
               </a-button>
             </div>
             <a-table :columns="settlementColumns" :data="settlements" :loading="settlementLoading" :pagination="false" row-key="id">
               <template #status="{ record }">
-                <a-tag :color="record.status === 'APPROVED' ? 'green' : 'gray'">{{ record.status === 'APPROVED' ? '已审核' : '待审核' }}</a-tag>
+                <a-tag :color="record.status === 'APPROVED' ? 'green' : 'gray'">{{ record.status === 'APPROVED' ? $t('outsourcing.orders.lbl1336') : $t('outsourcing.orders.lbl1337') }}</a-tag>
               </template>
               <template #action="{ record }">
-                <a-button v-if="record.status === 'PENDING'" type="text" size="small" @click="handleApproveSettlement(record)">审核</a-button>
+                <a-button v-if="record.status === 'PENDING'" type="text" size="small" @click="handleApproveSettlement(record)">{{ $t('outsourcing.orders.lbl1338') }}</a-button>
               </template>
             </a-table>
           </a-tab-pane>
@@ -219,7 +219,7 @@ onMounted(async () => {
     const res = await getOutsourcingOrder(id)
     order.value = res
     await Promise.all([loadIssues(), loadReceipts(), loadSettlements(), loadLogs()])
-  } catch (e: any) { Message.error(e.message || '加载失败') }
+  } catch (e: any) { Message.error(e.message || t('outsourcing.加载失败')) }
   finally { loading.value = false }
 })
 
@@ -228,22 +228,22 @@ async function loadReceipts() { receiptLoading.value = true; try { const r = awa
 async function loadSettlements() { settlementLoading.value = true; try { const r = await getOutsourcingSettlements(id); settlements.value = (r as any).list ?? (r as any).data ?? [] } finally { settlementLoading.value = false } }
 async function loadLogs() { try { const r = await getOutsourcingLogs(id); logs.value = (r as any).list ?? (r as any).data ?? [] } catch {} }
 
-async function handleConfirm() { actionLoading.value = true; try { await confirmOutsourcingOrder(id); Message.success('确认成功'); order.value.status = 'CONFIRMED' } catch (e: any) { Message.error(e.message || '操作失败') } finally { actionLoading.value = false } }
-async function handleCancel() { try { await cancelOutsourcingOrder(id, {}); Message.success('取消成功'); order.value.status = 'CANCELLED' } catch (e: any) { Message.error(e.message || '操作失败') } }
+async function handleConfirm() { actionLoading.value = true; try { await confirmOutsourcingOrder(id); Message.success(t('outsourcing.确认成功')); order.value.status = 'CONFIRMED' } catch (e: any) { Message.error(e.message || t('outsourcing.操作失败')) } finally { actionLoading.value = false } }
+async function handleCancel() { try { await cancelOutsourcingOrder(id, {}); Message.success(t('outsourcing.取消成功')); order.value.status = 'CANCELLED' } catch (e: any) { Message.error(e.message || t('outsourcing.操作失败')) } }
 
 function showIssueModal() { Object.assign(issueForm, { qty: 1, warehouseId: '', batchId: '' }); issueModalVisible.value = true }
-async function submitIssue() { issueSubmitLoading.value = true; try { await createOutsourcingIssue(id, issueForm); Message.success('发料单创建成功'); issueModalVisible.value = false; loadIssues() } catch (e: any) { Message.error(e.message || '操作失败') } finally { issueSubmitLoading.value = false } }
-async function handleConfirmIssue(record: any) { try { await confirmOutsourcingIssue(record.id); Message.success('发料确认成功'); loadIssues() } catch (e: any) { Message.error(e.message || '操作失败') } }
+async function submitIssue() { issueSubmitLoading.value = true; try { await createOutsourcingIssue(id, issueForm); Message.success(t('outsourcing.发料单创建成功')); issueModalVisible.value = false; loadIssues() } catch (e: any) { Message.error(e.message || t('outsourcing.操作失败')) } finally { issueSubmitLoading.value = false } }
+async function handleConfirmIssue(record: any) { try { await confirmOutsourcingIssue(record.id); Message.success(t('outsourcing.发料确认成功')); loadIssues() } catch (e: any) { Message.error(e.message || t('outsourcing.操作失败')) } }
 
 function showReceiptModal() { Object.assign(receiptForm, { qty: 1, stagingLocationId: '' }); receiptModalVisible.value = true }
-async function submitReceipt() { receiptSubmitLoading.value = true; try { await createOutsourcingReceipt(id, receiptForm); Message.success('收货单创建成功'); receiptModalVisible.value = false; loadReceipts() } catch (e: any) { Message.error(e.message || '操作失败') } finally { receiptSubmitLoading.value = false } }
-async function handleConfirmReceipt(record: any) { try { await confirmOutsourcingReceipt(record.id); Message.success('收货确认成功'); loadReceipts() } catch (e: any) { Message.error(e.message || '操作失败') } }
+async function submitReceipt() { receiptSubmitLoading.value = true; try { await createOutsourcingReceipt(id, receiptForm); Message.success(t('outsourcing.收货单创建成功')); receiptModalVisible.value = false; loadReceipts() } catch (e: any) { Message.error(e.message || t('outsourcing.操作失败')) } finally { receiptSubmitLoading.value = false } }
+async function handleConfirmReceipt(record: any) { try { await confirmOutsourcingReceipt(record.id); Message.success(t('outsourcing.收货确认成功')); loadReceipts() } catch (e: any) { Message.error(e.message || t('outsourcing.操作失败')) } }
 
 function showSettlementModal() { Object.assign(settlementForm, { settledQty: 1, taxRate: 13 }); settlementModalVisible.value = true }
-async function submitSettlement() { settlementSubmitLoading.value = true; try { await createOutsourcingSettlement(id, settlementForm); Message.success('结算单创建成功'); settlementModalVisible.value = false; loadSettlements() } catch (e: any) { Message.error(e.message || '操作失败') } finally { settlementSubmitLoading.value = false } }
-async function handleApproveSettlement(record: any) { try { await approveOutsourcingSettlement(record.id); Message.success('审核成功'); loadSettlements() } catch (e: any) { Message.error(e.message || '操作失败') } }
+async function submitSettlement() { settlementSubmitLoading.value = true; try { await createOutsourcingSettlement(id, settlementForm); Message.success(t('outsourcing.结算单创建成功')); settlementModalVisible.value = false; loadSettlements() } catch (e: any) { Message.error(e.message || t('outsourcing.操作失败')) } finally { settlementSubmitLoading.value = false } }
+async function handleApproveSettlement(record: any) { try { await approveOutsourcingSettlement(record.id); Message.success(t('outsourcing.审核成功')); loadSettlements() } catch (e: any) { Message.error(e.message || t('outsourcing.操作失败')) } }
 
-function statusLabel(s: string) { return ({ DRAFT: '草稿', CONFIRMED: '已确认', ISSUED: '已发料', RECEIPTED: '已收货', SETTLED: '已结算', CANCELLED: '已取消' } as any)[s] ?? s }
+function statusLabel(s: string) { return ({ DRAFT: t('outsourcing.orders.draft'), CONFIRMED: t('outsourcing.orders.lbl1339'), ISSUED: t('outsourcing.orders.lbl1340'), RECEIPTED: t('outsourcing.orders.lbl1341'), SETTLED: t('outsourcing.orders.lbl1342'), CANCELLED: t('outsourcing.orders.lbl1343') } as any)[s] ?? s }
 function statusColor(s: string) { return ({ DRAFT: 'gray', CONFIRMED: 'blue', ISSUED: 'orange', RECEIPTED: 'cyan', SETTLED: 'green', CANCELLED: 'red' } as any)[s] ?? 'gray' }
 </script>
 

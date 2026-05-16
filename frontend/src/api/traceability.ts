@@ -1,4 +1,4 @@
-import request from '@/utils/request'
+import { request } from '@/utils/request'
 
 // 追溯批次管理
 export function getTraceBatches(params: any) {

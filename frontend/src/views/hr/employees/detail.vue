@@ -3,8 +3,8 @@
     <a-page-header :title="$t('hr.employees.detail.员工详情')" @back="handleBack">
       <template #extra>
         <a-space>
-          <a-button @click="handleEdit">编辑</a-button>
-          <a-button type="primary" @click="handleStatusChange">变更状态</a-button>
+          <a-button @click="handleEdit">{{ $t('common.edit') }}</a-button>
+          <a-button type="primary" @click="handleStatusChange">{{ $t('hr.employees.index.变更员工状态') }}</a-button>
         </a-space>
       </template>
     </a-page-header>
@@ -17,11 +17,11 @@
             <a-descriptions-item :label="$t('hr.employees.detail.工号')">{{ employeeData.employeeNo }}</a-descriptions-item>
             <a-descriptions-item :label="$t('hr.employees.detail.姓名')">{{ employeeData.name }}</a-descriptions-item>
             <a-descriptions-item :label="$t('hr.employees.detail.工种')">{{ employeeData.jobType }}</a-descriptions-item>
-            <a-descriptions-item :label="$t('hr.employees.detail.工作中心')">{{ employeeData.workCenter }}</a-descriptions-item>
+            <a-descriptions-item :label="$t('hr.employees.detail.工作中心')">{{ workCenterMap[employeeData.workCenterId] || employeeData.workCenterId || '-' }}</a-descriptions-item>
             <a-descriptions-item :label="$t('common.status')">
-              <a-tag v-if="employeeData.status === 'ACTIVE'" color="green">在职</a-tag>
-              <a-tag v-else-if="employeeData.status === 'INACTIVE'" color="gray">离职</a-tag>
-              <a-tag v-else-if="employeeData.status === 'SUSPENDED'" color="orange">停职</a-tag>
+              <a-tag v-if="employeeData.status === 'ACTIVE'" color="green">{{ $t('common.status.onDuty') }}</a-tag>
+              <a-tag v-else-if="employeeData.status === 'INACTIVE'" color="gray">{{ $t('common.status.inactive') }}</a-tag>
+              <a-tag v-else-if="employeeData.status === 'SUSPENDED'" color="orange">{{ $t('common.status.suspended') }}</a-tag>
             </a-descriptions-item>
             <a-descriptions-item :label="$t('hr.employees.detail.入职日期')">{{ employeeData.hireDate }}</a-descriptions-item>
             <a-descriptions-item :label="$t('hr.employees.detail.离职日期')">{{ employeeData.terminationDate || '-' }}</a-descriptions-item>
@@ -36,7 +36,7 @@
           <div class="tab-header">
             <a-button type="primary" @click="handleAddCertification">
               <template #icon><icon-plus /></template>
-              添加认证
+              {{ $t('hr.employees.detail.添加认证') }}
             </a-button>
           </div>
           <a-table
@@ -47,15 +47,15 @@
             row-key="id"
           >
             <template #status="{ record }">
-              <a-tag v-if="record.isExpired" color="red">已过期</a-tag>
-              <a-tag v-else-if="record.isExpiringSoon" color="orange">即将到期</a-tag>
-              <a-tag v-else color="green">有效</a-tag>
+              <a-tag v-if="record.isExpired" color="red">{{ $t('hr.employees.detail.已过期') }}</a-tag>
+              <a-tag v-else-if="record.isExpiringSoon" color="orange">{{ $t('hr.employees.detail.即将到期') }}</a-tag>
+              <a-tag v-else color="green">{{ $t('hr.employees.detail.有效') }}</a-tag>
             </template>
             <template #action="{ record }">
               <a-space>
-                <a-button type="text" size="small" @click="handleRenewCert(record)">续期</a-button>
+                <a-button type="text" size="small" @click="handleRenewCert(record)">{{ $t('hr.employees.detail.续期') }}</a-button>
                 <a-popconfirm :content="$t('hr.employees.detail.确定删除此认证吗')" @ok="handleDeleteCert(record)">
-                  <a-button type="text" size="small" status="danger">删除</a-button>
+                  <a-button type="text" size="small" status="danger">{{ $t('common.delete') }}</a-button>
                 </a-popconfirm>
               </a-space>
             </template>
@@ -97,13 +97,18 @@
             <template #footer>
               <div style="text-align: right; padding: 8px 0;">
                 <a-space size="large">
-                  <span>总工时: <strong>{{ workHourSummary.totalHours }}</strong> 小时</span>
-                  <span>正常工时: <strong>{{ workHourSummary.normalHours }}</strong> 小时</span>
-                  <span>加班工时: <strong>{{ workHourSummary.overtimeHours }}</strong> 小时</span>
+                  <span>{{ $t('hr.employees.detail.总工时') }}: <strong>{{ workHourSummary.totalHours }}</strong> {{ $t('hr.employees.detail.小时') }}</span>
+                  <span>{{ $t('hr.employees.detail.正常工时') }}: <strong>{{ workHourSummary.normalHours }}</strong> {{ $t('hr.employees.detail.小时') }}</span>
+                  <span>{{ $t('hr.employees.detail.加班工时') }}: <strong>{{ workHourSummary.overtimeHours }}</strong> {{ $t('hr.employees.detail.小时') }}</span>
                 </a-space>
               </div>
             </template>
           </a-table>
+        </a-tab-pane>
+
+        <!-- 履历记录 -->
+        <a-tab-pane key="history" :title="t('hr.employees.detail.履历记录')">
+          <EmployeeHistory :employee-id="employeeId" />
         </a-tab-pane>
       </a-tabs>
     </a-card>
@@ -126,11 +131,11 @@
         <a-form-item :label="$t('hr.employees.detail.证书编号')" field="certNo">
           <a-input v-model="certForm.certNo" :placeholder="$t('hr.employees.detail.请输入证书编号')" />
         </a-form-item>
-        <a-form-item :label="$t('hr.employees.detail.获得日期')" field="obtainedDate">
-          <a-date-picker v-model="certForm.obtainedDate" style="width: 100%" />
+        <a-form-item :label="$t('hr.employees.detail.获得日期')" field="issueDate">
+          <a-date-picker v-model="certForm.issueDate" style="width: 100%" />
         </a-form-item>
-        <a-form-item :label="$t('hr.employees.detail.有效期至')" field="expiryDate">
-          <a-date-picker v-model="certForm.expiryDate" style="width: 100%" />
+        <a-form-item :label="$t('hr.employees.detail.有效期至')" field="expireDate">
+          <a-date-picker v-model="certForm.expireDate" style="width: 100%" />
         </a-form-item>
       </a-form>
     </a-modal>
@@ -142,8 +147,8 @@
       @ok="handleRenewSubmit"
       @cancel="renewModalVisible = false"
     >
-      <a-form :model="renewForm" layout="vertical">
-        <a-form-item :label="$t('hr.employees.detail.新有效期至')">
+      <a-form :model="renewForm" :rules="renewRules" ref="renewFormRef" layout="vertical">
+        <a-form-item :label="$t('hr.employees.detail.新有效期至')" field="newExpiryDate">
           <a-date-picker v-model="renewForm.newExpiryDate" style="width: 100%" />
         </a-form-item>
       </a-form>
@@ -165,8 +170,10 @@ import {
   addCertification,
   renewCertification,
   deleteCertification,
+  getWorkCenters,
 } from '@/api/hr'
 import { getSchedules, getWorkHourRecords } from '@/api/hr'
+import EmployeeHistory from '@/views/hr/employee-history/index.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -174,6 +181,7 @@ const employeeId = route.params.id as string
 
 const loading = ref(false)
 const employeeData = ref<any>({})
+const workCenterMap = ref<Record<number, string>>({})
 
 const certLoading = ref(false)
 const certifications = ref<any[]>([])
@@ -192,14 +200,18 @@ const certFormRef = ref()
 const certForm = reactive({
   certTypeId: '',
   certNo: '',
-  obtainedDate: '',
-  expiryDate: '',
+  issueDate: '',
+  expireDate: '',
 })
 const certRules = {
-  certTypeId: [{ required: true, message: '请选择认证类型' }],
-  certNo: [{ required: true, message: '请输入证书编号' }],
-  obtainedDate: [{ required: true, message: '请选择获得日期' }],
-  expiryDate: [{ required: true, message: '请选择有效期' }],
+  certTypeId: [{ required: true, message: t('hr.employees.detail.请选择认证类型') }],
+  certNo: [{ required: true, message: t('hr.employees.detail.请输入证书编号') }],
+  issueDate: [{ required: true, message: t('hr.employees.detail.请选择获得日期') }],
+  expireDate: [{ required: true, message: t('hr.employees.detail.请选择有效期') }],
+}
+
+const renewRules = {
+  newExpiryDate: [{ required: true, message: t('hr.employees.detail.请选择新有效期') }],
 }
 
 const renewModalVisible = ref(false)
@@ -207,6 +219,7 @@ const renewForm = reactive({
   id: '',
   newExpiryDate: '',
 })
+const renewFormRef = ref()
 
 const calendarDate = ref(new Date())
 const schedules = ref<any[]>([])
@@ -247,10 +260,22 @@ onMounted(async () => {
 async function fetchEmployee() {
   loading.value = true
   try {
+    // 加载工作中心映射
+    try {
+      const wcRes = await getWorkCenters()
+      const wcList = (wcRes as any).list ?? (wcRes as any).data ?? wcRes ?? []
+      const map: Record<number, string> = {}
+      wcList.forEach((item: any) => {
+        if (item.id != null) map[item.id] = item.name || item.workCenterName || ''
+      })
+      workCenterMap.value = map
+    } catch {
+      // 工作中心加载失败不影响主数据
+    }
     const res = await getEmployee(employeeId)
     employeeData.value = res
   } catch (error: any) {
-    Message.error(error.message || '加载失败')
+    Message.error(error.message || t('common.msg.loadDataFail'))
   } finally {
     loading.value = false
   }
@@ -262,7 +287,7 @@ async function fetchCertifications() {
     const res = await getEmployeeCertifications(employeeId)
     certifications.value = (res as any).list ?? (res as any).data ?? res ?? []
   } catch (error: any) {
-    Message.error(error.message || '加载认证失败')
+    Message.error(error.message || t('common.msg.loadCertFail'))
   } finally {
     certLoading.value = false
   }
@@ -273,7 +298,7 @@ async function fetchCertTypes() {
     const res = await getCertificationTypes()
     certTypes.value = (res as any).list ?? (res as any).data ?? res ?? []
   } catch (error: any) {
-    Message.error(error.message || '加载认证类型失败')
+    Message.error(error.message || t('common.msg.loadCertTypeFail'))
   }
 }
 
@@ -281,14 +306,17 @@ async function fetchSchedules() {
   try {
     const year = calendarDate.value.getFullYear()
     const month = calendarDate.value.getMonth() + 1
+    const startDate = `${year}-${String(month).padStart(2, '0')}-01`
+    const lastDay = new Date(year, month, 0).getDate()
+    const endDate = `${year}-${String(month).padStart(2, '0')}-${lastDay}`
     const res = await getSchedules({
-      employeeId,
-      year,
-      month,
+      empId: Number(employeeId),
+      startDate,
+      endDate,
     })
     schedules.value = (res as any).list ?? (res as any).items ?? []
   } catch (error: any) {
-    Message.error(error.message || '加载排班失败')
+    Message.error(error.message || t('common.msg.loadScheduleFail'))
   }
 }
 
@@ -312,7 +340,7 @@ async function fetchWorkHours() {
     workHourSummary.normalHours = items.reduce((sum: number, item: any) => sum + (item.actualHours - item.overtimeHours), 0).toFixed(2)
     workHourSummary.overtimeHours = items.reduce((sum: number, item: any) => sum + item.overtimeHours, 0).toFixed(2)
   } catch (error: any) {
-    Message.error(error.message || '加载工时失败')
+    Message.error(error.message || t('common.msg.loadWorkHoursFail'))
   } finally {
     workHourLoading.value = false
   }
@@ -324,19 +352,19 @@ function handleBack() {
 
 function handleEdit() {
   // 跳转到编辑页面或打开编辑弹窗
-  Message.info('编辑功能待实现')
+  Message.info(t('common.msg.featurePending', { feature: t('common.edit') }))
 }
 
 function handleStatusChange() {
-  Message.info('状态变更功能待实现')
+  Message.info(t('common.msg.featurePending', { feature: t('hr.employees.index.变更员工状态') }))
 }
 
 function handleAddCertification() {
   Object.assign(certForm, {
     certTypeId: '',
     certNo: '',
-    obtainedDate: '',
-    expiryDate: '',
+    issueDate: '',
+    expireDate: '',
   })
   certModalVisible.value = true
 }
@@ -345,10 +373,10 @@ async function handleCertSubmit() {
   try {
     await certFormRef.value?.validate()
     await addCertification({
-      employeeId,
+      empId: Number(employeeId),
       ...certForm,
-    })
-    Message.success('添加成功')
+    } as any)
+    Message.success(t('common.msg.addSuccess'))
     certModalVisible.value = false
     fetchCertifications()
   } catch (error: any) {
@@ -366,22 +394,23 @@ function handleRenewCert(record: any) {
 
 async function handleRenewSubmit() {
   try {
-    await renewCertification(renewForm.id, { expiryDate: renewForm.newExpiryDate })
-    Message.success('续期成功')
+    await renewFormRef.value?.validate()
+    await renewCertification(renewForm.id, { expireDate: renewForm.newExpiryDate })
+    Message.success(t('common.msg.renewSuccess'))
     renewModalVisible.value = false
     fetchCertifications()
   } catch (error: any) {
-    Message.error(error.message || '续期失败')
+    Message.error(error.message || t('common.msg.renewFail'))
   }
 }
 
 async function handleDeleteCert(record: any) {
   try {
     await deleteCertification(record.id)
-    Message.success('删除成功')
+    Message.success(t('common.msg.deleteSuccess'))
     fetchCertifications()
   } catch (error: any) {
-    Message.error(error.message || '删除失败')
+    Message.error(error.message || t('common.msg.deleteFail'))
   }
 }
 

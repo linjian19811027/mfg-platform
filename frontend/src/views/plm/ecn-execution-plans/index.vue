@@ -7,11 +7,11 @@
         </a-form-item>
         <a-form-item :label="$t('common.status')">
           <a-select v-model="searchForm.status" :placeholder="$t('plm.ecn-execution-plans.全部')" allow-clear style="width: 130px">
-            <a-option value="PENDING">待执行</a-option>
-            <a-option value="IN_PROGRESS">执行中</a-option>
-            <a-option value="COMPLETED">已完成</a-option>
-            <a-option value="FAILED">失败</a-option>
-            <a-option value="CANCELLED">已取消</a-option>
+            <a-option value="PENDING">{{ $t('plm.ecn-execution-plans.lbl1399') }}</a-option>
+            <a-option value="IN_PROGRESS">{{ $t('plm.ecn-execution-plans.lbl1400') }}</a-option>
+            <a-option value="COMPLETED">{{ $t('plm.ecn-execution-plans.completed') }}</a-option>
+            <a-option value="FAILED">{{ $t('plm.ecn-execution-plans.lbl1401') }}</a-option>
+            <a-option value="CANCELLED">{{ $t('plm.ecn-execution-plans.lbl1402') }}</a-option>
           </a-select>
         </a-form-item>
         <a-form-item :label="$t('plm.ecn-execution-plans.生效日期')">
@@ -35,13 +35,13 @@
         </template>
         <template #action="{ record }">
           <a-space>
-            <a-button type="text" size="small" @click="handleView(record)">详情</a-button>
+            <a-button type="text" size="small" @click="handleView(record)">{{ $t('plm.ecn-execution-plans.detail') }}</a-button>
             <a-button v-if="record.status === 'PENDING'" type="text" size="small"
               @click="handleTrigger(record)" :loading="triggeringId === record.id">
-              手动触发
+              {{ $t('plm.ecn-execution-plans.manualTrigger') }}
             </a-button>
             <a-button v-if="record.status === 'FAILED'" type="text" size="small"
-              @click="handleRetry(record)">重试</a-button>
+              @click="handleRetry(record)">{{ $t('plm.ecn-execution-plans.lbl1403') }}</a-button>
             <a-popconfirm v-if="record.status === 'PENDING'" :content="$t('plm.ecn-execution-plans.确定取消此执行计划')" @ok="handleCancel(record)">
               <a-button type="text" size="small" status="danger">{{ $t('common.cancel') }}</a-button>
             </a-popconfirm>
@@ -93,7 +93,7 @@ async function fetchData() {
     const res = await getEcnExecutionPlans(params)
     tableData.value = (res as any).data?.items ?? []
     pagination.total = (res as any).data?.total ?? 0
-  } catch (e: any) { Message.error(e.message || '加载失败') }
+  } catch (e: any) { Message.error(e.message || t('plm.加载失败')) }
   finally { loading.value = false }
 }
 
@@ -104,23 +104,23 @@ function handleView(record: any) { router.push(`/plm/ecn-execution-plans/${recor
 
 async function handleTrigger(record: any) {
   triggeringId.value = record.id
-  try { await triggerEcnExecutionPlan(record.id); Message.success('触发成功'); fetchData() }
-  catch (e: any) { Message.error(e.message || '触发失败') }
+  try { await triggerEcnExecutionPlan(record.id); Message.success(t('plm.触发成功')); fetchData() }
+  catch (e: any) { Message.error(e.message || t('plm.触发失败')) }
   finally { triggeringId.value = '' }
 }
 
 async function handleRetry(record: any) {
-  try { await retryEcnExecutionPlan(record.id); Message.success('重试已发起'); fetchData() }
-  catch (e: any) { Message.error(e.message || '操作失败') }
+  try { await retryEcnExecutionPlan(record.id); Message.success(t('plm.重试已发起')); fetchData() }
+  catch (e: any) { Message.error(e.message || t('plm.操作失败')) }
 }
 
 async function handleCancel(record: any) {
-  try { await cancelEcnExecutionPlan(record.id); Message.success('取消成功'); fetchData() }
-  catch (e: any) { Message.error(e.message || '操作失败') }
+  try { await cancelEcnExecutionPlan(record.id); Message.success(t('plm.取消成功')); fetchData() }
+  catch (e: any) { Message.error(e.message || t('plm.操作失败')) }
 }
 
 function statusLabel(s: string) {
-  return { PENDING: '待执行', IN_PROGRESS: '执行中', COMPLETED: '已完成', FAILED: '失败', CANCELLED: '已取消' }[s] ?? s
+  return { PENDING: t('plm.ecn-execution-plans.lbl1404'), IN_PROGRESS: t('plm.ecn-execution-plans.lbl1405'), COMPLETED: t('plm.ecn-execution-plans.completed'), FAILED: t('plm.ecn-execution-plans.lbl1406'), CANCELLED: t('plm.ecn-execution-plans.lbl1407') }[s] ?? s
 }
 function statusColor(s: string) {
   return { PENDING: 'gray', IN_PROGRESS: 'orange', COMPLETED: 'green', FAILED: 'red', CANCELLED: 'gray' }[s] ?? 'gray'

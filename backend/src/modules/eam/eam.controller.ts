@@ -23,6 +23,7 @@ import { LubricationService } from './services/lubrication.service.js';
 import { FaultService } from './services/fault.service.js';
 import { OeeService } from './services/oee.service.js';
 import { SparePartService } from './services/spare-part.service.js';
+import { EquipmentHistoryService } from './services/equipment-history.service.js';
 
 @ApiTags('EAM 设备管理')
 @Controller('api/v1/eam')
@@ -39,6 +40,7 @@ export class EamController {
     private readonly faultService: FaultService,
     private readonly oeeService: OeeService,
     private readonly sparePartService: SparePartService,
+    private readonly historyService: EquipmentHistoryService,
   ) {}
 
   private tenantId(req: Request): string {
@@ -158,6 +160,12 @@ export class EamController {
   @ApiOperation({ summary: '保存财务信息' })
   saveFinance(@Req() req: Request, @Param('id') id: string, @Body() body: any) {
     return this.financeService.upsert(this.tenantId(req), id, body);
+  }
+
+  @Get('equipment/:id/history')
+  @ApiOperation({ summary: '设备变更历史' })
+  getHistory(@Req() req: Request, @Param('id') id: string) {
+    return this.historyService.findByEquipment(this.tenantId(req), id);
   }
 
   @Post('equipment/:id/documents')

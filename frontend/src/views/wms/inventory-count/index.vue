@@ -3,16 +3,18 @@
     <a-card :bordered="false" style="margin-bottom: 16px">
       <a-space wrap>
         <a-select v-model="query.status" :placeholder="$t('common.status')" allow-clear style="width: 140px">
-          <a-option value="DRAFT">草稿</a-option>
-          <a-option value="IN_PROGRESS">盘点中</a-option>
-          <a-option value="PENDING_APPROVAL">待审批</a-option>
-          <a-option value="COMPLETED">已完成</a-option>
+          <a-option value="DRAFT">{{ $t('wms.inventory-count.status.draft') }}</a-option>
+          <a-option value="IN_PROGRESS">{{ $t('wms.inventory-count.status.in_progress') }}</a-option>
+          <a-option value="COUNTING">{{ $t('wms.inventory-count.status.counting') }}</a-option>
+          <a-option value="REVIEWING">{{ $t('wms.inventory-count.status.reviewing') }}</a-option>
+          <a-option value="APPROVED">{{ $t('wms.inventory-count.status.approved') }}</a-option>
+          <a-option value="CLOSED">{{ $t('wms.inventory-count.status.closed') }}</a-option>
         </a-select>
         <a-button type="primary" @click="loadData">{{ $t('common.search') }}</a-button>
         <a-button @click="resetQuery">{{ $t('common.reset') }}</a-button>
       </a-space>
       <template #extra>
-        <a-button type="primary" @click="openCreateDrawer">新建盘点单</a-button>
+        <a-button type="primary" @click="openCreateDrawer">{{ $t('wms.inventory-count.lbl1911') }}</a-button>
       </template>
     </a-card>
 
@@ -23,10 +25,10 @@
         </template>
         <template #action="{ record }">
           <a-space>
-            <a-link @click="openDetailDrawer(record as unknown as StockTake)">录入/查看</a-link>
-            <a-link v-if="record.status === 'DRAFT'" @click="handleStart(record.id as string)">开始盘点</a-link>
-            <a-popconfirm v-if="record.status === 'PENDING_APPROVAL'" :content="$t('wms.inventory-count.index.确认审批通过并调整库存')" @ok="handleApprove(record.id as string)">
-              <a-link>审批</a-link>
+            <a-link @click="openDetailDrawer(record as unknown as StockTake)">{{ $t('wms.inventory-count.lbl1912') }}</a-link>
+            <a-link v-if="record.status === 'DRAFT'" @click="handleStart(record.id as string)">{{ $t('wms.inventory-count.action.start') }}</a-link>
+            <a-popconfirm v-if="record.status === 'REVIEWING'" :content="$t('wms.inventory-count.confirm.approve')" @ok="handleApprove(record.id as string)">
+              <a-link>{{ $t('wms.inventory-count.action.approve') }}</a-link>
             </a-popconfirm>
           </a-space>
         </template>
@@ -39,9 +41,9 @@
     </a-drawer>
 
     <!-- 盘点明细抽屉 -->
-    <a-drawer v-model:visible="detailDrawerVisible" :title="`盘点明细 - ${currentTake?.code ?? ''}`" :width="800" @cancel="detailDrawerVisible = false">
+    <a-drawer v-model:visible="detailDrawerVisible" ::title="t('wms.inventory-count.lbl1913')" :width="800" @cancel="detailDrawerVisible = false">
       <div style="margin-bottom: 12px; display: flex; gap: 8px; justify-content: flex-end">
-        <a-button v-if="currentTake?.status === 'IN_PROGRESS'" type="primary" size="small" @click="submitForApproval">提交审批</a-button>
+        <a-button v-if="currentTake?.status === 'IN_PROGRESS'" type="primary" size="small" @click="submitForApproval">{{ $t('wms.inventory-count.lbl1914') }}</a-button>
       </div>
       <a-table :columns="lineColumns" :data="diffLines" :loading="diffLoading" :pagination="false" row-key="id">
         <template #countQty="{ record }">
@@ -101,13 +103,20 @@ const lineColumns = [
 ]
 
 function statusColor(s: string) {
-  if (s === 'COMPLETED') return 'green'
-  if (s === 'IN_PROGRESS') return 'orange'
-  if (s === 'PENDING_APPROVAL') return 'blue'
+  if (s === 'CLOSED' || s === 'APPROVED') return 'green'
+  if (s === 'IN_PROGRESS' || s === 'COUNTING') return 'blue'
+  if (s === 'REVIEWING') return 'orange'
   return 'gray'
 }
 function statusLabel(s: string) {
-  const m: Record<string, string> = { DRAFT: '草稿', IN_PROGRESS: '盘点中', PENDING_APPROVAL: '待审批', COMPLETED: '已完成' }
+  const m: Record<string, string> = {
+    DRAFT: t('wms.inventory-count.draft'),
+    IN_PROGRESS: t('wms.inventory-count.lbl1915'),
+    COUNTING: t('wms.inventory-count.lbl1916'),
+    REVIEWING: t('wms.inventory-count.lbl1917'),
+    APPROVED: t('wms.inventory-count.lbl1918'),
+    CLOSED: t('wms.inventory-count.completed')
+  }
   return m[s] ?? s
 }
 
@@ -128,15 +137,15 @@ const createDrawerVisible = ref(false)
 const creating = ref(false)
 const createForm = ref<Record<string, unknown>>({})
 const createSchema: MFormField[] = [
-  { field: 'warehouseId', label: '仓库ID', type: 'input', required: true },
-  { field: 'description', label: '备注', type: 'textarea' },
+  { field: 'warehouseId', label: t('wms.inventory-count.lbl1919'), type: 'warehouse-select', required: true },
+  { field: 'description', label: t('wms.inventory-count.remark'), type: 'textarea' },
 ]
 function openCreateDrawer() { createForm.value = {}; createDrawerVisible.value = true }
 async function handleCreate(data: Record<string, unknown>) {
   creating.value = true
   try {
     await wmsApi.createStockTake(data)
-    Message.success('创建成功')
+    Message.success(t('wms.创建成功'))
     createDrawerVisible.value = false
     loadData()
   } catch { /* handled */ } finally { creating.value = false }
@@ -146,7 +155,7 @@ async function handleCreate(data: Record<string, unknown>) {
 async function handleStart(id: string) {
   try {
     await wmsApi.startStockTake(id)
-    Message.success('盘点已开始')
+    Message.success(t('wms.盘点已开始'))
     loadData()
   } catch { /* handled */ }
 }
@@ -155,7 +164,7 @@ async function handleStart(id: string) {
 async function handleApprove(id: string) {
   try {
     await wmsApi.approveStockTake(id, authStore.userId ?? 'system')
-    Message.success('审批通过，库存已调整')
+    Message.success(t('wms.审批通过，库存已调整'))
     loadData()
   } catch { /* handled */ }
 }
@@ -188,7 +197,7 @@ async function updateCountQty(lineId: string, qty: number) {
 async function submitForApproval() {
   if (!currentTake.value) return
   // 通过 patch status 提交审批（后端暂无独立接口，用 approve 代替）
-  Message.info('请在列表页点击"审批"按钮完成审批')
+  Message.info(t('wms.请在列表页点击审批按钮完成审批'))
   detailDrawerVisible.value = false
   loadData()
 }

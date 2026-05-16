@@ -22,8 +22,8 @@
           <a-option v-for="w in warehouseOptions" :key="w.id" :value="w.id" :label="w.name" />
         </a-select>
         <a-select v-model="query.direction" :placeholder="$t('wms.transaction.index.方向')" allow-clear style="width: 120px">
-          <a-option :value="1">入库</a-option>
-          <a-option :value="-1">出库</a-option>
+          <a-option :value="1">{{ $t('wms.transaction.lbl1943') }}</a-option>
+          <a-option :value="-1">{{ $t('wms.transaction.lbl1944') }}</a-option>
         </a-select>
         <a-button type="primary" @click="loadData">{{ $t('common.search') }}</a-button>
         <a-button @click="resetQuery">{{ $t('common.reset') }}</a-button>
@@ -40,7 +40,7 @@
       >
         <template #direction="{ record }">
           <a-tag :color="record.direction === 1 ? 'green' : 'red'">
-            {{ record.direction === 1 ? '入库' : '出库' }}
+            {{ record.direction === 1 ? $t('wms.transaction.lbl1945') : $t('wms.transaction.lbl1946') }}
           </a-tag>
         </template>
       </MTable>

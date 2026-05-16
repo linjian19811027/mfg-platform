@@ -3,9 +3,11 @@
     <a-card>
       <!-- 搜索栏 -->
       <a-space wrap style="margin-bottom: 16px">
-        <a-input v-model="resourceId" :placeholder="$t('aps.calendar.index.资源ID')" allow-clear style="width: 200px" />
+        <a-select v-model="resourceId" :placeholder="$t('aps.calendar.index.资源')" allow-clear style="width: 200px">
+          <a-option value="">{{ $t('common.all') }}</a-option>
+        </a-select>
         <a-button type="primary" @click="handleSearch">{{ $t('common.search') }}</a-button>
-        <a-button type="outline" style="margin-left: auto" @click="openDrawer">新增日历</a-button>
+        <a-button type="outline" style="margin-left: auto" @click="openDrawer">{{ $t('aps.calendar.index.新增日历') }}</a-button>
       </a-space>
 
       <MTable
@@ -19,7 +21,7 @@
           <a-tag>{{ record.shiftType }}</a-tag>
         </template>
         <template #isWorkday="{ record }">
-          <a-tag :color="record.isWorkday ? 'green' : 'red'">{{ record.isWorkday ? '是' : '否' }}</a-tag>
+          <a-tag :color="record.isWorkday ? 'green' : 'red'">{{ record.isWorkday ? $t('common.yes') : $t('common.no') }}</a-tag>
         </template>
       </MTable>
     </a-card>
@@ -77,10 +79,10 @@ const columns: MTableColumn[] = [
 ]
 
 const formSchema: MFormField[] = [
-  { field: 'resourceId', label: '资源ID', type: 'input', required: true },
-  { field: 'date', label: '日期', type: 'date', required: true },
+  { field: 'resourceId', label: t('aps.calendar.index.资源'), type: 'select', required: true, placeholder: t('common.select') },
+  { field: 'date', label: t('aps.calendar.index.日期'), type: 'date', required: true },
   {
-    field: 'shiftType', label: '班次类型', type: 'select', required: true,
+    field: 'shiftType', label: t('aps.calendar.index.班次类型'), type: 'select', required: true,
     options: [
       { label: 'MORNING', value: 'MORNING' },
       { label: 'AFTERNOON', value: 'AFTERNOON' },
@@ -88,8 +90,8 @@ const formSchema: MFormField[] = [
       { label: 'HOLIDAY', value: 'HOLIDAY' },
     ],
   },
-  { field: 'startTime', label: '开始时间', type: 'input', placeholder: 'HH:mm', required: true },
-  { field: 'endTime', label: '结束时间', type: 'input', placeholder: 'HH:mm', required: true },
+  { field: 'startTime', label: t('aps.calendar.index.开始时间'), type: 'input', placeholder: 'HH:mm', required: true },
+  { field: 'endTime', label: t('aps.calendar.index.结束时间'), type: 'input', placeholder: 'HH:mm', required: true },
 ]
 
 async function loadData() {
@@ -133,9 +135,11 @@ async function handleSubmit() {
       endTime: formData.value.endTime as string,
       tenantId: auth.tenantId ?? '',
     })
-    Message.success('创建成功')
+    Message.success(t('common.message.create'))
     drawerVisible.value = false
     loadData()
+  } catch {
+    Message.error(t('common.message.createFailed'))
   } finally {
     submitting.value = false
   }

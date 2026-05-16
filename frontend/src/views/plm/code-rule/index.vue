@@ -9,8 +9,8 @@
           allow-clear
           style="width: 130px"
         >
-          <a-option value="ACTIVE">启用</a-option>
-          <a-option value="INACTIVE">停用</a-option>
+          <a-option value="ACTIVE">{{ $t('plm.code-rule.enable') }}</a-option>
+          <a-option value="INACTIVE">{{ $t('plm.code-rule.disable') }}</a-option>
         </a-select>
         <a-input
           v-model="query.keyword"
@@ -25,7 +25,7 @@
       <template #extra>
         <a-button type="primary" @click="openDrawer(null)">
           <template #icon><icon-plus /></template>
-          新建规则
+          {{ $t('plm.code-rule.createRule') }}
         </a-button>
       </template>
     </a-card>
@@ -42,7 +42,7 @@
       >
         <template #status="{ record }">
           <a-tag :color="record.status === 'ACTIVE' ? 'green' : 'gray'">
-            {{ record.status === 'ACTIVE' ? '启用' : '停用' }}
+            {{ record.status === 'ACTIVE' ? $t('plm.code-rule.enable') : $t('plm.code-rule.disable') }}
           </a-tag>
         </template>
         <template #action="{ record }">
@@ -133,22 +133,22 @@ const editingRule = ref<MaterialCodeRule | null>(null)
 const formData = ref<Record<string, unknown>>({})
 
 const formSchema: MFormField[] = [
-  { field: 'code', label: '编码', type: 'input', required: true, placeholder: '请输入规则编码' },
-  { field: 'name', label: '名称', type: 'input', required: true, placeholder: '请输入规则名称' },
-  { field: 'pattern', label: '规则模板', type: 'input', required: true, placeholder: '如 {PREFIX}-{CATEGORY}-{SEQ6}' },
-  { field: 'prefix', label: '前缀', type: 'input', placeholder: '如 MAT' },
-  { field: 'seqDigits', label: '序号位数', type: 'number', placeholder: '如 6', props: { min: 1, max: 10 } },
+  { field: 'code', label: t('plm.code-rule.code'), type: 'input', required: true, placeholder: t('plm.code-rule.r33031') },
+  { field: 'name', label: t('plm.code-rule.name'), type: 'input', required: true, placeholder: t('plm.code-rule.r33032') },
+  { field: 'pattern', label: t('plm.code-rule.lbl1368'), type: 'input', required: true, placeholder: t('plm.code-rule.r33033') },
+  { field: 'prefix', label: t('plm.code-rule.lbl1369'), type: 'input', placeholder: t('plm.code-rule.r33034') },
+  { field: 'seqDigits', label: t('plm.code-rule.lbl1370'), type: 'number', placeholder: t('plm.code-rule.r33035'), props: { min: 1, max: 10 } },
   {
     field: 'status',
-    label: '状态',
+    label: t('plm.code-rule.status'),
     type: 'select',
     required: true,
     options: [
-      { label: '启用', value: 'ACTIVE' },
-      { label: '停用', value: 'INACTIVE' },
+      { label: t('plm.code-rule.enable'), value: 'ACTIVE' },
+      { label: t('plm.code-rule.disable'), value: 'INACTIVE' },
     ],
   },
-  { field: 'description', label: '描述', type: 'textarea', placeholder: '请输入规则描述', props: { autoSize: { minRows: 2, maxRows: 4 } } },
+  { field: 'description', label: t('plm.code-rule.description'), type: 'textarea', placeholder: t('plm.code-rule.r33036'), props: { autoSize: { minRows: 2, maxRows: 4 } } },
 ]
 
 function openDrawer(rule: MaterialCodeRule | null) {
@@ -164,10 +164,10 @@ async function handleSave(data: Record<string, unknown>) {
   try {
     if (editingRule.value) {
       await plmApi.updateCodeRule(editingRule.value.id, data)
-      Message.success('更新成功')
+      Message.success(t('plm.更新成功'))
     } else {
       await plmApi.createCodeRule(data)
-      Message.success('创建成功')
+      Message.success(t('plm.创建成功'))
     }
     drawerVisible.value = false
     loadData()

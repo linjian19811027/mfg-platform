@@ -17,7 +17,8 @@ export interface ErpCustomer {
 
 export interface ErpQuotation {
   id: string
-  code?: string
+  quotationNo?: string
+  quotationDate?: string
   customerId: string
   customerName?: string
   status: string  // DRAFT/SENT/ACCEPTED/REJECTED/EXPIRED
@@ -52,6 +53,8 @@ export interface ErpSalesReturn {
 
 export interface ErpReceivable {
   id: string
+  receivableNo: string        // 应收单号（关联后端 receivableNo）
+  soId: string                // 关联销售订单（关联后端 soId）
   customerId: string
   customerName?: string
   amount: number
@@ -64,13 +67,16 @@ export interface ErpReceivable {
 
 export interface ErpPayable {
   id: string
+  payableNo: string           // 应付单号
   supplierId: string
   supplierName?: string
   amount: number
+  paidAmount?: number
   currency: string
   dueDate: string
-  status: string
-  paidAmount?: number
+  status: string              // PENDING/PARTIAL/PAID
+  reconId?: string            // 关联对账记录
+  paymentPlan?: Record<string, any>[]  // 付款计划
   createdAt: string
 }
 
@@ -115,8 +121,8 @@ export interface ErpStandardCost {
   status: string
 }
 
-const d = async <T>(fn: () => Promise<T>, fallback: T): Promise<T> => {
-  try { return await fn() } catch { return fallback }
+const d = async <T>(fn: () => Promise<T>, _fallback: T): Promise<T> => {
+  return await fn()
 }
 
 export const erpExtApi = {

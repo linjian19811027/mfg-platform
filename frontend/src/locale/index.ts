@@ -1,6 +1,6 @@
 import { createI18n } from 'vue-i18n';
-import zhCN from './zh-CN';
-import enUS from './en-US';
+import zhCN from './zh-CN/index';
+import enUS from './en-US/index';
 
 function getInitialLanguage() {
   const saved = localStorage.getItem('user-language');

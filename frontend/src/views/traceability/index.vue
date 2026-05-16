@@ -10,11 +10,11 @@
         @press-enter="handleSearch"
       />
       <a-radio-group v-model="direction" type="button">
-        <a-radio value="forward">正向追溯（成品→原料）</a-radio>
-        <a-radio value="backward">反向追溯（原料→成品）</a-radio>
+        <a-radio value="forward">{{ $t('common.misc.lbl1843') }}</a-radio>
+        <a-radio value="backward">{{ $t('common.misc.lbl1844') }}</a-radio>
       </a-radio-group>
       <a-button type="primary" :loading="loading" @click="handleSearch">{{ $t('common.search') }}</a-button>
-      <a-button :disabled="!treeData.length" @click="exportPdf">导出 PDF</a-button>
+      <a-button :disabled="!treeData.length" @click="exportPdf">{{ $t('common.misc.lbl1845') }}</a-button>
     </div>
 
     <!-- 主体 -->
@@ -66,7 +66,9 @@
 import { ref, computed } from 'vue'
 import { Message } from '@arco-design/web-vue'
 import type { TreeNodeData } from '@arco-design/web-vue'
-import request from '@/utils/request'
+import { request } from '@/utils/request'
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 
 interface TraceabilityNode {
   batchId: string
@@ -120,7 +122,7 @@ function nodeToTreeData(node: TraceabilityNode): TraceTreeNode {
 
 async function handleSearch() {
   if (!batchNo.value.trim()) {
-    Message.warning('请输入批次号')
+    Message.warning(t('traceability.请输入批次号'))
     return
   }
   loading.value = true
@@ -139,7 +141,7 @@ async function handleSearch() {
     const batchId = Array.isArray(batches) ? batches[0]?.id : (batchData as { id: string })?.id
 
     if (!batchId) {
-      Message.warning('未找到对应批次')
+      Message.warning(t('traceability.未找到对应批次'))
       return
     }
 
@@ -154,7 +156,7 @@ async function handleSearch() {
       treeData.value = [nodeToTreeData(root)]
     }
   } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : '查询失败'
+    const msg = e instanceof Error ? e.message : t('common.misc.lbl1846')
     Message.error(msg)
   } finally {
     loading.value = false
@@ -169,27 +171,27 @@ function onNodeSelect(keys: (string | number)[]) {
 }
 
 const sourceTypeLabel: Record<string, string> = {
-  PURCHASE: '采购',
-  PRODUCTION: '生产',
+  PURCHASE: t('common.misc.lbl1847'),
+  PRODUCTION: t('common.misc.lbl1848')
 }
 
 const qualityLabel: Record<string, string> = {
-  PASSED: '合格',
-  FAILED: '不合格',
-  PENDING: '待检',
+  PASSED: t('common.misc.qualified'),
+  FAILED: t('common.misc.unqualified'),
+  PENDING: t('common.misc.uninspected')
 }
 
 const descItems = computed(() => {
   const n = selectedNode.value
   if (!n) return []
   return [
-    { label: '批次号', value: n.batchNo || '-' },
-    { label: '批次 ID', value: n.batchId },
-    { label: '物料 ID', value: n.materialId || '-' },
-    { label: '来源类型', value: sourceTypeLabel[n.sourceType ?? ''] || n.sourceType || '-' },
-    { label: '数量', value: n.quantity != null ? String(n.quantity) : '-' },
-    { label: '生产时间', value: n.producedAt ? n.producedAt.replace('T', ' ').slice(0, 19) : '-' },
-    { label: '质量状态', value: qualityLabel[n.qualityStatus ?? ''] || n.qualityStatus || '-' },
+    { label: t('common.misc.lbl1849'), value: n.batchNo || '-' },
+    { label: t('common.misc.lbl1850'), value: n.batchId },
+    { label: t('common.misc.lbl1851'), value: n.materialId || '-' },
+    { label: t('common.misc.lbl1852'), value: sourceTypeLabel[n.sourceType ?? ''] || n.sourceType || '-' },
+    { label: t('common.misc.quantity'), value: n.quantity != null ? String(n.quantity) : '-' },
+    { label: t('common.misc.lbl1853'), value: n.producedAt ? n.producedAt.replace('T', ' ').slice(0, 19) : '-' },
+    { label: t('common.misc.lbl1854'), value: qualityLabel[n.qualityStatus ?? ''] || n.qualityStatus || '-' },
   ]
 })
 

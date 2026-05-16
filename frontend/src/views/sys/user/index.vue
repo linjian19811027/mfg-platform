@@ -284,6 +284,8 @@ async function handleSubmit(data: Record<string, unknown>) {
     }
     drawerVisible.value = false
     loadData()
+  } catch {
+    Message.error(t('common.error') || t('sys.user.r33084'))
   } finally {
     submitting.value = false
   }
@@ -297,6 +299,8 @@ async function toggleStatus(user: SysUser) {
     await sysApi.toggleUserStatus(user.id, newStatus)
     Message.success(t('common.success'))
     loadData()
+  } catch {
+    Message.error(t('common.error') || t('sys.user.r33085'))
   } finally {
     toggleLoadingId.value = null
   }
@@ -309,6 +313,8 @@ async function resetPassword(user: SysUser) {
     const res = await sysApi.resetPassword(user.id)
     tempPassword.value = res.tempPassword
     tempPwdVisible.value = true
+  } catch {
+    Message.error(t('common.error') || t('sys.user.r33086'))
   } finally {
     resetLoadingId.value = null
   }

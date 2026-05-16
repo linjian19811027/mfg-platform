@@ -7,6 +7,7 @@ import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { AuthService } from './auth.service.js';
 import { AuthController } from './auth.controller.js';
 import { SysController } from './sys.controller.js';
+import { PermissionSeedService } from './seed/permission-seed.service.js';
 import { AuditInterceptor } from './interceptors/audit.interceptor.js';
 import { JwtStrategy } from './strategies/jwt.strategy.js';
 import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
@@ -56,6 +57,7 @@ import { CacheModule } from '../../shared/cache/cache.module.js';
   providers: [
     AuthService,
     JwtStrategy,
+    PermissionSeedService,
     // 全局拦截器：记录所有写操作日志
     { provide: APP_INTERCEPTOR, useClass: AuditInterceptor },
     // 全局注册 JWT 守卫（所有接口默认需要认证，用 @Public() 豁免）

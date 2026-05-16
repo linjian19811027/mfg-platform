@@ -2,28 +2,30 @@
   <div class="page-container">
     <a-card :bordered="false" style="margin-bottom: 16px">
       <a-space wrap>
-        <a-input v-model="query.equipmentId" :placeholder="$t('eam.strategy.index.设备ID')" allow-clear style="width: 160px" @keyup.enter="loadData" />
+        <a-select v-model="query.equipmentId" :placeholder="$t('eam.strategy.index.设备')" allow-clear style="width: 160px">
+          <a-option value="">{{ $t('common.all') }}</a-option>
+        </a-select>
         <a-select v-model="query.strategyType" :placeholder="$t('eam.strategy.index.策略类型')" allow-clear style="width: 140px">
-          <a-option value="PERIODIC">定期维保</a-option>
-          <a-option value="PREDICTIVE">预测性维保</a-option>
-          <a-option value="CORRECTIVE">纠正性维保</a-option>
+          <a-option value="PERIODIC">{{ $t('eam.strategy.type.periodic') }}</a-option>
+          <a-option value="PREDICTIVE">{{ $t('eam.strategy.type.predictive') }}</a-option>
+          <a-option value="CORRECTIVE">{{ $t('eam.strategy.type.corrective') }}</a-option>
         </a-select>
         <a-button type="primary" @click="loadData">{{ $t('common.search') }}</a-button>
         <a-button @click="resetQuery">{{ $t('common.reset') }}</a-button>
       </a-space>
-      <template #extra><a-button type="primary" @click="openDrawer(null)">新建策略</a-button></template>
+      <template #extra><a-button type="primary" @click="openDrawer(null)">{{ $t('eam.strategy.lbl1138') }}</a-button></template>
     </a-card>
     <a-card :bordered="false">
       <MTable :columns="columns" :data="tableData" :loading="loading" :total="total" :page-size="20" @change="onTableChange">
         <template #status="{ record }">
-          <a-tag :color="record.status === 'ACTIVE' ? 'green' : 'gray'">{{ record.status === 'ACTIVE' ? '启用' : '停用' }}</a-tag>
+          <a-tag :color="record.isActive ? 'green' : 'gray'">{{ record.isActive ? $t('eam.strategy.enable') : $t('eam.strategy.disable') }}</a-tag>
         </template>
         <template #action="{ record }">
           <a-link @click="openDrawer(record as unknown as MaintenanceStrategy)">{{ $t('common.edit') }}</a-link>
         </template>
       </MTable>
     </a-card>
-    <a-drawer v-model:visible="drawerVisible" :title="editing ? '编辑维保策略' : '新建维保策略'" :width="520" @cancel="drawerVisible = false">
+    <a-drawer v-model:visible="drawerVisible" :title="editing ? $t('eam.strategy.action.edit') : $t('eam.strategy.action.create')" :width="520" @cancel="drawerVisible = false">
       <MForm :schema="formSchema" v-model="formData" :loading="saving" :submit-text="$t('eam.strategy.index.保存')" @submit="handleSave" @cancel="drawerVisible = false" />
     </a-drawer>
   </div>
@@ -50,17 +52,17 @@ const columns: MTableColumn[] = [
   { key: 'action', title: t('eam.strategy.index.操作'), slotName: 'action', width: 80 },
 ]
 const formSchema: MFormField[] = [
-  { field: 'equipmentId', label: '设备ID', type: 'input', required: true },
-  { field: 'name', label: '策略名称', type: 'input', required: true },
-  { field: 'strategyType', label: '策略类型', type: 'select', required: true, options: [
-    { label: '定期维保', value: 'PERIODIC' }, { label: '预测性维保', value: 'PREDICTIVE' }, { label: '纠正性维保', value: 'CORRECTIVE' },
+  { field: 'equipmentId', label: t('eam.strategy.lbl1139'), type: 'select', required: true, placeholder: t('eam.strategy.r33015') },
+  { field: 'name', label: t('eam.strategy.lbl1140'), type: 'input', required: true },
+  { field: 'strategyType', label: t('eam.strategy.lbl1141'), type: 'select', required: true, options: [
+    { label: t('eam.strategy.lbl1142'), value: 'PERIODIC' }, { label: t('eam.strategy.lbl1143'), value: 'PREDICTIVE' }, { label: t('eam.strategy.lbl1144'), value: 'CORRECTIVE' },
   ]},
-  { field: 'triggerType', label: '触发方式', type: 'select', required: true, options: [
-    { label: '按天数', value: 'DAYS' }, { label: '按运行小时', value: 'HOURS' },
+  { field: 'triggerType', label: t('eam.strategy.lbl1145'), type: 'select', required: true, options: [
+    { label: t('eam.strategy.lbl1146'), value: 'DAYS' }, { label: t('eam.strategy.lbl1147'), value: 'HOURS' },
   ]},
-  { field: 'triggerValue', label: '触发值', type: 'number', required: true, props: { min: 1 } },
-  { field: 'content', label: '维保内容', type: 'textarea', props: { autoSize: { minRows: 2 } } },
-  { field: 'status', label: '状态', type: 'select', options: [{ label: '启用', value: 'ACTIVE' }, { label: '停用', value: 'INACTIVE' }] },
+  { field: 'triggerValue', label: t('eam.strategy.lbl1148'), type: 'number', required: true, props: { min: 1 } },
+  { field: 'content', label: t('eam.strategy.lbl1149'), type: 'textarea', props: { autoSize: { minRows: 2 } } },
+  { field: 'isActive', label: t('eam.strategy.status'), type: 'select', options: [{ label: t('eam.strategy.enable'), value: true }, { label: t('eam.strategy.disable'), value: false }] },
 ]
 async function loadData() {
   loading.value = true
@@ -74,8 +76,8 @@ function openDrawer(item: MaintenanceStrategy | null) { editing.value = item; fo
 async function handleSave(data: Record<string, unknown>) {
   saving.value = true
   try {
-    if (editing.value) { await eamApi.updateStrategy(editing.value.id, data); Message.success('更新成功') }
-    else { await eamApi.createStrategy(data); Message.success('创建成功') }
+    if (editing.value) { await eamApi.updateStrategy(editing.value.id, data); Message.success(t('eam.更新成功')) }
+    else { await eamApi.createStrategy(data); Message.success(t('eam.创建成功')) }
     drawerVisible.value = false; loadData()
   } catch { /* handled */ } finally { saving.value = false }
 }

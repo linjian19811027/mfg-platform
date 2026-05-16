@@ -3,15 +3,15 @@
     <a-card :bordered="false" style="margin-bottom: 16px">
       <a-space wrap>
         <a-select v-model="query.status" :placeholder="$t('common.status')" allow-clear style="width: 130px">
-          <a-option value="PENDING">待拣货</a-option>
-          <a-option value="IN_PROGRESS">拣货中</a-option>
-          <a-option value="COMPLETED">已完成</a-option>
+          <a-option value="PENDING">{{ $t('wms.picking-task.lbl1920') }}</a-option>
+          <a-option value="IN_PROGRESS">{{ $t('wms.picking-task.lbl1921') }}</a-option>
+          <a-option value="COMPLETED">{{ $t('wms.picking-task.completed') }}</a-option>
         </a-select>
         <a-button type="primary" @click="loadData">{{ $t('common.search') }}</a-button>
         <a-button @click="resetQuery">{{ $t('common.reset') }}</a-button>
       </a-space>
       <template #extra>
-        <a-button type="primary" @click="openCreateDrawer">新建拣货任务</a-button>
+        <a-button type="primary" @click="openCreateDrawer">{{ $t('wms.picking-task.lbl1922') }}</a-button>
       </template>
     </a-card>
 
@@ -27,8 +27,8 @@
         </template>
         <template #action="{ record }">
           <a-space>
-            <a-link @click="openDetailDrawer(record as unknown as PickTask)">查看/执行</a-link>
-            <a-link v-if="record.status === 'IN_PROGRESS'" @click="openVerifyDrawer(record as unknown as PickTask)">复核</a-link>
+            <a-link @click="openDetailDrawer(record as unknown as PickTask)">{{ $t('wms.picking-task.lbl1923') }}</a-link>
+            <a-link v-if="record.status === 'IN_PROGRESS'" @click="openVerifyDrawer(record as unknown as PickTask)">{{ $t('wms.picking-task.lbl1924') }}</a-link>
           </a-space>
         </template>
       </MTable>
@@ -40,7 +40,7 @@
     </a-drawer>
 
     <!-- 拣货明细抽屉 -->
-    <a-drawer v-model:visible="detailDrawerVisible" :title="`拣货任务 - ${currentTask?.code ?? ''}`" :width="720" @cancel="detailDrawerVisible = false">
+    <a-drawer v-model:visible="detailDrawerVisible" ::title="t('wms.picking-task.lbl1925')" :width="720" @cancel="detailDrawerVisible = false">
       <a-table :columns="lineColumns" :data="currentTask?.lines ?? []" :pagination="false" row-key="id">
         <template #pickedQty="{ record }">
           <a-input-number v-model="(record as PickTaskLine).pickedQty" :min="0" :max="record.requiredQty as number" :precision="4" style="width: 100px" />
@@ -50,7 +50,7 @@
 
     <!-- 复核弹窗 -->
     <a-modal v-model:visible="verifyModalVisible" :title="$t('wms.picking-task.index.拣货复核')" :ok-loading="verifying" @ok="handleVerify" @cancel="verifyModalVisible = false">
-      <p style="color: #8b949e; margin-bottom: 12px">确认以下拣货数量并完成复核：</p>
+      <p style="color: #8b949e; margin-bottom: 12px">{{ $t('wms.picking-task.lbl1926') }}</p>
       <a-table :columns="verifyColumns" :data="verifyLines" :pagination="false" row-key="lineId" size="small" />
     </a-modal>
   </div>
@@ -96,7 +96,7 @@ const verifyColumns = [
 ]
 
 function statusColor(s: string) { return s === 'COMPLETED' ? 'green' : s === 'IN_PROGRESS' ? 'orange' : 'gray' }
-function statusLabel(s: string) { const m: Record<string, string> = { PENDING: '待拣货', IN_PROGRESS: '拣货中', COMPLETED: '已完成' }; return m[s] ?? s }
+function statusLabel(s: string) { const m: Record<string, string> = { PENDING: t('wms.picking-task.lbl1927'), IN_PROGRESS: t('wms.picking-task.lbl1928'), COMPLETED: t('wms.picking-task.completed') }; return m[s] ?? s }
 
 async function loadData() {
   loading.value = true
@@ -115,16 +115,16 @@ const createDrawerVisible = ref(false)
 const creating = ref(false)
 const createForm = ref<Record<string, unknown>>({})
 const createSchema: MFormField[] = [
-  { field: 'referenceType', label: '来源类型', type: 'select', options: [{ label: '销售出库', value: 'SALES' }, { label: '生产领料', value: 'PRODUCTION' }, { label: '其他', value: 'OTHER' }] },
-  { field: 'referenceId', label: '来源单据ID', type: 'input' },
-  { field: 'priority', label: '优先级(1-10)', type: 'number', props: { min: 1, max: 10 } },
+  { field: 'referenceType', label: t('wms.picking-task.lbl1929'), type: 'select', options: [{ label: t('wms.picking-task.lbl1930'), value: 'SALES' }, { label: t('wms.picking-task.lbl1931'), value: 'PRODUCTION' }, { label: t('wms.picking-task.lbl1932'), value: 'OTHER' }] },
+  { field: 'referenceId', label: t('wms.picking-task.lbl1933'), type: 'input' },
+  { field: 'priority', label: t('wms.picking-task.lbl1934'), type: 'number', props: { min: 1, max: 10 } },
 ]
 function openCreateDrawer() { createForm.value = { priority: 5 }; createDrawerVisible.value = true }
 async function handleCreate(data: Record<string, unknown>) {
   creating.value = true
   try {
     await wmsApi.createPickTask(data)
-    Message.success('创建成功')
+    Message.success(t('wms.创建成功'))
     createDrawerVisible.value = false
     loadData()
   } catch { /* handled */ } finally { creating.value = false }
@@ -151,7 +151,7 @@ async function handleVerify() {
   verifying.value = true
   try {
     await wmsApi.verifyPickTask(currentTask.value.id, verifyLines.value)
-    Message.success('复核完成')
+    Message.success(t('wms.复核完成'))
     verifyModalVisible.value = false
     loadData()
   } catch { /* handled */ } finally { verifying.value = false }

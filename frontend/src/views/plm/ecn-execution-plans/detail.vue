@@ -3,8 +3,8 @@
     <a-page-header :title="$t('plm.ecn-execution-plans.ECN执行计划详情')" @back="router.back()">
       <template #extra>
         <a-space>
-          <a-button v-if="plan.status === 'PENDING'" type="primary" @click="handleTrigger" :loading="actionLoading">手动触发</a-button>
-          <a-button v-if="plan.status === 'FAILED'" @click="handleRetry" :loading="actionLoading">重试失败项</a-button>
+          <a-button v-if="plan.status === 'PENDING'" type="primary" @click="handleTrigger" :loading="actionLoading">{{ $t('plm.ecn-execution-plans.lbl1381') }}</a-button>
+          <a-button v-if="plan.status === 'FAILED'" @click="handleRetry" :loading="actionLoading">{{ $t('plm.ecn-execution-plans.lbl1382') }}</a-button>
           <a-popconfirm v-if="plan.status === 'PENDING'" :content="$t('plm.ecn-execution-plans.确定取消此执行计划')" @ok="handleCancel">
             <a-button status="danger">{{ $t('common.cancel') }}</a-button>
           </a-popconfirm>
@@ -25,7 +25,7 @@
               </a-descriptions-item>
               <a-descriptions-item :label="$t('plm.ecn-execution-plans.生效日期')">
                 <span>{{ plan.effectiveDate }}</span>
-                <a-button v-if="plan.status === 'PENDING'" type="text" size="mini" @click="showDateModal">修改</a-button>
+                <a-button v-if="plan.status === 'PENDING'" type="text" size="mini" @click="showDateModal">{{ $t('plm.ecn-execution-plans.lbl1383') }}</a-button>
               </a-descriptions-item>
               <a-descriptions-item :label="$t('plm.ecn-execution-plans.触发方式')">{{ plan.triggerType }}</a-descriptions-item>
               <a-descriptions-item :label="$t('plm.ecn-execution-plans.创建时间')">{{ plan.createdAt }}</a-descriptions-item>
@@ -40,11 +40,11 @@
           <a-tab-pane key="items" :title="$t('plm.ecn-execution-plans.执行计划项')">
             <a-table :columns="itemColumns" :data="plan.items ?? []" :pagination="false" row-key="id">
               <template #itemType="{ record }">
-                <a-tag>{{ record.itemType === 'BOM' ? 'BOM变更' : '工艺路线变更' }}</a-tag>
+                <a-tag>{{ record.itemType === 'BOM' ? $t('plm.ecn-execution-plans.lbl1384') : $t('plm.ecn-execution-plans.lbl1385') }}</a-tag>
               </template>
               <template #status="{ record }">
                 <a-tag :color="({ COMPLETED: 'green', FAILED: 'red', PENDING: 'gray', IN_PROGRESS: 'orange' } as any)[record.status] ?? 'gray'">
-                  {{ ({ COMPLETED: '已完成', FAILED: '失败', PENDING: '待执行', IN_PROGRESS: '执行中' } as any)[record.status] ?? record.status }}
+                  {{ ({ COMPLETED: t('plm.ecn-execution-plans.completed'), FAILED: t('plm.ecn-execution-plans.lbl1386'), PENDING: t('plm.ecn-execution-plans.lbl1387'), IN_PROGRESS: t('plm.ecn-execution-plans.lbl1388') } as any)[record.status] ?? record.status }}
                 </a-tag>
               </template>
             </a-table>
@@ -82,12 +82,12 @@
               <a-table :columns="wipColumns" :data="wipAssessment.items ?? []" :pagination="false" row-key="id">
                 <template #suggestion="{ record }">
                   <a-tag :color="({ CONTINUE_OLD: 'blue', SWITCH_NEW: 'green', SUSPEND_REVIEW: 'orange' } as any)[record.suggestion] ?? 'gray'">
-                    {{ ({ CONTINUE_OLD: '继续旧版', SWITCH_NEW: '切换新版', SUSPEND_REVIEW: '待确认' } as any)[record.suggestion] ?? record.suggestion }}
+                    {{ ({ CONTINUE_OLD: t('plm.ecn-execution-plans.lbl1389'), SWITCH_NEW: t('plm.ecn-execution-plans.lbl1390'), SUSPEND_REVIEW: t('plm.ecn-execution-plans.lbl1391') } as any)[record.suggestion] ?? record.suggestion }}
                   </a-tag>
                 </template>
                 <template #action="{ record }">
                   <a-button v-if="record.suggestion === 'SUSPEND_REVIEW'" type="text" size="small"
-                    @click="showOverrideModal(record)">人工覆盖</a-button>
+                    @click="showOverrideModal(record)">{{ $t('plm.ecn-execution-plans.lbl1392') }}</a-button>
                 </template>
               </a-table>
 
@@ -95,7 +95,7 @@
                 <a-button type="primary" @click="handleConfirmAssessment"
                   :disabled="(wipAssessment.suspendReviewCount ?? 0) > 0"
                   :loading="confirmLoading">
-                  确认评估
+                  {{ $t('plm.ecn-execution-plans.confirmEval') }}
                 </a-button>
               </div>
             </div>
@@ -128,8 +128,8 @@
       <a-form :model="overrideForm" layout="vertical">
         <a-form-item :label="$t('plm.ecn-execution-plans.处理建议')" required>
           <a-select v-model="overrideForm.suggestion">
-            <a-option value="CONTINUE_OLD">继续使用旧版BOM/工艺</a-option>
-            <a-option value="SWITCH_NEW">切换到新版BOM/工艺</a-option>
+            <a-option value="CONTINUE_OLD">{{ $t('plm.ecn-execution-plans.lbl1393') }}</a-option>
+            <a-option value="SWITCH_NEW">{{ $t('plm.ecn-execution-plans.lbl1394') }}</a-option>
           </a-select>
         </a-form-item>
         <a-form-item :label="$t('plm.ecn-execution-plans.覆盖原因')" required>
@@ -193,43 +193,43 @@ onMounted(async () => {
     const [planRes, wipRes] = await Promise.all([getEcnExecutionPlan(id), getWipAssessment(id)])
     plan.value = (planRes as any).data
     wipAssessment.value = (wipRes as any).data
-  } catch (e: any) { Message.error(e.message || '加载失败') }
+  } catch (e: any) { Message.error(e.message || t('plm.加载失败')) }
   finally { loading.value = false }
 })
 
-async function handleTrigger() { actionLoading.value = true; try { await triggerEcnExecutionPlan(id); Message.success('触发成功'); reload() } catch (e: any) { Message.error(e.message || '触发失败') } finally { actionLoading.value = false } }
-async function handleRetry() { actionLoading.value = true; try { await retryEcnExecutionPlan(id); Message.success('重试已发起'); reload() } catch (e: any) { Message.error(e.message || '操作失败') } finally { actionLoading.value = false } }
-async function handleCancel() { try { await cancelEcnExecutionPlan(id); Message.success('取消成功'); plan.value.status = 'CANCELLED' } catch (e: any) { Message.error(e.message || '操作失败') } }
+async function handleTrigger() { actionLoading.value = true; try { await triggerEcnExecutionPlan(id); Message.success(t('plm.触发成功')); reload() } catch (e: any) { Message.error(e.message || t('plm.触发失败')) } finally { actionLoading.value = false } }
+async function handleRetry() { actionLoading.value = true; try { await retryEcnExecutionPlan(id); Message.success(t('plm.重试已发起')); reload() } catch (e: any) { Message.error(e.message || t('plm.操作失败')) } finally { actionLoading.value = false } }
+async function handleCancel() { try { await cancelEcnExecutionPlan(id); Message.success(t('plm.取消成功')); plan.value.status = 'CANCELLED' } catch (e: any) { Message.error(e.message || t('plm.操作失败')) } }
 
 function showDateModal() { newEffectiveDate.value = plan.value.effectiveDate; dateModalVisible.value = true }
 async function submitDateChange() {
-  if (!newEffectiveDate.value) { Message.warning('请选择日期'); return }
+  if (!newEffectiveDate.value) { Message.warning(t('plm.请选择日期')); return }
   dateLoading.value = true
-  try { await updateEcnEffectiveDate(id, { effectiveDate: newEffectiveDate.value }); Message.success('修改成功'); dateModalVisible.value = false; reload() }
-  catch (e: any) { Message.error(e.message || '修改失败') }
+  try { await updateEcnEffectiveDate(id, { effectiveDate: newEffectiveDate.value }); Message.success(t('plm.修改成功')); dateModalVisible.value = false; reload() }
+  catch (e: any) { Message.error(e.message || t('plm.修改失败')) }
   finally { dateLoading.value = false }
 }
 
 function showOverrideModal(record: any) { overrideTargetId.value = record.id; Object.assign(overrideForm, { suggestion: 'CONTINUE_OLD', reason: '' }); overrideModalVisible.value = true }
 async function submitOverride() {
-  if (!overrideForm.reason) { Message.warning('请填写覆盖原因'); return }
+  if (!overrideForm.reason) { Message.warning(t('plm.请填写覆盖原因')); return }
   overrideLoading.value = true
-  try { await overrideWipAssessmentItem(overrideTargetId.value, overrideForm); Message.success('覆盖成功'); overrideModalVisible.value = false; reloadWip() }
-  catch (e: any) { Message.error(e.message || '操作失败') }
+  try { await overrideWipAssessmentItem(overrideTargetId.value, overrideForm); Message.success(t('plm.覆盖成功')); overrideModalVisible.value = false; reloadWip() }
+  catch (e: any) { Message.error(e.message || t('plm.操作失败')) }
   finally { overrideLoading.value = false }
 }
 
 async function handleConfirmAssessment() {
   confirmLoading.value = true
-  try { await confirmWipAssessment(id); Message.success('评估已确认'); reloadWip() }
-  catch (e: any) { Message.error(e.message || '操作失败') }
+  try { await confirmWipAssessment(id); Message.success(t('plm.评估已确认')); reloadWip() }
+  catch (e: any) { Message.error(e.message || t('plm.操作失败')) }
   finally { confirmLoading.value = false }
 }
 
 async function reload() { const res = await getEcnExecutionPlan(id); plan.value = (res as any).data }
 async function reloadWip() { const res = await getWipAssessment(id); wipAssessment.value = (res as any).data }
 
-function statusLabel(s: string) { return { PENDING: '待执行', IN_PROGRESS: '执行中', COMPLETED: '已完成', FAILED: '失败', CANCELLED: '已取消' }[s] ?? s }
+function statusLabel(s: string) { return { PENDING: t('plm.ecn-execution-plans.lbl1395'), IN_PROGRESS: t('plm.ecn-execution-plans.lbl1396'), COMPLETED: t('plm.ecn-execution-plans.completed'), FAILED: t('plm.ecn-execution-plans.lbl1397'), CANCELLED: t('plm.ecn-execution-plans.lbl1398') }[s] ?? s }
 function statusColor(s: string) { return { PENDING: 'gray', IN_PROGRESS: 'orange', COMPLETED: 'green', FAILED: 'red', CANCELLED: 'gray' }[s] ?? 'gray' }
 </script>
 

@@ -8,13 +8,13 @@
         <a-button type="primary" @click="loadData">{{ $t('common.search') }}</a-button>
         <a-button @click="resetQuery">{{ $t('common.reset') }}</a-button>
       </a-space>
-      <template #extra><a-button type="primary" @click="openDrawer">新建点检记录</a-button></template>
+      <template #extra><a-button type="primary" @click="openDrawer">{{ $t('eam.inspection.lbl1114') }}</a-button></template>
     </a-card>
     <a-card :bordered="false">
       <MTable :columns="columns" :data="tableData" :loading="loading" :total="total" :page-size="20" @change="onTableChange">
         <template #status="{ record }">
           <a-tag :color="record.status === 'NORMAL' ? 'green' : record.status === 'ABNORMAL' ? 'red' : 'gray'">
-            {{ record.status === 'NORMAL' ? '正常' : record.status === 'ABNORMAL' ? '异常' : '待检' }}
+            {{ record.status === 'NORMAL' ? t('eam.inspection.r33008') : record.status === 'ABNORMAL' ? $t('eam.inspection.lbl1115') : $t('eam.inspection.uninspected') }}
           </a-tag>
         </template>
         <template #action="{ record }">
@@ -31,10 +31,10 @@
           <div v-for="(item, idx) in inspForm.items" :key="idx" style="display:flex;gap:8px;margin-bottom:8px;align-items:center">
             <a-input v-model="item.name" :placeholder="$t('eam.inspection.index.项目名称')" style="width:140px" />
             <a-input v-model="item.value" :placeholder="$t('eam.inspection.index.检测值')" style="width:120px" />
-            <a-switch v-model="item.normal" checked-text="正常" unchecked-text="异常" />
-            <a-button size="mini" status="danger" @click="inspForm.items.splice(idx, 1)">删除</a-button>
+            <a-switch v-model="item.normal" :checked-text="t('eam.inspection.normal')" un:checked-text="t('eam.inspection.abnormal')" />
+            <a-button size="mini" status="danger" @click="inspForm.items.splice(idx, 1)">{{ $t('eam.inspection.delete') }}</a-button>
           </div>
-          <a-button size="small" @click="inspForm.items.push({ name: '', value: '', normal: true })">添加项目</a-button>
+          <a-button size="small" @click="inspForm.items.push({ name: '', value: '', normal: true })">{{ $t('eam.inspection.lbl1116') }}</a-button>
         </a-form-item>
       </a-form>
       <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px;padding-top:16px;border-top:1px solid var(--color-border)">
@@ -51,7 +51,7 @@
           <a-descriptions-item :label="$t('eam.inspection.index.点检时间')">{{ currentRecord.createdAt }}</a-descriptions-item>
         </a-descriptions>
         <a-table
-          :columns="[{ title: t('eam.inspection.index.项目'), dataIndex: 'name' }, { title: t('eam.inspection.index.检测值'), dataIndex: 'value' }, { title: t('eam.inspection.index.状态'), dataIndex: 'normal', render: ({ record }: any) => record.normal ? '正常' : '异常' }]"
+          :columns="[{ title: t(t('eam.inspection.r33009')), dataIndex: 'name' }, { title: t(t('eam.inspection.r33010')), dataIndex: 'value' }, { title: t(t('eam.inspection.r33011')), dataIndex: 'normal', render: ({ record }: any) => record.normal ? t('eam.inspection.r33012') : t('eam.inspection.r33013') }]"
           :data="currentRecord.items ?? []"
           :pagination="false"
           row-key="name"
@@ -89,12 +89,12 @@ const drawerVisible = ref(false); const saving = ref(false)
 const inspForm = reactive({ equipmentId: '', items: [{ name: '', value: '', normal: true }] })
 function openDrawer() { inspForm.equipmentId = ''; inspForm.items = [{ name: '', value: '', normal: true }]; drawerVisible.value = true }
 async function handleCreate() {
-  if (!inspForm.equipmentId) { Message.warning('请填写设备ID'); return }
+  if (!inspForm.equipmentId) { Message.warning(t('eam.请填写设备ID')); return }
   saving.value = true
   try {
     const hasAbnormal = inspForm.items.some(i => !i.normal)
     await eamApi.createInspection({ equipmentId: inspForm.equipmentId, items: inspForm.items, status: hasAbnormal ? 'ABNORMAL' : 'NORMAL' })
-    Message.success(hasAbnormal ? '点检完成，发现异常项！' : '点检完成，一切正常')
+    Message.success(hasAbnormal ? t('eam.inspection.lbl1117') : t('eam.inspection.lbl1118'))
     drawerVisible.value = false; loadData()
   } catch { /* handled */ } finally { saving.value = false }
 }

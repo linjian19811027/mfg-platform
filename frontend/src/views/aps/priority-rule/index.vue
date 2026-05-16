@@ -4,8 +4,8 @@
       <a-alert v-if="allDisabled" type="warning" :content="$t('aps.priority-rule.index.警告当前没有启用的优先级规则排')" style="margin-bottom: 0" />
     </a-card>
     <a-card :bordered="false">
-      <template #title>优先级规则管理</template>
-      <template #extra><a-button type="primary" @click="openDrawer(null)">新建规则</a-button></template>
+      <template #title>{{ $t('aps.priority-rule.index.规则管理') }}</template>
+      <template #extra><a-button type="primary" @click="openDrawer(null)">{{ $t('aps.priority-rule.action.create') }}</a-button></template>
       <MTable :columns="columns" :data="tableData" :loading="loading" :total="tableData.length" :show-column-config="false">
         <template #status="{ record }">
           <a-switch
@@ -19,7 +19,7 @@
         </template>
       </MTable>
     </a-card>
-    <a-drawer v-model:visible="drawerVisible" :title="editing ? '编辑规则' : '新建规则'" :width="480" @cancel="drawerVisible = false">
+    <a-drawer v-model:visible="drawerVisible" :title="editing ? $t('aps.priority-rule.action.edit') : $t('aps.priority-rule.action.create')" :width="480" @cancel="drawerVisible = false">
       <MForm :schema="formSchema" v-model="formData" :loading="saving" :submit-text="$t('aps.priority-rule.index.保存')" @submit="handleSave" @cancel="drawerVisible = false" />
     </a-drawer>
   </div>
@@ -46,13 +46,13 @@ const columns: MTableColumn[] = [
   { key: 'action', title: t('aps.priority-rule.index.操作'), slotName: 'action', width: 80 },
 ]
 const formSchema: MFormField[] = [
-  { field: 'name', label: '规则名称', type: 'input', required: true },
-  { field: 'type', label: '规则类型', type: 'select', required: true, options: [
-    { label: '最早交期(EDD)', value: 'EDD' }, { label: '最短工时(SPT)', value: 'SPT' },
-    { label: '最高优先级(HPF)', value: 'HPF' }, { label: '先进先出(FIFO)', value: 'FIFO' },
+  { field: 'name', label: t('aps.priority-rule.index.规则名称'), type: 'input', required: true },
+  { field: 'type', label: t('aps.priority-rule.index.规则类型'), type: 'select', required: true, options: [
+    { label: 'EDD', value: 'EDD' }, { label: 'SPT', value: 'SPT' },
+    { label: 'HPF', value: 'HPF' }, { label: 'FIFO', value: 'FIFO' },
   ]},
-  { field: 'weight', label: '权重系数(1-10)', type: 'number', required: true, props: { min: 1, max: 10 } },
-  { field: 'description', label: '描述', type: 'textarea', props: { autoSize: { minRows: 2 } } },
+  { field: 'weight', label: t('aps.priority-rule.index.权重系数'), type: 'number', required: true, props: { min: 1, max: 10 } },
+  { field: 'description', label: t('aps.priority-rule.index.描述'), type: 'textarea', props: { autoSize: { minRows: 2 } } },
 ]
 async function loadData() {
   loading.value = true
@@ -62,7 +62,7 @@ async function loadData() {
 const togglingId = ref<string | null>(null)
 async function handleToggle(id: string, enabled: boolean) {
   togglingId.value = id
-  try { await apsApi.togglePriorityRule(id, enabled); Message.success(enabled ? '已启用' : '已禁用'); loadData() }
+  try { await apsApi.togglePriorityRule(id, enabled); Message.success(enabled ? t('common.status.active') : t('common.status.inactive')); loadData() }
   catch { /* handled */ } finally { togglingId.value = null }
 }
 const drawerVisible = ref(false); const saving = ref(false); const editing = ref<PriorityRule | null>(null); const formData = ref<Record<string, unknown>>({})
@@ -70,8 +70,8 @@ function openDrawer(item: PriorityRule | null) { editing.value = item; formData.
 async function handleSave(data: Record<string, unknown>) {
   saving.value = true
   try {
-    if (editing.value) { await apsApi.updatePriorityRule(editing.value.id, data); Message.success('更新成功') }
-    else { await apsApi.createPriorityRule(data); Message.success('创建成功') }
+    if (editing.value) { await apsApi.updatePriorityRule(editing.value.id, data); Message.success(t('aps.priority-rule.message.update')) }
+    else { await apsApi.createPriorityRule(data); Message.success(t('aps.priority-rule.message.create')) }
     drawerVisible.value = false; loadData()
   } catch { /* handled */ } finally { saving.value = false }
 }

@@ -65,7 +65,7 @@
           
           <div class="lang-switch-login">
             <a-radio-group v-model="currentLocale" type="button" size="mini" @change="handleLocaleChange">
-              <a-radio value="zh-CN">简</a-radio>
+              <a-radio value="zh-CN">{{ $t('common.misc.zh') }}</a-radio>
               <a-radio value="en-US">EN</a-radio>
             </a-radio-group>
           </div>

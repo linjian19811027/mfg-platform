@@ -27,11 +27,11 @@ import type { MTableColumn } from '@/components/MTable/index.vue'
 import { eamApi, type MaintenancePlan } from '@/api/eam'
 
 const statusOptions = [
-  { label: '待执行', value: 'pending' }, { label: '进行中', value: 'in_progress' },
-  { label: '已完成', value: 'completed' }, { label: '已取消', value: 'cancelled' },
+  { label: t('eam.maintenance.lbl1132'), value: 'pending' }, { label: t('eam.maintenance.inProgress'), value: 'in_progress' },
+  { label: t('eam.maintenance.completed'), value: 'completed' }, { label: t('eam.maintenance.lbl1133'), value: 'cancelled' },
 ]
 const statusColorMap: Record<string, string> = { pending: 'gray', in_progress: 'orange', completed: 'green', cancelled: 'red' }
-const statusLabelMap: Record<string, string> = { pending: '待执行', in_progress: '进行中', completed: '已完成', cancelled: '已取消' }
+const statusLabelMap: Record<string, string> = { pending: t('eam.maintenance.lbl1134'), in_progress: t('eam.maintenance.inProgress'), completed: t('eam.maintenance.completed'), cancelled: t('eam.maintenance.lbl1135') }
 
 const columns: MTableColumn[] = [
   { key: 'equipmentName', title: t('eam.maintenance.index.设备名称') },

@@ -5,11 +5,11 @@
         <!-- 仓库 -->
         <a-tab-pane key="warehouse" :title="$t('wms.warehouse.index.仓库管理')">
           <div style="margin-bottom: 12px; display: flex; justify-content: flex-end">
-            <a-button type="primary" @click="openWarehouseDrawer(null)">新建仓库</a-button>
+            <a-button type="primary" @click="openWarehouseDrawer(null)">{{ $t('wms.warehouse.action.create') }}</a-button>
           </div>
           <a-table :columns="whColumns" :data="warehouses" :loading="whLoading" :pagination="false" row-key="id">
             <template #status="{ record }">
-              <a-tag :color="record.status === 'ACTIVE' ? 'green' : 'gray'">{{ record.status === 'ACTIVE' ? '启用' : '停用' }}</a-tag>
+              <a-tag :color="record.status === 'ACTIVE' ? 'green' : 'gray'">{{ record.status === 'ACTIVE' ? $t('common.status.active') : $t('common.status.inactive') }}</a-tag>
             </template>
             <template #action="{ record }">
               <a-link @click="openWarehouseDrawer(record as Warehouse)">{{ $t('common.edit') }}</a-link>
@@ -23,7 +23,7 @@
             <a-select v-model="selectedWarehouseId" :placeholder="$t('wms.warehouse.index.选择仓库')" style="width: 200px" @change="loadZones">
               <a-option v-for="w in warehouses" :key="w.id" :value="w.id">{{ w.name }}</a-option>
             </a-select>
-            <a-button type="primary" :disabled="!selectedWarehouseId" @click="openZoneDrawer(null)">新建库区</a-button>
+            <a-button type="primary" :disabled="!selectedWarehouseId" @click="openZoneDrawer(null)">{{ $t('wms.zone.action.create') }}</a-button>
           </div>
           <a-table :columns="zoneColumns" :data="zones" :loading="zoneLoading" :pagination="false" row-key="id">
             <template #action="{ record }">
@@ -38,12 +38,12 @@
             <a-select v-model="selectedZoneId" :placeholder="$t('wms.warehouse.index.选择库区')" style="width: 200px" @change="loadLocations">
               <a-option v-for="z in zones" :key="z.id" :value="z.id">{{ z.name }}</a-option>
             </a-select>
-            <a-button type="primary" :disabled="!selectedZoneId" @click="openLocationDrawer(null)">新建货位</a-button>
+            <a-button type="primary" :disabled="!selectedZoneId" @click="openLocationDrawer(null)">{{ $t('wms.location.action.create') }}</a-button>
           </div>
           <a-table :columns="locColumns" :data="locations" :loading="locLoading" :pagination="false" row-key="id">
             <template #status="{ record }">
               <a-tag :color="record.status === 'AVAILABLE' ? 'green' : record.status === 'OCCUPIED' ? 'orange' : 'gray'">
-                {{ record.status === 'AVAILABLE' ? '空闲' : record.status === 'OCCUPIED' ? '占用' : record.status }}
+                {{ record.status === 'AVAILABLE' ? $t('wms.location.status.available') : record.status === 'OCCUPIED' ? $t('wms.location.status.occupied') : record.status }}
               </a-tag>
             </template>
             <template #action="{ record }">
@@ -55,17 +55,17 @@
     </a-card>
 
     <!-- 仓库抽屉 -->
-    <a-drawer v-model:visible="whDrawerVisible" :title="editingWh ? '编辑仓库' : '新建仓库'" :width="480" @cancel="whDrawerVisible = false">
+    <a-drawer v-model:visible="whDrawerVisible" :title="editingWh ? $t('wms.warehouse.action.edit') : $t('wms.warehouse.action.create')" :width="480" @cancel="whDrawerVisible = false">
       <MForm :schema="whSchema" v-model="whForm" :loading="saving" :submit-text="$t('wms.warehouse.index.保存')" @submit="saveWarehouse" @cancel="whDrawerVisible = false" />
     </a-drawer>
 
     <!-- 库区抽屉 -->
-    <a-drawer v-model:visible="zoneDrawerVisible" :title="editingZone ? '编辑库区' : '新建库区'" :width="480" @cancel="zoneDrawerVisible = false">
+    <a-drawer v-model:visible="zoneDrawerVisible" :title="editingZone ? $t('wms.zone.action.edit') : $t('wms.zone.action.create')" :width="480" @cancel="zoneDrawerVisible = false">
       <MForm :schema="zoneSchema" v-model="zoneForm" :loading="saving" :submit-text="$t('wms.warehouse.index.保存')" @submit="saveZone" @cancel="zoneDrawerVisible = false" />
     </a-drawer>
 
     <!-- 货位抽屉 -->
-    <a-drawer v-model:visible="locDrawerVisible" :title="editingLoc ? '编辑货位' : '新建货位'" :width="480" @cancel="locDrawerVisible = false">
+    <a-drawer v-model:visible="locDrawerVisible" :title="editingLoc ? $t('wms.location.action.edit') : $t('wms.location.action.create')" :width="480" @cancel="locDrawerVisible = false">
       <MForm :schema="locSchema" v-model="locForm" :loading="saving" :submit-text="$t('wms.warehouse.index.保存')" @submit="saveLocation" @cancel="locDrawerVisible = false" />
     </a-drawer>
   </div>
@@ -97,10 +97,10 @@ const whColumns = [
   { title: t('wms.warehouse.index.操作'), slotName: 'action', width: 80 },
 ]
 const whSchema: MFormField[] = [
-  { field: 'code', label: '仓库编码', type: 'input', required: true },
-  { field: 'name', label: '仓库名称', type: 'input', required: true },
-  { field: 'type', label: '类型', type: 'select', options: [{ label: '原材料仓', value: 'RAW' }, { label: '成品仓', value: 'FG' }, { label: '半成品仓', value: 'WIP' }, { label: '其他', value: 'OTHER' }] },
-  { field: 'status', label: '状态', type: 'select', options: [{ label: '启用', value: 'ACTIVE' }, { label: '停用', value: 'INACTIVE' }] },
+  { field: 'code', label: t('wms.warehouse.lbl1947'), type: 'input', required: true },
+  { field: 'name', label: t('wms.warehouse.lbl1948'), type: 'input', required: true },
+  { field: 'type', label: t('wms.warehouse.type'), type: 'select', options: [{ label: t('wms.warehouse.lbl1949'), value: 'RAW' }, { label: t('wms.warehouse.lbl1950'), value: 'FG' }, { label: t('wms.warehouse.lbl1951'), value: 'WIP' }, { label: t('wms.warehouse.lbl1952'), value: 'OTHER' }] },
+  { field: 'status', label: t('wms.warehouse.status'), type: 'select', options: [{ label: t('wms.warehouse.enable'), value: 'ACTIVE' }, { label: t('wms.warehouse.disable'), value: 'INACTIVE' }] },
 ]
 
 async function loadWarehouses() {
@@ -120,8 +120,8 @@ function openWarehouseDrawer(wh: Warehouse | null) {
 async function saveWarehouse(data: Record<string, unknown>) {
   saving.value = true
   try {
-    if (editingWh.value) { await wmsApi.updateWarehouse(editingWh.value.id, data); Message.success('更新成功') }
-    else { await wmsApi.createWarehouse(data); Message.success('创建成功') }
+    if (editingWh.value) { await wmsApi.updateWarehouse(editingWh.value.id, data); Message.success(t('wms.更新成功')) }
+    else { await wmsApi.createWarehouse(data); Message.success(t('wms.创建成功')) }
     whDrawerVisible.value = false
     loadWarehouses()
   } catch { /* handled */ } finally { saving.value = false }
@@ -141,9 +141,9 @@ const zoneColumns = [
   { title: t('wms.warehouse.index.操作'), slotName: 'action', width: 80 },
 ]
 const zoneSchema: MFormField[] = [
-  { field: 'code', label: '库区编码', type: 'input', required: true },
-  { field: 'name', label: '库区名称', type: 'input', required: true },
-  { field: 'type', label: '类型', type: 'input', placeholder: '如 NORMAL/COLD/HAZARD' },
+  { field: 'code', label: t('wms.warehouse.lbl1953'), type: 'input', required: true },
+  { field: 'name', label: t('wms.warehouse.lbl1954'), type: 'input', required: true },
+  { field: 'type', label: t('wms.warehouse.type'), type: 'input', placeholder: t('wms.warehouse.r33102') },
 ]
 
 async function loadZones() {
@@ -164,7 +164,7 @@ function openZoneDrawer(zone: WmsZone | null) {
 async function saveZone(_data: Record<string, unknown>) {
   saving.value = true
   try {
-    Message.success(editingZone.value ? '更新成功' : '创建成功')
+    Message.success(editingZone.value ? t('wms.warehouse.lbl1955') : t('wms.warehouse.lbl1956'))
     zoneDrawerVisible.value = false
   } catch { /* handled */ } finally { saving.value = false }
 }
@@ -183,9 +183,9 @@ const locColumns = [
   { title: t('wms.warehouse.index.操作'), slotName: 'action', width: 80 },
 ]
 const locSchema: MFormField[] = [
-  { field: 'code', label: '货位编码', type: 'input', required: true },
-  { field: 'type', label: '类型', type: 'select', options: [{ label: '普通', value: 'NORMAL' }, { label: '暂存', value: 'STAGING' }, { label: '隔离', value: 'QUARANTINE' }] },
-  { field: 'status', label: '状态', type: 'select', options: [{ label: '空闲', value: 'AVAILABLE' }, { label: '停用', value: 'DISABLED' }] },
+  { field: 'code', label: t('wms.warehouse.lbl1957'), type: 'input', required: true },
+  { field: 'type', label: t('wms.warehouse.type'), type: 'select', options: [{ label: t('wms.warehouse.lbl1958'), value: 'NORMAL' }, { label: t('wms.warehouse.lbl1959'), value: 'STAGING' }, { label: t('wms.warehouse.lbl1960'), value: 'QUARANTINE' }, { label: t('wms.warehouse.lbl1961'), value: 'OCCUPIED' }] },
+  { field: 'status', label: t('wms.warehouse.status'), type: 'select', options: [{ label: t('wms.warehouse.idle'), value: 'AVAILABLE' }, { label: t('wms.warehouse.lbl1962'), value: 'DISABLED' }] },
 ]
 
 async function loadLocations() { locations.value = [] }
@@ -196,7 +196,7 @@ function openLocationDrawer(loc: WmsLocation | null) {
 }
 async function saveLocation(_data: Record<string, unknown>) {
   saving.value = true
-  try { Message.success(editingLoc.value ? '更新成功' : '创建成功'); locDrawerVisible.value = false }
+  try { Message.success(editingLoc.value ? t('wms.warehouse.lbl1963') : t('wms.warehouse.lbl1964')); locDrawerVisible.value = false }
   catch { /* handled */ } finally { saving.value = false }
 }
 

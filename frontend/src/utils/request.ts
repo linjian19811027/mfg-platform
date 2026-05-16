@@ -107,23 +107,24 @@ instance.interceptors.response.use(
   },
 )
 
-// 类型安全的请求方法
+// 类型安全的请求方法（async 确保 Promise 解包）
 export const request = {
-  get<T>(url: string, params?: object): Promise<T> {
-    return instance.get(url, { params } as AxiosRequestConfig) as Promise<T>
+  async get<T = any>(url: string, params?: object): Promise<T> {
+    return (await instance.get(url, { params } as AxiosRequestConfig)) as T
   },
-  post<T>(url: string, data?: object): Promise<T> {
-    return instance.post(url, data) as Promise<T>
+  async post<T = any>(url: string, data?: object): Promise<T> {
+    return (await instance.post(url, data)) as T
   },
-  put<T>(url: string, data?: object): Promise<T> {
-    return instance.put(url, data) as Promise<T>
+  async put<T = any>(url: string, data?: object): Promise<T> {
+    return (await instance.put(url, data)) as T
   },
-  patch<T>(url: string, data?: object): Promise<T> {
-    return instance.patch(url, data) as Promise<T>
+  async patch<T = any>(url: string, data?: object): Promise<T> {
+    return (await instance.patch(url, data)) as T
   },
-  delete<T>(url: string, params?: object): Promise<T> {
-    return instance.delete(url, { params } as AxiosRequestConfig) as Promise<T>
+  async delete<T = any>(url: string, params?: object): Promise<T> {
+    return (await instance.delete(url, { params } as AxiosRequestConfig)) as T
   },
 }
 
+export { instance }
 export default instance

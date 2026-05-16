@@ -3,9 +3,9 @@
     <a-card :bordered="false" style="margin-bottom: 16px">
       <a-space wrap>
         <a-select v-model="query.period" :placeholder="$t('aps.capacity.index.时间周期')" style="width: 120px">
-          <a-option value="day">日</a-option>
-          <a-option value="week">周</a-option>
-          <a-option value="month">月</a-option>
+          <a-option value="day">{{ $t('aps.capacity.day') }}</a-option>
+          <a-option value="week">{{ $t('aps.capacity.week') }}</a-option>
+          <a-option value="month">{{ $t('aps.capacity.month') }}</a-option>
         </a-select>
         <a-button type="primary" :loading="loading" @click="loadData">{{ $t('common.search') }}</a-button>
       </a-space>
@@ -20,14 +20,13 @@
     <a-card :title="$t('aps.capacity.index.交期风险工单预计延迟')" :bordered="false">
       <MTable :columns="deliveryColumns" :data="deliveryData" :loading="loading" :total="deliveryData.length" :show-column-config="false">
         <template #delayDays="{ record }">
-          <a-tag :color="(record.delayDays as number) > 7 ? 'red' : 'orange'">延迟 {{ record.delayDays }} 天</a-tag>
+          <a-tag :color="(record.delayDays as number) > 7 ? 'red' : 'orange'">{{ $t('aps.capacity.delayDays', {n: record.delayDays}) }}</a-tag>
         </template>
       </MTable>
     </a-card>
   </div>
 </template>
 <script setup lang="ts">
-const { t } = useI18n()
 import { useI18n } from 'vue-i18n'
 import { ref, reactive, onMounted, onUnmounted, nextTick } from 'vue'
 import * as echarts from 'echarts/core'
@@ -38,6 +37,7 @@ import MTable from '@/components/MTable/index.vue'
 import type { MTableColumn } from '@/components/MTable/index.vue'
 import { apsApi } from '@/api/aps'
 echarts.use([BarChart, GridComponent, TooltipComponent, MarkLineComponent, CanvasRenderer])
+const { t } = useI18n()
 const loading = ref(false); const query = reactive({ period: 'week' })
 const capacityRef = ref<HTMLElement | null>(null); let capacityChart: echarts.ECharts | null = null
 const deliveryData = ref<any[]>([])
@@ -76,4 +76,3 @@ async function loadData() {
 onMounted(loadData); onUnmounted(() => capacityChart?.dispose())
 </script>
 <style scoped>.page-container { padding: 16px; } .chart-container { height: 300px; width: 100%; }</style>
-

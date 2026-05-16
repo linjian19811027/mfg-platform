@@ -16,9 +16,9 @@
         </a-form-item>
         <a-form-item :label="$t('hr.work-hours.summary.汇总维度')">
           <a-select v-model="searchForm.dimension" style="width: 120px">
-            <a-option value="DAY">日</a-option>
-            <a-option value="WEEK">周</a-option>
-            <a-option value="MONTH">月</a-option>
+            <a-option value="DAY">{{ $t('hr.work-hours.day') }}</a-option>
+            <a-option value="WEEK">{{ $t('hr.work-hours.week') }}</a-option>
+            <a-option value="MONTH">{{ $t('hr.work-hours.month') }}</a-option>
           </a-select>
         </a-form-item>
         <a-form-item>
@@ -33,7 +33,7 @@
       <div class="action-bar">
         <a-button @click="handleExport" :loading="exportLoading">
           <template #icon><icon-download /></template>
-          导出 Excel
+          {{ $t('hr.workHours.exportExcel') }}
         </a-button>
       </div>
 
@@ -124,7 +124,7 @@ async function fetchData() {
     tableData.value = (res as any).list ?? (res as any).items ?? []
     pagination.total = (res as any).total ?? 0
   } catch (e: any) {
-    Message.error(e.message || '加载失败')
+    Message.error(e.message || t('hr.work-hours.summary.加载失败'))
   } finally {
     loading.value = false
   }
@@ -162,12 +162,12 @@ async function handleExport() {
     const url = window.URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `工时统计_${new Date().getTime()}.xlsx`
+    a.download = `${t('hr.work-hours.summary.导出文件名')}_${new Date().getTime()}.xlsx`
     a.click()
     window.URL.revokeObjectURL(url)
-    Message.success('导出成功')
+    Message.success(t('hr.work-hours.summary.导出成功'))
   } catch (e: any) {
-    Message.error(e.message || '导出失败')
+    Message.error(e.message || t('hr.work-hours.summary.导出失败'))
   } finally {
     exportLoading.value = false
   }

@@ -4,9 +4,9 @@
       <a-space wrap>
         <a-input v-model="query.equipmentId" :placeholder="$t('eam.lubrication.index.设备ID')" allow-clear style="width: 160px" @keyup.enter="loadData" />
         <a-select v-model="query.status" :placeholder="$t('common.status')" allow-clear style="width: 130px">
-          <a-option value="NORMAL">正常</a-option>
-          <a-option value="DUE_SOON">即将到期</a-option>
-          <a-option value="OVERDUE">已逾期</a-option>
+          <a-option value="NORMAL">{{ $t('eam.lubrication.normal') }}</a-option>
+          <a-option value="DUE_SOON">{{ $t('eam.lubrication.expiring') }}</a-option>
+          <a-option value="OVERDUE">{{ $t('eam.lubrication.lbl1127') }}</a-option>
         </a-select>
         <a-button type="primary" @click="loadData">{{ $t('common.search') }}</a-button>
         <a-button @click="resetQuery">{{ $t('common.reset') }}</a-button>
@@ -17,19 +17,19 @@
     <a-row :gutter="16" style="margin-bottom: 16px">
       <a-col :span="8">
         <div class="stat-card">
-          <div class="stat-label">逾期润滑</div>
+          <div class="stat-label">{{ $t('eam.lubrication.lbl1128') }}</div>
           <div class="stat-value danger">{{ overdueCount }}</div>
         </div>
       </a-col>
       <a-col :span="8">
         <div class="stat-card">
-          <div class="stat-label">7天内到期</div>
+          <div class="stat-label">{{ $t('eam.lubrication.lbl1129') }}</div>
           <div class="stat-value warning">{{ dueSoonCount }}</div>
         </div>
       </a-col>
       <a-col :span="8">
         <div class="stat-card">
-          <div class="stat-label">正常</div>
+          <div class="stat-label">{{ $t('eam.lubrication.normal') }}</div>
           <div class="stat-value success">{{ normalCount }}</div>
         </div>
       </a-col>
@@ -39,11 +39,11 @@
       <MTable :columns="columns" :data="tableData" :loading="loading" :total="total" :page-size="20" @change="onTableChange">
         <template #status="{ record }">
           <a-tag :color="record.status === 'NORMAL' ? 'green' : record.status === 'DUE_SOON' ? 'orange' : 'red'">
-            {{ { NORMAL: '正常', DUE_SOON: '即将到期', OVERDUE: '已逾期' }[record.status as string] ?? record.status }}
+            {{ { NORMAL: t('eam.lubrication.normal'), DUE_SOON: t('eam.lubrication.expiring'), OVERDUE: t('eam.lubrication.lbl1130') }[record.status as string] ?? record.status }}
           </a-tag>
         </template>
         <template #action="{ record }">
-          <a-link @click="openRecordModal(record as unknown as LubricationPoint)">记录润滑</a-link>
+          <a-link @click="openRecordModal(record as unknown as LubricationPoint)">{{ $t('eam.lubrication.lbl1131') }}</a-link>
         </template>
       </MTable>
     </a-card>
@@ -125,11 +125,11 @@ function openRecordModal(point: LubricationPoint) {
 }
 
 async function handleRecord() {
-  if (!currentPoint.value || !recordForm.lubricantType) { Message.warning('请填写润滑油型号'); return }
+  if (!currentPoint.value || !recordForm.lubricantType) { Message.warning(t('eam.请填写润滑油型号')); return }
   recording.value = true
   try {
     await eamApi.recordLubrication(currentPoint.value.id, recordForm)
-    Message.success('润滑记录已保存，下次到期日已更新')
+    Message.success(t('eam.润滑记录已保存，下次到期日已更新'))
     recordModalVisible.value = false
     loadData()
   } catch { /* handled */ } finally { recording.value = false }

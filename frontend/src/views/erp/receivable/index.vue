@@ -8,12 +8,12 @@
       </a-col>
     </a-row>
     <a-card :bordered="false">
-      <template #title>应收账款列表</template>
+      <template #title>{{ $t('erp.receivable.lbl1208') }}</template>
       <template #extra>
         <a-space>
           <a-select v-model="query.status" :placeholder="$t('common.status')" allow-clear style="width: 120px" @change="loadData">
-            <a-option value="OPEN">未收</a-option><a-option value="PARTIAL">部分收</a-option>
-            <a-option value="PAID">已收</a-option><a-option value="OVERDUE">逾期</a-option>
+            <a-option value="OPEN">{{ $t('erp.receivable.lbl1209') }}</a-option><a-option value="PARTIAL">{{ $t('erp.receivable.lbl1210') }}</a-option>
+            <a-option value="PAID">{{ $t('erp.receivable.lbl1211') }}</a-option><a-option value="OVERDUE">{{ $t('erp.receivable.lbl1212') }}</a-option>
           </a-select>
           <a-button type="primary" @click="loadData">{{ $t('common.search') }}</a-button>
         </a-space>
@@ -21,11 +21,11 @@
       <MTable :columns="columns" :data="tableData" :loading="loading" :total="total" :page-size="20" @change="onTableChange">
         <template #status="{ record }">
           <a-tag :color="record.status === 'PAID' ? 'green' : record.status === 'OVERDUE' ? 'red' : record.status === 'PARTIAL' ? 'orange' : 'blue'">
-            {{ { OPEN: '未收', PARTIAL: '部分收', PAID: '已收', OVERDUE: '逾期' }[record.status as string] ?? record.status }}
+            {{ { OPEN: t('erp.receivable.lbl1213'), PARTIAL: t('erp.receivable.lbl1214'), PAID: t('erp.receivable.lbl1215'), OVERDUE: t('erp.receivable.lbl1216') }[record.status as string] ?? record.status }}
           </a-tag>
         </template>
         <template #action="{ record }">
-          <a-link v-if="record.status !== 'PAID'" @click="openPaymentModal(record.id as string)">收款</a-link>
+          <a-link v-if="record.status !== 'PAID'" @click="openPaymentModal(record.id as string)">{{ $t('erp.receivable.lbl1217') }}</a-link>
         </template>
       </MTable>
     </a-card>
@@ -79,9 +79,9 @@ function onTableChange(e: { page: number; pageSize: number }) { query.page = e.p
 const paymentModalVisible = ref(false); const paying = ref(false); const currentId = ref(''); const paymentForm = reactive({ amount: 0, paymentDate: '', bankAccount: '' })
 function openPaymentModal(id: string) { currentId.value = id; paymentForm.amount = 0; paymentForm.paymentDate = ''; paymentForm.bankAccount = ''; paymentModalVisible.value = true }
 async function handlePayment() {
-  if (!paymentForm.amount || !paymentForm.paymentDate) { Message.warning('请填写收款金额和日期'); return }
+  if (!paymentForm.amount || !paymentForm.paymentDate) { Message.warning(t('erp.请填写收款金额和日期')); return }
   paying.value = true
-  try { await erpExtApi.recordReceivablePayment(currentId.value, paymentForm); Message.success('收款记录成功'); paymentModalVisible.value = false; loadData() }
+  try { await erpExtApi.recordReceivablePayment(currentId.value, paymentForm); Message.success(t('erp.收款记录成功')); paymentModalVisible.value = false; loadData() }
   catch { /* handled */ } finally { paying.value = false }
 }
 onMounted(loadData); onUnmounted(() => agingChart?.dispose())

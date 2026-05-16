@@ -7,10 +7,10 @@
         </a-form-item>
         <a-form-item :label="$t('common.status')">
           <a-select v-model="searchForm.status" :placeholder="$t('mes.receipt-logs.index.全部')" allow-clear style="width: 130px">
-            <a-option value="PENDING">待处理</a-option>
-            <a-option value="SUCCESS">成功</a-option>
-            <a-option value="FAILED">失败</a-option>
-            <a-option value="RETRYING">重试中</a-option>
+            <a-option value="PENDING">{{ $t('mes.receipt-logs.pending') }}</a-option>
+            <a-option value="SUCCESS">{{ $t('mes.receipt-logs.lbl1309') }}</a-option>
+            <a-option value="FAILED">{{ $t('mes.receipt-logs.lbl1310') }}</a-option>
+            <a-option value="RETRYING">{{ $t('mes.receipt-logs.lbl1311') }}</a-option>
           </a-select>
         </a-form-item>
         <a-form-item>
@@ -24,17 +24,17 @@
       <a-table :columns="columns" :data="tableData" :loading="loading"
         :pagination="pagination" @page-change="handlePageChange" row-key="id">
         <template #status="{ record }">
-          <a-tag v-if="record.status === 'SUCCESS'" color="green">成功</a-tag>
-          <a-tag v-else-if="record.status === 'FAILED'" color="red">失败</a-tag>
-          <a-tag v-else-if="record.status === 'RETRYING'" color="orange">重试中</a-tag>
-          <a-tag v-else color="gray">待处理</a-tag>
+          <a-tag v-if="record.status === 'SUCCESS'" color="green">{{ $t('mes.receipt-logs.lbl1312') }}</a-tag>
+          <a-tag v-else-if="record.status === 'FAILED'" color="red">{{ $t('mes.receipt-logs.lbl1313') }}</a-tag>
+          <a-tag v-else-if="record.status === 'RETRYING'" color="orange">{{ $t('mes.receipt-logs.lbl1314') }}</a-tag>
+          <a-tag v-else color="gray">{{ $t('mes.receipt-logs.pending') }}</a-tag>
         </template>
         <template #action="{ record }">
           <a-button v-if="record.status === 'FAILED'" type="text" size="small"
             @click="handleRetry(record)" :loading="retryingId === record.id">
-            重试
+            {{ $t('mes.receipt-logs.retry') }}
           </a-button>
-          <a-button type="text" size="small" @click="handleViewDetail(record)">详情</a-button>
+          <a-button type="text" size="small" @click="handleViewDetail(record)">{{ $t('mes.receipt-logs.detail') }}</a-button>
         </template>
       </a-table>
     </a-card>
@@ -51,7 +51,7 @@
         <a-descriptions-item :label="$t('mes.receipt-logs.index.创建时间')" :span="2">{{ detail.createdAt }}</a-descriptions-item>
       </a-descriptions>
       <div v-if="detail.errorMessage" style="margin-top: 16px">
-        <div style="font-weight: 500; margin-bottom: 8px; color: #f53f3f">错误信息：</div>
+        <div style="font-weight: 500; margin-bottom: 8px; color: #f53f3f">{{ $t('mes.receipt-logs.lbl1315') }}</div>
         <a-typography-paragraph code style="white-space: pre-wrap; font-size: 12px">{{ detail.errorMessage }}</a-typography-paragraph>
       </div>
     </a-modal>
@@ -92,7 +92,7 @@ async function fetchData() {
     const res = await getReceiptLogs({ ...searchForm, page: pagination.current, pageSize: pagination.pageSize })
     tableData.value = (res as any).data?.items ?? []
     pagination.total = (res as any).data?.total ?? 0
-  } catch (e: any) { Message.error(e.message || '加载失败') }
+  } catch (e: any) { Message.error(e.message || t('mes.加载失败')) }
   finally { loading.value = false }
 }
 
@@ -104,9 +104,9 @@ async function handleRetry(record: any) {
   retryingId.value = record.id
   try {
     await retryReceiptLog(record.id)
-    Message.success('重试指令已发送')
+    Message.success(t('mes.重试指令已发送'))
     fetchData()
-  } catch (e: any) { Message.error(e.message || '重试失败') }
+  } catch (e: any) { Message.error(e.message || t('mes.重试失败')) }
   finally { retryingId.value = '' }
 }
 

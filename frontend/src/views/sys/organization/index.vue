@@ -13,11 +13,11 @@
               @search="handleSearch"
               @press-enter="handleSearch"
             />
-            <a-button @click="expandAll">展开</a-button>
-            <a-button @click="collapseAll">折叠</a-button>
+            <a-button @click="expandAll">{{ $t('sys.organization.expand') }}</a-button>
+            <a-button @click="collapseAll">{{ $t('sys.organization.lbl1740') }}</a-button>
             <a-button type="primary" @click="openCreateRoot">
               <template #icon><icon-plus /></template>
-              新建顶级
+              {{ $t('sys.organization.createTopLevel') }}
             </a-button>
           </div>
 
@@ -69,7 +69,7 @@
 
       <!-- 右侧详情 -->
       <a-col :span="14">
-        <a-card :title="selectedOrg ? '组织详情' : '请选择组织'">
+        <a-card :title="t('sys.organization.lbl1741')">
           <a-empty v-if="!selectedOrg" :description="$t('sys.organization.index.点击左侧树节点查看详情')" style="margin-top:60px" />
           <template v-else>
             <a-descriptions :column="2" bordered>
@@ -78,7 +78,7 @@
               </a-descriptions-item>
               <a-descriptions-item :label="$t('sys.organization.index.组织编码')">{{ selectedOrg.code }}</a-descriptions-item>
               <a-descriptions-item :label="$t('sys.organization.index.层级')">
-                <a-tag :color="levelColor(selectedOrg.level)">第 {{ selectedOrg.level }} 层</a-tag>
+                <a-tag :color="levelColor(selectedOrg.level)">{{ $t('sys.organization.r22016', {level: selectedOrg.level}) }}</a-tag>
               </a-descriptions-item>
               <a-descriptions-item :label="$t('sys.organization.index.负责人')">{{ selectedOrg.manager || '—' }}</a-descriptions-item>
               <a-descriptions-item :label="$t('sys.organization.index.联系电话')">{{ selectedOrg.phone || '—' }}</a-descriptions-item>
@@ -87,12 +87,12 @@
             </a-descriptions>
 
             <div v-if="selectedOrg.children?.length" style="margin-top:20px">
-              <div style="font-weight:600;margin-bottom:10px">子组织（{{ selectedOrg.children.length }}）</div>
+              <div style="font-weight:600;margin-bottom:10px">{{ $t('sys.organization.r22017', {length: selectedOrg.children.length}) }}</div>
               <a-table :columns="childColumns" :data="selectedOrg.children" :pagination="false" size="small">
                 <template #action="{ record }">
-                  <a-button type="text" size="small" @click="openEdit(record)">编辑</a-button>
+                  <a-button type="text" size="small" @click="openEdit(record)">{{ $t('sys.organization.edit') }}</a-button>
                   <a-popconfirm :content="$t('sys.organization.index.确认删除')" @ok="handleDelete(record.id)">
-                    <a-button type="text" size="small" status="danger">删除</a-button>
+                    <a-button type="text" size="small" status="danger">{{ $t('sys.organization.delete') }}</a-button>
                   </a-popconfirm>
                 </template>
               </a-table>
@@ -100,14 +100,14 @@
 
             <div style="margin-top:20px;display:flex;gap:8px">
               <a-button type="primary" @click="openEdit(selectedOrg)">
-                <template #icon><icon-edit /></template>编辑
-              </a-button>
-              <a-button @click="openCreateChild(selectedOrg)">
-                <template #icon><icon-plus /></template>新建子组织
-              </a-button>
-              <a-popconfirm :content="$t('sys.organization.index.确认删除该组织')" @ok="handleDelete(selectedOrg.id)">
-                <a-button status="danger">
-                  <template #icon><icon-delete /></template>删除
+                <template #icon><icon-edit /></template>{{ $t('sys.organization.edit') }}
+                              </a-button>
+                              <a-button @click="openCreateChild(selectedOrg)">
+                                <template #icon><icon-plus /></template>{{ $t('sys.organization.createSubOrg') }}
+                              </a-button>
+                              <a-popconfirm :content="$t('sys.organization.index.确认删除该组织')" @ok="handleDelete(selectedOrg.id)">
+                                <a-button status="danger">
+                                  <template #icon><icon-delete /></template>{{ $t('common.delete') }}
                 </a-button>
               </a-popconfirm>
             </div>
@@ -128,10 +128,10 @@
         <a-form-item :label="$t('sys.organization.index.上级组织')">
           <a-input :model-value="parentLabel" disabled />
         </a-form-item>
-        <a-form-item :label="$t('sys.organization.index.组织名称')" field="name" :rules="[{ required: true, message: '请输入组织名称' }]" validate-trigger="blur">
+        <a-form-item :label="t('sys.organization.r33075')" field="name" :rules="[{ required: true, message: t('sys.organization.inputOrgName') }]" validate-trigger="blur">
           <a-input v-model="formData.name" :placeholder="$t('sys.organization.index.请输入组织名称')" allow-clear />
         </a-form-item>
-        <a-form-item :label="$t('sys.organization.index.组织编码')" field="code" :rules="[{ required: true, message: '请输入组织编码' }, { match: /^[A-Za-z0-9\-_]+$/, message: '只能包含字母、数字、横线和下划线' }]" validate-trigger="blur">
+        <a-form-item :label="t('sys.organization.r33076')" field="code" :rules="[{ required: true, message: t('sys.organization.inputOrgCode') }, { match: /^[A-Za-z0-9\-_]+$/, message: t('sys.organization.r44002') }]" validate-trigger="blur">
           <a-input v-model="formData.code" :placeholder="$t('sys.organization.index.如PRODW1')" allow-clear />
         </a-form-item>
         <a-form-item :label="$t('sys.organization.index.负责人')" field="manager">
@@ -148,7 +148,7 @@
         <div style="display:flex;justify-content:flex-end;gap:8px">
           <a-button @click="drawerVisible = false">{{ $t('common.cancel') }}</a-button>
           <a-button type="primary" :loading="submitLoading" @click="handleSubmit">
-            {{ editingId ? '保存' : '创建' }}
+            {{ editingId ? $t('sys.organization.save') : $t('sys.organization.lbl1742') }}
           </a-button>
         </div>
       </template>
@@ -173,14 +173,14 @@ const treeRef = ref()
 
 const drawerVisible = ref(false)
 const editingId = ref<string | null>(null)
-const parentLabel = ref('无（顶级组织）')
+const parentLabel = ref(t('sys.organization.lbl1743'))
 const formRef = ref()
 const formData = ref<OrgFormData>({
   name: '', code: '', parentId: null, manager: '', phone: '', description: '',
 })
 
 const drawerTitle = computed(() =>
-  editingId.value ? '编辑组织' : `新建${formData.value.parentId ? '子' : '顶级'}组织`
+  editingId.value ? t('sys.organization.lbl1744') : `${t('sys.organization.r33077')}${formData.value.parentId ? t('sys.organization.lbl1745') : t('sys.organization.lbl1746')}${t('sys.organization.r33078')}`
 )
 
 function flattenTree(nodes: OrgNode[]): OrgNode[] {
@@ -195,7 +195,7 @@ function flattenTree(nodes: OrgNode[]): OrgNode[] {
 const allNodes = computed(() => flattenTree(orgTree.value))
 
 function parentName(parentId: string | null): string {
-  if (!parentId) return '无（顶级组织）'
+  if (!parentId) return t('sys.organization.lbl1747')
   return allNodes.value.find(n => n.id === parentId)?.name ?? parentId
 }
 
@@ -254,7 +254,7 @@ function collapseAll() { treeRef.value?.collapseAll?.() }
 function openCreateRoot() {
   editingId.value = null
   formData.value = { name: '', code: '', parentId: null, manager: '', phone: '', description: '' }
-  parentLabel.value = '无（顶级组织）'
+  parentLabel.value = t('sys.organization.lbl1748')
   drawerVisible.value = true
 }
 
@@ -282,10 +282,10 @@ async function handleSubmit() {
   try {
     if (editingId.value) {
       await orgApi.updateOrg(editingId.value, formData.value)
-      Message.success('更新成功')
+      Message.success(t('sys.更新成功'))
     } else {
       await orgApi.createOrg(formData.value)
-      Message.success('创建成功')
+      Message.success(t('sys.创建成功'))
     }
     drawerVisible.value = false
     const prevId = selectedOrg.value?.id
@@ -295,7 +295,7 @@ async function handleSubmit() {
       if (found) { selectedKeys.value = [prevId]; selectedOrg.value = found }
     }
   } catch (e: unknown) {
-    Message.error((e as { message?: string })?.message ?? '操作失败')
+    Message.error((e as { message?: string })?.message ?? t('sys.organization.lbl1749'))
   } finally {
     submitLoading.value = false
   }
@@ -304,11 +304,11 @@ async function handleSubmit() {
 async function handleDelete(id: string) {
   try {
     await orgApi.deleteOrg(id)
-    Message.success('删除成功')
+    Message.success(t('sys.删除成功'))
     if (selectedOrg.value?.id === id) { selectedOrg.value = null; selectedKeys.value = [] }
     await loadTree()
   } catch (e: unknown) {
-    Message.error((e as { message?: string })?.message ?? '删除失败')
+    Message.error((e as { message?: string })?.message ?? t('sys.organization.lbl1750'))
   }
 }
 

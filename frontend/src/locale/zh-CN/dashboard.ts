@@ -1,0 +1,23 @@
+export default {
+  'dashboard.welcome': '欢迎回来，{name}！',
+  'dashboard.welcomeDesc': '今天又是提升生产效率的好日子，各项指标运行平稳。',
+  'dashboard.productionBoard': '进入生产大屏',
+  'dashboard.totalOutput': '今日总产量',
+  'dashboard.equipRate': '设备运转率',
+  'dashboard.avgMtt': '平均故障恢复',
+  'dashboard.workers': '在岗工人',
+  'dashboard.unit.piece': '件',
+  'dashboard.unit.min': '分钟',
+  'dashboard.unit.person': '人',
+  'dashboard.trendText': '{value}% 较昨日',
+  'dashboard.oeeTrend': '生产效率趋势 OEE',
+  'dashboard.week': '本周',
+  'dashboard.month': '本月',
+  'dashboard.mon': '周一',
+  'dashboard.tue': '周二',
+  'dashboard.wed': '周三',
+  'dashboard.thu': '周四',
+  'dashboard.fri': '周五',
+  'dashboard.sat': '周六',
+  'dashboard.sun': '周日'
+}

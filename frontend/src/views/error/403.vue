@@ -5,9 +5,9 @@
       <div class="error-icon">
         <icon-lock :size="64" />
       </div>
-      <h2 class="error-title">无权限访问</h2>
-      <p class="error-desc">您没有访问该页面的权限</p>
-      <a-button type="primary" @click="$router.push('/dashboard')">返回首页</a-button>
+      <h2 class="error-title">{{ $t('common.misc.lbl1262') }}</h2>
+      <p class="error-desc">{{ $t('common.misc.lbl1263') }}</p>
+      <a-button type="primary" @click="$router.push('/dashboard')">{{ $t('common.misc.lbl1264') }}</a-button>
     </div>
   </div>
 </template>

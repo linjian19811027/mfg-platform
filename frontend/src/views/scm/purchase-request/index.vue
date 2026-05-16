@@ -3,16 +3,16 @@
     <a-card :bordered="false" style="margin-bottom: 16px">
       <a-space wrap>
         <a-select v-model="query.status" :placeholder="$t('common.status')" allow-clear style="width: 130px">
-          <a-option value="DRAFT">草稿</a-option>
-          <a-option value="PENDING">待审批</a-option>
-          <a-option value="APPROVED">已批准</a-option>
-          <a-option value="REJECTED">已拒绝</a-option>
+          <a-option value="DRAFT">{{ $t('scm.purchase-request.draft') }}</a-option>
+          <a-option value="PENDING">{{ $t('scm.purchase-request.lbl1586') }}</a-option>
+          <a-option value="APPROVED">{{ $t('scm.purchase-request.approved') }}</a-option>
+          <a-option value="REJECTED">{{ $t('scm.purchase-request.rejected') }}</a-option>
         </a-select>
         <a-button type="primary" @click="loadData">{{ $t('common.search') }}</a-button>
         <a-button @click="resetQuery">{{ $t('common.reset') }}</a-button>
       </a-space>
       <template #extra>
-        <a-button type="primary" @click="openDrawer(null)">新建采购申请</a-button>
+        <a-button type="primary" @click="openDrawer(null)">{{ $t('scm.purchase-request.lbl1587') }}</a-button>
       </template>
     </a-card>
 
@@ -24,13 +24,13 @@
         <template #action="{ record }">
           <a-space>
             <a-popconfirm v-if="record.status === 'DRAFT'" :content="$t('scm.purchase-request.index.确认提交审批')" @ok="handleSubmit(record.id as string)">
-              <a-link>提交</a-link>
+              <a-link>{{ $t('scm.purchase-request.submit') }}</a-link>
             </a-popconfirm>
             <a-popconfirm v-if="record.status === 'PENDING'" :content="$t('scm.purchase-request.index.确认批准该申请')" @ok="handleApprove(record.id as string)">
-              <a-link>批准</a-link>
+              <a-link>{{ $t('scm.purchase-request.lbl1588') }}</a-link>
             </a-popconfirm>
-            <a-link v-if="record.status === 'PENDING'" @click="openRejectModal(record.id as string)">拒绝</a-link>
-            <a-link v-if="record.status === 'APPROVED'" @click="convertToPo(record as unknown as PurchaseRequest)">转采购订单</a-link>
+            <a-link v-if="record.status === 'PENDING'" @click="openRejectModal(record.id as string)">{{ $t('scm.purchase-request.lbl1589') }}</a-link>
+            <a-link v-if="record.status === 'APPROVED'" @click="convertToPo(record as unknown as PurchaseRequest)">{{ $t('scm.purchase-request.lbl1590') }}</a-link>
           </a-space>
         </template>
       </MTable>
@@ -141,20 +141,20 @@ function openDrawer(_item: null) {
   drawerVisible.value = true
 }
 async function handleCreate() {
-  if (!createForm.materialId) { Message.warning('请选择物料'); return }
-  if (!createForm.qty) { Message.warning('请填写申请数量'); return }
+  if (!createForm.materialId) { Message.warning(t('scm.请选择物料')); return }
+  if (!createForm.qty) { Message.warning(t('scm.请填写申请数量')); return }
   saving.value = true
-  try { await scmApi.createPurchaseRequest({ ...createForm }); Message.success('创建成功'); drawerVisible.value = false; loadData() }
+  try { await scmApi.createPurchaseRequest({ ...createForm }); Message.success(t('scm.创建成功')); drawerVisible.value = false; loadData() }
   catch { /* handled */ } finally { saving.value = false }
 }
 
 async function handleSubmit(id: string) {
-  try { await scmApi.submitPurchaseRequest(id); Message.success('已提交审批'); loadData() }
+  try { await scmApi.submitPurchaseRequest(id); Message.success(t('scm.已提交审批')); loadData() }
   catch { /* handled */ }
 }
 
 async function handleApprove(id: string) {
-  try { await scmApi.approvePurchaseRequest(id); Message.success('已批准'); loadData() }
+  try { await scmApi.approvePurchaseRequest(id); Message.success(t('scm.已批准')); loadData() }
   catch { /* handled */ }
 }
 
@@ -164,9 +164,9 @@ const rejectId = ref('')
 const rejectReason = ref('')
 function openRejectModal(id: string) { rejectId.value = id; rejectReason.value = ''; rejectModalVisible.value = true }
 async function handleReject() {
-  if (!rejectReason.value.trim()) { Message.warning('请填写拒绝原因'); return }
+  if (!rejectReason.value.trim()) { Message.warning(t('scm.请填写拒绝原因')); return }
   rejecting.value = true
-  try { await scmApi.rejectPurchaseRequest(rejectId.value, rejectReason.value); Message.success('已拒绝'); rejectModalVisible.value = false; loadData() }
+  try { await scmApi.rejectPurchaseRequest(rejectId.value, rejectReason.value); Message.success(t('scm.已拒绝')); rejectModalVisible.value = false; loadData() }
   catch { /* handled */ } finally { rejecting.value = false }
 }
 
@@ -181,7 +181,7 @@ function convertToPo(pr: PurchaseRequest) {
   convertModalVisible.value = true
 }
 async function handleConvert() {
-  if (!convertingPr.value || !convertForm.supplierId) { Message.warning('请选择供应商'); return }
+  if (!convertingPr.value || !convertForm.supplierId) { Message.warning(t('scm.请选择供应商')); return }
   converting.value = true
   try {
     await scmApi.createPurchaseOrder({
@@ -190,7 +190,7 @@ async function handleConvert() {
       orderDate: new Date().toISOString().slice(0, 10),
       expectedDate: convertForm.expectedDate || undefined
     })
-    Message.success('采购订单已创建')
+    Message.success(t('scm.采购订单已创建'))
     convertModalVisible.value = false
   } catch { /* handled */ } finally { converting.value = false }
 }

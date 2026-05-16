@@ -185,21 +185,105 @@ function filterBatches(params: BatchListParams) {
   return { list: list.slice(start, start + pageSize), total }
 }
 
+export interface NumberingRuleParams {
+  businessKey?: string
+  keyword?: string
+  page?: number
+  pageSize?: number
+}
+
+export interface NumberingRule {
+  id: string
+  businessKey: string
+  code: string
+  name: string
+  mode: string
+  status: string
+  segments: any[]
+  createdAt: string
+  updatedAt: string
+}
+
+export interface ShiftRecord {
+  id: number
+  code: string
+  name: string
+  startTime: string
+  endTime: string
+  enabled?: number
+}
+
+export interface CertTypeRecord {
+  id: number
+  code: string
+  name: string
+  isMandatory?: number
+  defaultValidityMonths?: number
+}
+
+// ==================== 工作中心管理 ====================
+
+export interface WorkCenter {
+  id: string
+  name: string
+  code?: string
+  type?: string
+  description?: string
+  enabled: number
+  createdAt: string
+  updatedAt: string
+}
+
+export interface WorkCenterFormData {
+  name: string
+  code?: string
+  type?: string
+  description?: string
+  enabled?: number
+}
+
 export const baseApi = {
   // 编码规则管理
-  getNumberingRules: (params?: any) => 
-    request.get<{ list: any[]; total: number }>('/v1/base/numbering-rules', params),
+  getNumberingRules: (params?: NumberingRuleParams) => 
+    request.get<{ list: NumberingRule[]; total: number }>('/v1/base/numbering-rules', params),
   
-  createNumberingRule: (data: any) => 
-    request.post<any>('/v1/base/numbering-rules', data),
+  createNumberingRule: (data: Partial<NumberingRule>) => 
+    request.post<NumberingRule>('/v1/base/numbering-rules', data),
   
-  updateNumberingRule: (id: string, data: any) => 
-    request.put<any>(`/v1/base/numbering-rules/${id}`, data),
+  updateNumberingRule: (id: string, data: Partial<NumberingRule>) => 
+    request.put<NumberingRule>(`/v1/base/numbering-rules/${id}`, data),
   
   deleteNumberingRule: (id: string) => 
     request.delete<void>(`/v1/base/numbering-rules/${id}`),
 
-  // 组织架构相关...
+  // ── 班次管理 ───────────────────────────────────────────────
+  getShifts: () => request.get<ShiftRecord[]>('/v1/base/shifts'),
+  getAllShifts: () => request.get<ShiftRecord[]>('/v1/base/shifts/all'),
+  createShift: (data: { code: string; name: string; startTime: string; endTime: string; enabled?: number }) =>
+    request.post<ShiftRecord>('/v1/base/shifts', data),
+  updateShift: (id: number, data: { code?: string; name?: string; startTime?: string; endTime?: string; enabled?: number }) =>
+    request.put<ShiftRecord>(`/v1/base/shifts/${id}`, data),
+  deleteShift: (id: number) => request.delete<void>(`/v1/base/shifts/${id}`),
+
+  // ── 认证类型管理 ──────────────────────────────────────────
+  getCertificationTypes: () => request.get<CertTypeRecord[]>('/v1/base/certification-types'),
+  createCertificationType: (data: { code: string; name: string; isMandatory?: number; defaultValidityMonths?: number }) =>
+    request.post<CertTypeRecord>('/v1/base/certification-types', data),
+  updateCertificationType: (id: number, data: { code?: string; name?: string; isMandatory?: number; defaultValidityMonths?: number }) =>
+    request.put<CertTypeRecord>(`/v1/base/certification-types/${id}`, data),
+  deleteCertificationType: (id: number) => request.delete<void>(`/v1/base/certification-types/${id}`),
+
+  // ── 工作中心管理 ──────────────────────────────────────────
+  getWorkCenters: () => request.get<WorkCenter[]>('/v1/base/work-centers'),
+
+  createWorkCenter: (data: WorkCenterFormData) =>
+    request.post<WorkCenter>('/v1/base/work-centers', data),
+
+  updateWorkCenter: (id: string, data: Partial<WorkCenterFormData>) =>
+    request.put<WorkCenter>(`/v1/base/work-centers/${id}`, data),
+
+  deleteWorkCenter: (id: string) =>
+    request.delete<void>(`/v1/base/work-centers/${id}`),
 }
 
 export const batchApi = {

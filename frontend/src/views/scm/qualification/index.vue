@@ -4,15 +4,15 @@
       <a-space wrap>
         <a-input v-model="query.supplierId" :placeholder="$t('scm.qualification.index.供应商ID')" allow-clear style="width: 160px" @keyup.enter="loadData" />
         <a-select v-model="query.status" :placeholder="$t('common.status')" allow-clear style="width: 130px">
-          <a-option value="VALID">有效</a-option>
-          <a-option value="EXPIRING">即将到期</a-option>
-          <a-option value="EXPIRED">已过期</a-option>
+          <a-option value="VALID">{{ $t('scm.qualification.valid') }}</a-option>
+          <a-option value="EXPIRING">{{ $t('scm.qualification.expiring') }}</a-option>
+          <a-option value="EXPIRED">{{ $t('scm.qualification.expired') }}</a-option>
         </a-select>
         <a-button type="primary" @click="loadData">{{ $t('common.search') }}</a-button>
         <a-button @click="resetQuery">{{ $t('common.reset') }}</a-button>
       </a-space>
       <template #extra>
-        <a-button type="primary" @click="openDrawer(null)">新建资质</a-button>
+        <a-button type="primary" @click="openDrawer(null)">{{ $t('scm.qualification.lbl1591') }}</a-button>
       </template>
     </a-card>
 
@@ -20,7 +20,7 @@
       <MTable :columns="columns" :data="tableData" :loading="loading" :total="total" :page-size="20" @change="onTableChange">
         <template #status="{ record }">
           <a-tag :color="record.status === 'VALID' ? 'green' : record.status === 'EXPIRING' ? 'orange' : 'red'">
-            {{ record.status === 'VALID' ? '有效' : record.status === 'EXPIRING' ? '即将到期' : '已过期' }}
+            {{ record.status === 'VALID' ? t('scm.qualification.r33060') : record.status === 'EXPIRING' ? $t('scm.qualification.expiring') : $t('scm.qualification.expired') }}
           </a-tag>
         </template>
         <template #action="{ record }">
@@ -29,7 +29,7 @@
       </MTable>
     </a-card>
 
-    <a-drawer v-model:visible="drawerVisible" :title="editing ? '编辑资质' : '新建资质'" :width="480" @cancel="drawerVisible = false">
+    <a-drawer v-model:visible="drawerVisible" ::title="t('scm.qualification.lbl1592')" :width="480" @cancel="drawerVisible = false">
       <MForm :schema="formSchema" v-model="formData" :loading="saving" :submit-text="$t('scm.qualification.index.保存')" @submit="handleSave" @cancel="drawerVisible = false" />
     </a-drawer>
   </div>
@@ -62,11 +62,11 @@ const columns: MTableColumn[] = [
 ]
 
 const formSchema: MFormField[] = [
-  { field: 'supplierId', label: '供应商ID', type: 'input', required: true },
-  { field: 'certType', label: '资质类型', type: 'input', required: true, props: { placeholder: '如 ISO9001/CE/RoHS' } },
-  { field: 'certNo', label: '证书编号', type: 'input' },
-  { field: 'issueDate', label: '颁发日期', type: 'date' },
-  { field: 'expiryDate', label: '到期日期', type: 'date', required: true },
+  { field: 'supplierId', label: t('scm.qualification.lbl1593'), type: 'supplier-select', required: true },
+  { field: 'certType', label: t('scm.qualification.lbl1594'), type: 'input', required: true, props: { placeholder: t('scm.qualification.r33061') } },
+  { field: 'certNo', label: t('scm.qualification.lbl1595'), type: 'input' },
+  { field: 'issueDate', label: t('scm.qualification.lbl1596'), type: 'date' },
+  { field: 'expiryDate', label: t('scm.qualification.lbl1597'), type: 'date', required: true },
 ]
 
 async function loadData() {
@@ -98,8 +98,8 @@ function openDrawer(item: SupplierQualification | null) {
 async function handleSave(data: Record<string, unknown>) {
   saving.value = true
   try {
-    if (editing.value) { await scmApi.updateQualification(editing.value.id, data); Message.success('更新成功') }
-    else { await scmApi.createQualification(data); Message.success('创建成功') }
+    if (editing.value) { await scmApi.updateQualification(editing.value.id, data); Message.success(t('scm.更新成功')) }
+    else { await scmApi.createQualification(data); Message.success(t('scm.创建成功')) }
     drawerVisible.value = false
     loadData()
   } catch { /* handled */ } finally { saving.value = false }

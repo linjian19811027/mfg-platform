@@ -25,7 +25,7 @@ export class PlmBom {
   version!: number;
 
   @Column({ length: 20, default: 'DRAFT' })
-  status!: string; // DRAFT | ACTIVE | OBSOLETE
+  status!: string; // DRAFT | ACTIVE | INACTIVE | OBSOLETE
 
   @Column({ name: 'effective_date', type: 'date', nullable: true })
   effectiveDate?: Date;

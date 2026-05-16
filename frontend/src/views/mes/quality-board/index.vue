@@ -2,28 +2,28 @@
   <div class="qb-page">
     <!-- 标题栏 -->
     <div class="qb-header">
-      <span class="qb-title">质量看板</span>
-      <span class="qb-update">最后更新：{{ lastUpdate }}</span>
-      <a-button size="small" :loading="loading" @click="refresh">刷新</a-button>
+      <span class="qb-title">{{ $t('mes.quality-board.lbl1301') }}</span>
+      <span class="qb-update">{{ $t('mes.quality-board.r22006', {lastUpdate: lastUpdate}) }}</span>
+      <a-button size="small" :loading="loading" @click="refresh">{{ $t('mes.quality-board.refresh') }}</a-button>
     </div>
 
     <!-- 统计卡片 -->
     <a-row :gutter="16" style="margin-bottom: 16px">
       <a-col :span="8">
         <div class="stat-card">
-          <div class="stat-label">今日不合格品</div>
+          <div class="stat-label">{{ $t('mes.quality-board.lbl1302') }}</div>
           <div class="stat-value danger">{{ data.todayNcCount ?? 0 }}</div>
         </div>
       </a-col>
       <a-col :span="8">
         <div class="stat-card">
-          <div class="stat-label">首检通过率</div>
+          <div class="stat-label">{{ $t('mes.quality-board.lbl1303') }}</div>
           <div class="stat-value success">{{ ((data.firstPassRate ?? 0) * 100).toFixed(1) }}%</div>
         </div>
       </a-col>
       <a-col :span="8">
         <div class="stat-card">
-          <div class="stat-label">综合合格率</div>
+          <div class="stat-label">{{ $t('mes.quality-board.lbl1304') }}</div>
           <div class="stat-value primary">{{ ((data.overallPassRate ?? 0) * 100).toFixed(1) }}%</div>
         </div>
       </a-col>
@@ -110,8 +110,8 @@ function mockData(): QualityDashboard {
     todayNcCount: 3, firstPassRate: 0.92, overallPassRate: 0.97,
     ncTrend: dates.map((date, i) => ({ date, count: [2, 4, 1, 3, 5, 2, 3][i] })),
     operationPassRates: [
-      { operationName: '拉丝', rate: 0.98 }, { operationName: '绞线', rate: 0.95 },
-      { operationName: '绝缘', rate: 0.93 }, { operationName: '护套', rate: 0.97 },
+      { operationName: t('mes.quality-board.lbl1305'), rate: 0.98 }, { operationName: t('mes.quality-board.lbl1306'), rate: 0.95 },
+      { operationName: t('mes.quality-board.lbl1307'), rate: 0.93 }, { operationName: t('mes.quality-board.lbl1308'), rate: 0.97 },
     ],
     recentNcs: [],
   }

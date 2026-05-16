@@ -24,7 +24,7 @@
         <a-form-item>
           <a-button type="primary" @click="handleAssess" :loading="assessLoading">
             <template #icon><icon-thunderbolt /></template>
-            发起评估
+            {{ $t('traceability.recall.initiateEval') }}
           </a-button>
         </a-form-item>
       </a-form>
@@ -39,10 +39,10 @@
           <a-descriptions-item :label="$t('common.status')">
             <a-tag v-if="currentAssessment.status === 'CALCULATING'" color="blue">
               <template #icon><icon-loading /></template>
-              计算中
+              {{ $t('traceability.recall.calculating') }}
             </a-tag>
-            <a-tag v-else-if="currentAssessment.status === 'COMPLETED'" color="green">已完成</a-tag>
-            <a-tag v-else-if="currentAssessment.status === 'FAILED'" color="red">失败</a-tag>
+            <a-tag v-else-if="currentAssessment.status === 'COMPLETED'" color="green">{{ $t('traceability.recall.completed') }}</a-tag>
+            <a-tag v-else-if="currentAssessment.status === 'FAILED'" color="red">{{ $t('traceability.recall.lbl1866') }}</a-tag>
           </a-descriptions-item>
         </a-descriptions>
 
@@ -65,13 +65,13 @@
               <a-statistic :title="$t('traceability.recall.index.受影响销售订单')" :value="currentAssessment.affectedSoCount" />
             </a-col>
             <a-col :span="6">
-              <a-statistic :title="$t('traceability.recall.index.在库数量')" :value="currentAssessment.inStockQty" suffix="件" />
+              <a-statistic :title="$t('traceability.recall.r33097')" :value="currentAssessment.inStockQty" :suffix="t('traceability.recall.r44004')" />
             </a-col>
           </a-row>
 
           <a-divider />
 
-          <h4>风险等级分布</h4>
+          <h4>{{ $t('traceability.recall.lbl1867') }}</h4>
           <a-row :gutter="16">
             <a-col :span="8">
               <a-card :bordered="false" :style="{ backgroundColor: '#ffece8' }">
@@ -107,9 +107,9 @@
           <a-space>
             <a-button type="primary" @click="handleConfirmFreeze">
               <template #icon><icon-lock /></template>
-              确认冻结在库批次
+              {{ $t('traceability.recall.confirmFreezeBatches') }}
             </a-button>
-            <a-button @click="handleViewDetail">查看详细报告</a-button>
+            <a-button @click="handleViewDetail">{{ $t('traceability.recall.lbl1868') }}</a-button>
           </a-space>
         </div>
       </a-space>
@@ -130,27 +130,27 @@
           <a-link @click="handleViewAssessment(record)">{{ record.assessmentNo }}</a-link>
         </template>
         <template #status="{ record }">
-          <a-tag v-if="record.status === 'CALCULATING'" color="blue">计算中</a-tag>
-          <a-tag v-else-if="record.status === 'COMPLETED'" color="green">已完成</a-tag>
-          <a-tag v-else-if="record.status === 'FAILED'" color="red">失败</a-tag>
+          <a-tag v-if="record.status === 'CALCULATING'" color="blue">{{ $t('traceability.recall.lbl1869') }}</a-tag>
+          <a-tag v-else-if="record.status === 'COMPLETED'" color="green">{{ $t('traceability.recall.completed') }}</a-tag>
+          <a-tag v-else-if="record.status === 'FAILED'" color="red">{{ $t('traceability.recall.lbl1870') }}</a-tag>
         </template>
         <template #riskLevel="{ record }">
           <a-space>
-            <a-tag color="red">高: {{ record.highRiskCount }}</a-tag>
-            <a-tag color="orange">中: {{ record.mediumRiskCount }}</a-tag>
-            <a-tag color="green">低: {{ record.lowRiskCount }}</a-tag>
+            <a-tag color="red">{{ $t('traceability.recall.r22020', {highRiskCount: record.highRiskCount}) }}</a-tag>
+            <a-tag color="orange">{{ $t('traceability.recall.r22021', {mediumRiskCount: record.mediumRiskCount}) }}</a-tag>
+            <a-tag color="green">{{ $t('traceability.recall.r22022', {lowRiskCount: record.lowRiskCount}) }}</a-tag>
           </a-space>
         </template>
         <template #action="{ record }">
           <a-space>
-            <a-button type="text" size="small" @click="handleViewAssessment(record)">详情</a-button>
+            <a-button type="text" size="small" @click="handleViewAssessment(record)">{{ $t('traceability.recall.detail') }}</a-button>
             <a-button
               v-if="record.status === 'COMPLETED' && record.mediumRiskCount > 0"
               type="text"
               size="small"
               @click="handleFreeze(record)"
             >
-              冻结在库批次
+              {{ $t('traceability.recall.freezeBatches') }}
             </a-button>
           </a-space>
         </template>
@@ -222,7 +222,7 @@ async function fetchData() {
     tableData.value = (res as any).list ?? (res as any).items ?? []
     pagination.total = (res as any).total ?? 0
   } catch (error: any) {
-    Message.error(error.message || '加载失败')
+    Message.error(error.message || t('traceability.加载失败'))
   } finally {
     loading.value = false
   }
@@ -230,11 +230,11 @@ async function fetchData() {
 
 async function handleAssess() {
   if (!assessForm.traceCode) {
-    Message.warning('请输入问题批次追溯码')
+    Message.warning(t('traceability.请输入问题批次追溯码'))
     return
   }
   if (!assessForm.reason) {
-    Message.warning('请描述问题原因')
+    Message.warning(t('traceability.请描述问题原因'))
     return
   }
 
@@ -248,10 +248,10 @@ async function handleAssess() {
       startProgressSimulation()
     }
     
-    Message.success('评估已发起')
+    Message.success(t('traceability.评估已发起'))
     fetchData()
   } catch (error: any) {
-    Message.error(error.message || '评估失败')
+    Message.error(error.message || t('traceability.评估失败'))
   } finally {
     assessLoading.value = false
   }
@@ -308,14 +308,14 @@ function handleViewDetail() {
 function handleConfirmFreeze() {
   Modal.confirm({
     title: t('traceability.recall.index.确认冻结'),
-    content: `确定要冻结 ${currentAssessment.value.mediumRiskCount} 个在库批次吗？冻结后这些批次将无法出库。`,
+    content: `${t('traceability.recall.r33098')} ${currentAssessment.value.mediumRiskCount} ${t('traceability.recall.r33099')}。`,
     onOk: async () => {
       try {
         await confirmRecall(currentAssessment.value.id)
-        Message.success('冻结指令已发送')
+        Message.success(t('traceability.冻结指令已发送'))
         fetchData()
       } catch (error: any) {
-        Message.error(error.message || '冻结失败')
+        Message.error(error.message || t('traceability.冻结失败'))
       }
     },
   })

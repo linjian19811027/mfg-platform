@@ -87,14 +87,14 @@ export class BomService {
     if (materialId) qb.andWhere('b.material_id = :materialId', { materialId });
     if (status) qb.andWhere('b.status = :status', { status });
     if (keyword) {
-      qb.leftJoin(
-        PlmMaterial,
-        'm',
-        'm.id = b.material_id AND m.tenant_id = :tenantId2',
-        { tenantId2: tenantId },
-      ).andWhere('(m.code LIKE :kw OR m.name LIKE :kw)', {
-        kw: `%${keyword}%`,
-      });
+      const kw = `%${keyword}%`;
+      qb.andWhere(
+        `b.material_id IN (
+          SELECT m.id FROM plm_materials m
+          WHERE m.tenant_id = :tenantId AND (m.code LIKE :kw OR m.name LIKE :kw)
+        )`,
+        { tenantId, kw },
+      );
     }
 
     qb.orderBy('b.material_id', 'ASC').addOrderBy('b.version', 'DESC');

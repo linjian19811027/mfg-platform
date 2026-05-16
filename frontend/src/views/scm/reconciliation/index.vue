@@ -4,15 +4,15 @@
       <a-space wrap>
         <a-input v-model="query.supplierId" :placeholder="$t('scm.reconciliation.index.供应商ID')" allow-clear style="width: 160px" @keyup.enter="loadData" />
         <a-select v-model="query.status" :placeholder="$t('common.status')" allow-clear style="width: 130px">
-          <a-option value="DRAFT">草稿</a-option>
-          <a-option value="CONFIRMED">已确认</a-option>
-          <a-option value="DISPUTED">有争议</a-option>
+          <a-option value="DRAFT">{{ $t('scm.reconciliation.draft') }}</a-option>
+          <a-option value="CONFIRMED">{{ $t('scm.reconciliation.lbl1612') }}</a-option>
+          <a-option value="DISPUTED">{{ $t('scm.reconciliation.lbl1613') }}</a-option>
         </a-select>
         <a-button type="primary" @click="loadData">{{ $t('common.search') }}</a-button>
         <a-button @click="resetQuery">{{ $t('common.reset') }}</a-button>
       </a-space>
       <template #extra>
-        <a-button type="primary" @click="openDrawer(null)">新建对账单</a-button>
+        <a-button type="primary" @click="openDrawer(null)">{{ $t('scm.reconciliation.lbl1614') }}</a-button>
       </template>
     </a-card>
 
@@ -20,21 +20,21 @@
       <MTable :columns="columns" :data="tableData" :loading="loading" :total="total" :page-size="20" @change="onTableChange">
         <template #status="{ record }">
           <a-tag :color="record.status === 'CONFIRMED' ? 'green' : record.status === 'DISPUTED' ? 'red' : 'gray'">
-            {{ record.status === 'CONFIRMED' ? '已确认' : record.status === 'DISPUTED' ? '有争议' : '草稿' }}
+            {{ record.status === 'CONFIRMED' ? t('scm.reconciliation.r33063') : record.status === 'DISPUTED' ? $t('scm.reconciliation.lbl1615') : $t('scm.reconciliation.draft') }}
           </a-tag>
         </template>
         <template #action="{ record }">
           <a-space>
             <a-link @click="openDrawer(record as unknown as ScmReconciliation)">{{ $t('common.edit') }}</a-link>
             <a-popconfirm v-if="record.status === 'DRAFT'" :content="$t('scm.reconciliation.index.确认该对账单')" @ok="handleConfirm(record.id as string)">
-              <a-link>确认</a-link>
+              <a-link>{{ $t('scm.reconciliation.confirm') }}</a-link>
             </a-popconfirm>
           </a-space>
         </template>
       </MTable>
     </a-card>
 
-    <a-drawer v-model:visible="drawerVisible" :title="editing ? '编辑对账单' : '新建对账单'" :width="480" @cancel="drawerVisible = false">
+    <a-drawer v-model:visible="drawerVisible" ::title="t('scm.reconciliation.lbl1616')" :width="480" @cancel="drawerVisible = false">
       <MForm :schema="formSchema" v-model="formData" :loading="saving" :submit-text="$t('scm.reconciliation.index.保存')" @submit="handleSave" @cancel="drawerVisible = false" />
     </a-drawer>
   </div>
@@ -67,10 +67,10 @@ const columns: MTableColumn[] = [
 ]
 
 const formSchema: MFormField[] = [
-  { field: 'supplierId', label: '供应商ID', type: 'input', required: true },
-  { field: 'period', label: '对账期间', type: 'input', required: true, props: { placeholder: '如 2024-01' } },
-  { field: 'amount', label: '对账金额', type: 'number', required: true, props: { min: 0, precision: 2 } },
-  { field: 'currency', label: '币种', type: 'input', required: true, props: { placeholder: 'CNY' } },
+  { field: 'supplierId', label: t('scm.reconciliation.lbl1617'), type: 'supplier-select', required: true },
+  { field: 'period', label: t('scm.reconciliation.lbl1618'), type: 'input', required: true, props: { placeholder: t('scm.reconciliation.r33064') } },
+  { field: 'amount', label: t('scm.reconciliation.lbl1619'), type: 'number', required: true, props: { min: 0, precision: 2 } },
+  { field: 'currency', label: t('scm.reconciliation.lbl1620'), type: 'input', required: true, props: { placeholder: 'CNY' } },
 ]
 
 async function loadData() {
@@ -103,14 +103,14 @@ async function handleSave(data: Record<string, unknown>) {
   saving.value = true
   try {
     await scmApi.createReconciliation(data)
-    Message.success(editing.value ? '更新成功' : '创建成功')
+    Message.success(editing.value ? t('scm.reconciliation.lbl1621') : t('scm.reconciliation.lbl1622'))
     drawerVisible.value = false
     loadData()
   } catch { /* handled */ } finally { saving.value = false }
 }
 
 async function handleConfirm(id: string) {
-  try { await scmApi.confirmReconciliation(id); Message.success('对账已确认'); loadData() }
+  try { await scmApi.confirmReconciliation(id); Message.success(t('scm.对账已确认')); loadData() }
   catch { /* handled */ }
 }
 

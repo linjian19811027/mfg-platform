@@ -40,10 +40,10 @@ export interface Nonconformance {
   materialName?: string
   batchId?: string
   defectType: string
-  qty: number
+  quantity: number
   status: string
   disposition?: string
-  description?: string
+  defectDescription?: string
   createdAt: string
 }
 
@@ -51,13 +51,15 @@ export interface CorrectiveAction {
   id: string
   ncId?: string
   title: string
-  description: string
-  rootCause?: string
-  action: string
+  fiveWhy?: Record<string, unknown>[]
+  fishbone?: Record<string, unknown>
+  actionPlan?: string
   responsibleId?: string
-  targetDate?: string
+  dueDate?: string
   status: string
-  verifyResult?: string
+  verificationResult?: string
+  verifiedBy?: string
+  verifiedAt?: string
   createdAt: string
 }
 

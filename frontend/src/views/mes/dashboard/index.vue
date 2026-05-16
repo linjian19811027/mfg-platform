@@ -3,14 +3,14 @@
     <!-- 顶部标题栏 -->
     <div class="board-header">
       <div class="header-left">
-        <span class="board-title">生产看板</span>
-        <span class="board-subtitle">实时生产监控</span>
+        <span class="board-title">{{ $t('mes.dashboard.lbl1275') }}</span>
+        <span class="board-subtitle">{{ $t('mes.dashboard.lbl1276') }}</span>
       </div>
       <div class="header-right">
-        <span class="last-update">最后更新：{{ lastUpdateTime }}</span>
+        <span class="last-update">{{ $t('mes.dashboard.r22005', {lastUpdateTime: lastUpdateTime}) }}</span>
         <a-button type="outline" size="small" :loading="loading" @click="fetchData">
           <template #icon><icon-refresh /></template>
-          刷新
+          {{ $t('mes.dashboard.refresh') }}
         </a-button>
         <span class="realtime-clock">{{ currentTime }}</span>
       </div>
@@ -49,8 +49,8 @@
       <!-- 左侧：工单进度列表 -->
       <div class="panel panel--left">
         <div class="panel-header">
-          <span class="panel-title">工单进度</span>
-          <a-tag color="blue" size="small">前 10 条</a-tag>
+          <span class="panel-title">{{ $t('mes.dashboard.woProgress') }}</span>
+          <a-tag color="blue" size="small">{{ $t('mes.dashboard.top10') }}</a-tag>
         </div>
         <a-table
           :data="workOrders.slice(0, 10)"
@@ -95,7 +95,7 @@
       <!-- 右侧：产量趋势图 -->
       <div class="panel panel--right">
         <div class="panel-header">
-          <span class="panel-title">产量趋势（近 7 天）</span>
+          <span class="panel-title">{{ $t('mes.dashboard.lbl1277') }}</span>
         </div>
         <div ref="chartRef" class="trend-chart"></div>
       </div>
@@ -104,13 +104,13 @@
     <!-- 第三行：异常告警 -->
     <div class="panel panel--alert">
       <div class="panel-header">
-        <span class="panel-title">异常告警</span>
-        <a-tag v-if="exceptions.length > 0" color="red" size="small">{{ exceptions.length }} 条</a-tag>
-        <a-tag v-else color="green" size="small">正常</a-tag>
+        <span class="panel-title">{{ $t('mes.dashboard.exceptionAlert') }}</span>
+        <a-tag v-if="exceptions.length > 0" color="red" size="small">{{ $t('mes.dashboard.items', {length: exceptions.length}) }}</a-tag>
+        <a-tag v-else color="green" size="small">{{ $t('mes.dashboard.normal') }}</a-tag>
       </div>
       <div v-if="exceptions.length === 0" class="no-alert">
         <icon-check-circle style="color: #00B578; margin-right: 6px;" />
-        <span style="color: #8B949E;">暂无异常告警</span>
+        <span style="color: #8B949E;">{{ $t('mes.dashboard.noException') }}</span>
       </div>
       <div v-else class="alert-list">
         <a-alert
@@ -129,9 +129,11 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import * as echarts from 'echarts/core'
+const { t } = useI18n()
 import { LineChart } from 'echarts/charts'
 import {
   GridComponent,
@@ -217,18 +219,18 @@ function statusColor(status: string): string {
 
 function statusLabel(status: string): string {
   const map: Record<string, string> = {
-    draft: '草稿',
-    released: '已下达',
-    in_progress: '进行中',
-    completed: '已完成',
-    closed: '已关闭',
+    draft: t('mes.dashboard.draft'),
+    released: t('mes.dashboard.released'),
+    in_progress: t('mes.dashboard.inProgress'),
+    completed: t('mes.dashboard.completed'),
+    closed: t('mes.dashboard.closed')
   }
   return map[status] ?? status
 }
 
 function alertType(type: string): 'error' | 'warning' | 'info' {
-  if (type.includes('超期') || type.includes('故障') || type.includes('停机')) return 'error'
-  if (type.includes('预警') || type.includes('延迟')) return 'warning'
+  if (type.includes(t('mes.dashboard.lbl1278')) || type.includes(t('mes.dashboard.fault')) || type.includes(t('mes.dashboard.lbl1279'))) return 'error'
+  if (type.includes(t('mes.dashboard.lbl1280')) || type.includes(t('mes.dashboard.lbl1281'))) return 'warning'
   return 'info'
 }
 
@@ -305,7 +307,7 @@ function updateChart() {
       trigger: 'axis',
       formatter: (params: unknown) => {
         const p = (params as Array<{ name: string; value: number }>)[0]
-        return `${p.name}<br/>产量：<b>${p.value}</b>`
+        return `${p.name}<br/>{{ $t('mes.dashboard.lbl1282') }}<b>${p.value}</b>`
       },
     },
     xAxis: {

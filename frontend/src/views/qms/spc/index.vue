@@ -6,7 +6,7 @@
         <a-input v-model="itemId" :placeholder="$t('qms.spc.index.检验项目ID')" allow-clear style="width: 200px" @keyup.enter="loadChart" />
         <a-input-number v-model="limit" :min="10" :max="200" :placeholder="$t('qms.spc.index.数据点数量')" style="width: 140px" />
         <a-button type="primary" :loading="loading" @click="loadChart">{{ $t('common.search') }}</a-button>
-        <a-button @click="openAddModal">录入数据点</a-button>
+        <a-button @click="openAddModal">{{ $t('qms.spc.inputDataPoint') }}</a-button>
       </a-space>
     </a-card>
 
@@ -31,7 +31,7 @@
       v-if="outOfControlPoints.length"
       type="error"
       style="margin-top: 16px"
-      :content="`发现 ${outOfControlPoints.length} 个失控点，请检查生产过程！`"
+      :content="`${t('qms.spc.r33053')} ${outOfControlPoints.length} ${t('qms.spc.r33054')}！`"
     />
 
     <!-- 录入数据点弹窗 -->
@@ -61,6 +61,8 @@ import { GridComponent, TooltipComponent, MarkLineComponent } from 'echarts/comp
 import { CanvasRenderer } from 'echarts/renderers'
 import { qmsApi } from '@/api/qms'
 import { useAuthStore } from '@/stores/auth'
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 
 echarts.use([LineChart, GridComponent, TooltipComponent, MarkLineComponent, CanvasRenderer])
 
@@ -80,7 +82,7 @@ const chartData = ref<{ points: { value: number; measuredAt: string }[]; ucl: nu
 const outOfControlPoints = ref<number[]>([])
 
 async function loadChart() {
-  if (!itemId.value.trim()) { Message.warning('请输入检验项目ID'); return }
+  if (!itemId.value.trim()) { Message.warning(t('qms.请输入检验项目ID')); return }
   loading.value = true
   try {
     const res = await qmsApi.getSpcChart(itemId.value.trim(), limit.value)
@@ -165,11 +167,11 @@ function openAddModal() {
 }
 
 async function handleAdd() {
-  if (!addForm.itemId || addForm.value === undefined) { Message.warning('请填写检验项目ID和测量值'); return }
+  if (!addForm.itemId || addForm.value === undefined) { Message.warning(t('qms.请填写检验项目ID和测量值')); return }
   adding.value = true
   try {
     await qmsApi.addSpcPoint({ itemId: addForm.itemId, value: addForm.value, operatorId: addForm.operatorId || undefined })
-    Message.success('数据点录入成功')
+    Message.success(t('qms.数据点录入成功'))
     addModalVisible.value = false
     if (itemId.value === addForm.itemId) loadChart()
   } catch { /* handled */ } finally { adding.value = false }

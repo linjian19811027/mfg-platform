@@ -9,10 +9,11 @@
           allow-clear
           style="width: 130px"
         >
-          <a-option value="DRAFT">草稿</a-option>
-          <a-option value="SUBMITTED">审批中</a-option>
-          <a-option value="APPROVED">已批准</a-option>
-          <a-option value="REJECTED">已拒绝</a-option>
+          <a-option value="DRAFT">{{ $t('plm.ecr.draft') }}</a-option>
+          <a-option value="SUBMITTED">{{ $t('plm.ecr.underReview') }}</a-option>
+          <a-option value="APPROVED">{{ $t('plm.ecr.approved') }}</a-option>
+          <a-option value="REJECTED">{{ $t('plm.ecr.rejected') }}</a-option>
+          <a-option value="CLOSED">{{ $t('plm.ecr.closed') }}</a-option>
         </a-select>
         <a-input
           v-model="query.keyword"
@@ -25,7 +26,7 @@
         <a-button @click="resetQuery">{{ $t('common.reset') }}</a-button>
       </a-space>
       <template #extra>
-        <a-button type="primary" @click="openCreateDrawer">新建 ECR</a-button>
+        <a-button type="primary" @click="openCreateDrawer">{{ $t('plm.ecr.lbl1408') }}</a-button>
       </template>
     </a-card>
 
@@ -52,7 +53,7 @@
               :content="$t('plm.ecr.确认提交审批')"
               @ok="handleSubmit(record as unknown as Ecr)"
             >
-              <a-link :loading="submittingId === record.id">提交</a-link>
+              <a-link :loading="submittingId === record.id">{{ $t('plm.ecr.submit') }}</a-link>
             </a-popconfirm>
             <a-popconfirm
               :content="$t('plm.ecr.确认删除该ECR')"
@@ -93,22 +94,22 @@
         <!-- 审批操作区（仅 SUBMITTED 显示） -->
         <template v-if="currentEcr.status === 'SUBMITTED'">
           <a-divider />
-          <div style="margin-bottom: 12px; font-weight: 500; color: #1d2129">审批操作</div>
+          <div style="margin-bottom: 12px; font-weight: 500; color: #1d2129">{{ $t('plm.ecr.lbl1409') }}</div>
           <a-space>
             <a-popconfirm :content="$t('plm.ecr.确认审批通过')" @ok="handleApprove">
               <a-button type="primary" status="success" :loading="approving">
-                审批通过
+                {{ $t('plm.ecr.approve') }}
               </a-button>
             </a-popconfirm>
             <a-popconfirm :content="$t('plm.ecr.确认拒绝该ECR')" @ok="handleReject">
-              <a-button status="danger" :loading="rejecting">拒绝</a-button>
+              <a-button status="danger" :loading="rejecting">{{ $t('plm.ecr.lbl1410') }}</a-button>
             </a-popconfirm>
           </a-space>
         </template>
 
         <!-- 审批历史 -->
         <a-divider />
-        <div style="margin-bottom: 12px; font-weight: 500; color: #1d2129">审批历史</div>
+        <div style="margin-bottom: 12px; font-weight: 500; color: #1d2129">{{ $t('plm.ecr.lbl1411') }}</div>
         <a-steps direction="vertical" :current="approvalStepCurrent" size="small">
           <a-step :title="$t('plm.ecr.创建')" :description="currentEcr.createdAt" />
           <a-step
@@ -181,14 +182,16 @@ function statusColor(status: string) {
   if (status === 'SUBMITTED') return 'orange'
   if (status === 'APPROVED') return 'green'
   if (status === 'REJECTED') return 'red'
+  if (status === 'CLOSED') return 'purple'
   return 'gray'
 }
 
 function statusLabel(status: string) {
-  if (status === 'DRAFT') return '草稿'
-  if (status === 'SUBMITTED') return '审批中'
-  if (status === 'APPROVED') return '已批准'
-  if (status === 'REJECTED') return '已拒绝'
+  if (status === 'DRAFT') return t('plm.ecr.draft')
+  if (status === 'SUBMITTED') return t('plm.ecr.underReview')
+  if (status === 'APPROVED') return t('plm.ecr.approved')
+  if (status === 'REJECTED') return t('plm.ecr.rejected')
+  if (status === 'CLOSED') return t('plm.ecr.closed')
   return status
 }
 
@@ -228,7 +231,7 @@ async function handleSubmit(ecr: Ecr) {
   submittingId.value = ecr.id
   try {
     await plmApi.submitEcr(ecr.id, operatorId())
-    Message.success('已提交审批')
+    Message.success(t('plm.已提交审批'))
     loadData()
   } catch {
     // handled
@@ -240,7 +243,7 @@ async function handleSubmit(ecr: Ecr) {
 // ─── 删除 ────────────────────────────────────────────────────
 async function handleDelete(_id: string) {
   try {
-    Message.success('删除成功')
+    Message.success(t('plm.删除成功'))
     loadData()
   } catch {
     // handled
@@ -272,7 +275,7 @@ async function handleApprove() {
   approving.value = true
   try {
     await plmApi.approveEcr(currentEcr.value.id, operatorId())
-    Message.success('审批通过')
+    Message.success(t('plm.审批通过'))
     detailDrawerVisible.value = false
     loadData()
   } catch {
@@ -287,7 +290,7 @@ async function handleReject() {
   rejecting.value = true
   try {
     await plmApi.rejectEcr(currentEcr.value.id, operatorId())
-    Message.success('已拒绝')
+    Message.success(t('plm.已拒绝'))
     detailDrawerVisible.value = false
     loadData()
   } catch {
@@ -303,15 +306,15 @@ const creating = ref(false)
 const createFormData = ref<Record<string, unknown>>({})
 
 const createFormSchema: MFormField[] = [
-  { field: 'title', label: '标题', type: 'input', required: true, placeholder: '请输入变更标题' },
-  { field: 'changeType', label: '变更类型', type: 'select', required: true, options: [
-    { label: '物料变更', value: 'MATERIAL' },
-    { label: 'BOM变更', value: 'BOM' },
-    { label: '工艺变更', value: 'ROUTING' },
-    { label: '文件变更', value: 'DOCUMENT' },
+  { field: 'title', label: t('plm.ecr.lbl1412'), type: 'input', required: true, placeholder: t('plm.ecr.r33038') },
+  { field: 'changeType', label: t('plm.ecr.lbl1413'), type: 'select', required: true, options: [
+    { label: t('plm.ecr.lbl1414'), value: 'MATERIAL' },
+    { label: t('plm.ecr.lbl1415'), value: 'BOM' },
+    { label: t('plm.ecr.lbl1416'), value: 'ROUTING' },
+    { label: t('plm.ecr.lbl1417'), value: 'DOCUMENT' },
   ]},
-  { field: 'changeReason', label: '变更原因', type: 'textarea', required: true, placeholder: '请描述变更原因', props: { autoSize: { minRows: 3, maxRows: 6 } } },
-  { field: 'affectedMaterials', label: '影响物料', type: 'textarea', placeholder: '物料编码，逗号分隔', props: { autoSize: { minRows: 2, maxRows: 4 } } },
+  { field: 'changeReason', label: t('plm.ecr.lbl1418'), type: 'textarea', required: true, placeholder: t('plm.ecr.r33039'), props: { autoSize: { minRows: 3, maxRows: 6 } } },
+  { field: 'affectedMaterials', label: t('plm.ecr.lbl1419'), type: 'textarea', placeholder: t('plm.ecr.r33040'), props: { autoSize: { minRows: 2, maxRows: 4 } } },
 ]
 
 function openCreateDrawer() {
@@ -323,7 +326,7 @@ async function handleCreate(data: Record<string, unknown>) {
   creating.value = true
   try {
     await plmApi.createEcr(data)
-    Message.success('新建成功')
+    Message.success(t('plm.新建成功'))
     createDrawerVisible.value = false
     loadData()
   } catch {

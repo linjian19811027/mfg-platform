@@ -9,25 +9,35 @@ import {
   Query,
   HttpCode,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { OrganizationService } from './services/organization.service.js';
 import { UomService } from './services/uom.service.js';
 import { BatchService, BatchQuery } from './services/batch.service.js';
+import { WorkCenterService } from './services/work-center.service.js';
 import { SysFile } from '../file/entities/sys-file.entity.js';
 import { SysNumberingRule } from './entities/sys-numbering-rule.entity.js';
+import { MfgWorkCenter } from './entities/mfg-work-center.entity.js';
+import { ShiftService } from './services/shift.service.js';
+import { CertificationTypeService } from './services/certification-type.service.js';
 import { TenantContext } from '../../shared/tenant/tenant.context.js';
 
 @ApiTags('基础主数据')
 @ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('api/v1/base')
 export class BaseController {
   constructor(
     private readonly orgService: OrganizationService,
     private readonly uomService: UomService,
     private readonly batchService: BatchService,
+    private readonly workCenterSvc: WorkCenterService,
+    private readonly shiftSvc: ShiftService,
+    private readonly certTypeSvc: CertificationTypeService,
     @InjectRepository(SysFile) private readonly fileRepo: Repository<SysFile>,
     @InjectRepository(SysNumberingRule)
     private readonly ruleRepo: Repository<SysNumberingRule>,
@@ -177,5 +187,110 @@ export class BaseController {
   @ApiOperation({ summary: '删除编码规则' })
   deleteNumberingRule(@Param('id') id: string) {
     return this.ruleRepo.delete(id);
+  }
+
+  // ── 工作中心（工种绑定） ─────────────────────────────────
+
+  @Get('work-centers')
+  getWorkCenters() {
+    const tenantId = TenantContext.requireCurrentTenant();
+    return this.workCenterSvc.findAll(tenantId);
+  }
+
+  @Post('work-centers')
+  createWorkCenter(@Body() dto: { name: string; code?: string; type?: string; jobTypeId?: number }) {
+    const tenantId = TenantContext.requireCurrentTenant();
+    return this.workCenterSvc.create(tenantId, dto);
+  }
+
+  @Put('work-centers/:id')
+  updateWorkCenter(
+    @Param('id') id: string,
+    @Body() dto: { name?: string; code?: string; type?: string; jobTypeId?: number; enabled?: number },
+  ) {
+    const tenantId = TenantContext.requireCurrentTenant();
+    return this.workCenterSvc.update(tenantId, Number(id), dto);
+  }
+
+  @Delete('work-centers/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  deleteWorkCenter(@Param('id') id: string) {
+    const tenantId = TenantContext.requireCurrentTenant();
+    return this.workCenterSvc.delete(tenantId, Number(id));
+  }
+
+  // ── 班次管理 ──────────────────────────────────────────────────
+
+  @Get('shifts')
+  @ApiOperation({ summary: '班次列表（仅启用）' })
+  getShifts() {
+    const tenantId = TenantContext.requireCurrentTenant();
+    return this.shiftSvc.findAll(tenantId);
+  }
+
+  @Get('shifts/all')
+  @ApiOperation({ summary: '班次列表（全部）' })
+  getAllShifts() {
+    const tenantId = TenantContext.requireCurrentTenant();
+    return this.shiftSvc.findAllAdmin(tenantId);
+  }
+
+  @Post('shifts')
+  @ApiOperation({ summary: '创建班次' })
+  createShift(@Body() dto: { code: string; name: string; startTime: string; endTime: string; enabled?: number }) {
+    const tenantId = TenantContext.requireCurrentTenant();
+    return this.shiftSvc.create(tenantId, dto);
+  }
+
+  @Put('shifts/:id')
+  @ApiOperation({ summary: '更新班次' })
+  updateShift(
+    @Param('id') id: string,
+    @Body() dto: { code?: string; name?: string; startTime?: string; endTime?: string; enabled?: number },
+  ) {
+    const tenantId = TenantContext.requireCurrentTenant();
+    return this.shiftSvc.update(tenantId, Number(id), dto);
+  }
+
+  @Delete('shifts/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: '删除班次' })
+  deleteShift(@Param('id') id: string) {
+    const tenantId = TenantContext.requireCurrentTenant();
+    return this.shiftSvc.delete(tenantId, Number(id));
+  }
+
+  // ── 认证类型管理 ──────────────────────────────────────────────
+
+  @Get('certification-types')
+  @ApiOperation({ summary: '认证类型列表' })
+  getCertTypes() {
+    const tenantId = TenantContext.requireCurrentTenant();
+    return this.certTypeSvc.findAll(tenantId);
+  }
+
+  @Post('certification-types')
+  @ApiOperation({ summary: '创建认证类型' })
+  createCertType(@Body() dto: { code: string; name: string; isMandatory?: number; defaultValidityMonths?: number }) {
+    const tenantId = TenantContext.requireCurrentTenant();
+    return this.certTypeSvc.create(tenantId, dto);
+  }
+
+  @Put('certification-types/:id')
+  @ApiOperation({ summary: '更新认证类型' })
+  updateCertType(
+    @Param('id') id: string,
+    @Body() dto: { code?: string; name?: string; isMandatory?: number; defaultValidityMonths?: number },
+  ) {
+    const tenantId = TenantContext.requireCurrentTenant();
+    return this.certTypeSvc.update(tenantId, Number(id), dto);
+  }
+
+  @Delete('certification-types/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: '删除认证类型' })
+  deleteCertType(@Param('id') id: string) {
+    const tenantId = TenantContext.requireCurrentTenant();
+    return this.certTypeSvc.delete(tenantId, Number(id));
   }
 }

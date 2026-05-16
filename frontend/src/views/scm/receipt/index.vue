@@ -28,7 +28,7 @@ const statusColorMap: Record<string, string> = {
   pending: 'gray', inspecting: 'orange', accepted: 'green', rejected: 'red',
 }
 const statusLabelMap: Record<string, string> = {
-  pending: '待处理', inspecting: '检验中', accepted: '已接收', rejected: '已拒绝',
+  pending: t('scm.receipt.pending')
 }
 const statusColor = (s: string) => statusColorMap[s] ?? 'gray'
 const statusLabel = (s: string) => statusLabelMap[s] ?? s

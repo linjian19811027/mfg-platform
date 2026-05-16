@@ -123,11 +123,11 @@
         </a-descriptions>
         <div class="split-rows">
           <div v-for="(_row, idx) in splitQtys" :key="idx" class="split-row">
-            <span class="split-row-label">子工单 {{ idx + 1 }}</span>
+            <span class="split-row-label">{{ $t('mes.workorder.r22010', {idx: idx + 1}) }}</span>
             <a-input-number
               v-model="splitQtys[idx]"
               :min="1"
-              :placeholder="`数量`"
+              ::placeholder="t('mes.workorder.lbl1329')"
               style="width: 140px"
             />
             <a-button
@@ -136,7 +136,7 @@
               status="danger"
               size="mini"
               @click="splitQtys.splice(idx, 1)"
-            >删除</a-button>
+            >{{ $t('mes.workorder.delete') }}</a-button>
           </div>
         </div>
         <div class="split-actions">
@@ -163,7 +163,7 @@
       @ok="handleMerge"
       @cancel="mergeVisible = false"
     >
-      <p style="color:#8B949E;margin-bottom:12px">将以下 {{ selectedKeys.length }} 个工单合并（仅 draft/released 状态可合并）：</p>
+      <p style="color:#8B949E;margin-bottom:12px">{{ $t('mes.workorder.r22011', {length: selectedKeys.length}) }}</p>
       <a-tag v-for="id in selectedKeys" :key="id" style="margin:2px">
         {{ tableData.find(r => r.id === id)?.code ?? id }}
       </a-tag>
@@ -304,8 +304,8 @@ function openDrawer() {
 }
 
 async function handleSubmit() {
-  if (!createForm.materialId) { Message.warning('请选择物料'); return }
-  if (!createForm.plannedQty) { Message.warning('请输入计划数量'); return }
+  if (!createForm.materialId) { Message.warning(t('mes.请选择物料')); return }
+  if (!createForm.plannedQty) { Message.warning(t('mes.请输入计划数量')); return }
   submitting.value = true
   try {
     await mesApi.createMesWorkOrder({ ...createForm })

@@ -201,7 +201,7 @@ function getTheme(key: string) {
 
 function hasPermission(item: MenuItem): boolean {
   if (!item.permission) return true
-  if (authStore.roles.includes('ADMIN') || authStore.roles.includes('admin')) return true
+  if (authStore.roles.some(r => r === 'ADMIN' || r === 'admin' || r === 'SUPER_ADMIN')) return true
   if (authStore.permissions.length === 0) return true
   return authStore.permissions.includes(item.permission)
 }

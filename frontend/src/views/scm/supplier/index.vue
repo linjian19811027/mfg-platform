@@ -3,16 +3,16 @@
     <a-card>
       <div class="search-bar">
         <a-select v-model="query.status" :placeholder="$t('common.status')" allow-clear style="width:120px">
-          <a-option value="ACTIVE">启用</a-option>
-          <a-option value="INACTIVE">停用</a-option>
-          <a-option value="PENDING">待审</a-option>
+          <a-option value="ACTIVE">{{ $t('scm.supplier.enable') }}</a-option>
+          <a-option value="INACTIVE">{{ $t('scm.supplier.disable') }}</a-option>
+          <a-option value="PENDING">{{ $t('scm.supplier.lbl1632') }}</a-option>
         </a-select>
         <a-select v-model="query.grade" :placeholder="$t('scm.supplier.index.等级')" allow-clear style="width:100px">
           <a-option v-for="g in ['A','B','C','D']" :key="g" :value="g">{{ g }}</a-option>
         </a-select>
         <a-button type="primary" @click="loadData">{{ $t('common.search') }}</a-button>
         <a-button @click="resetQuery">{{ $t('common.reset') }}</a-button>
-        <a-button style="margin-left:auto" type="primary" @click="openCreate">新建供应商</a-button>
+        <a-button style="margin-left:auto" type="primary" @click="openCreate">{{ $t('scm.supplier.lbl1633') }}</a-button>
       </div>
 
       <MTable :columns="columns" :data="list" :loading="loading" :total="total" @change="onTableChange">
@@ -23,7 +23,7 @@
           <a-tag :color="statusColor(record.status as string)">{{ statusLabel(record.status as string) }}</a-tag>
         </template>
         <template #action="{ record }">
-          <a-button type="text" size="small" @click="viewDetail(record as Supplier)">查看</a-button>
+          <a-button type="text" size="small" @click="viewDetail(record as Supplier)">{{ $t('scm.supplier.view') }}</a-button>
         </template>
       </MTable>
     </a-card>
@@ -32,7 +32,7 @@
       <MForm :schema="createSchema" v-model="createForm" :loading="submitting" @submit="handleCreate" @cancel="createVisible=false" />
     </a-drawer>
 
-    <a-drawer v-model:visible="detailVisible" :title="`供应商：${currentSupplier?.name}`" :width="480" @cancel="detailVisible=false">
+    <a-drawer v-model:visible="detailVisible" ::title="t('scm.supplier.lbl1634')" :width="480" @cancel="detailVisible=false">
       <a-descriptions :data="detailItems" layout="inline-vertical" bordered />
     </a-drawer>
   </div>
@@ -51,7 +51,7 @@ import { scmApi, type Supplier } from '@/api/scm'
 
 const gradeColorMap: Record<string, string> = { A: 'green', B: 'blue', C: 'orange', D: 'red' }
 const statusColorMap: Record<string, string> = { ACTIVE: 'green', INACTIVE: 'gray', PENDING: 'orange' }
-const statusLabelMap: Record<string, string> = { ACTIVE: '启用', INACTIVE: '停用', PENDING: '待审' }
+const statusLabelMap: Record<string, string> = { ACTIVE: t('scm.supplier.enable'), INACTIVE: t('scm.supplier.disable'), PENDING: t('scm.supplier.lbl1635') }
 const gradeColor = (g: string) => gradeColorMap[g] ?? 'gray'
 const statusColor = (s: string) => statusColorMap[s] ?? 'gray'
 const statusLabel = (s: string) => statusLabelMap[s] ?? s
@@ -67,12 +67,12 @@ const columns: MTableColumn[] = [
 ]
 
 const createSchema: MFormField[] = [
-  { field: 'code', label: '编码', type: 'input', required: true },
-  { field: 'name', label: '名称', type: 'input', required: true },
-  { field: 'grade', label: '等级', type: 'select', required: true, options: ['A','B','C','D'].map(v => ({ label: v, value: v })) },
-  { field: 'contactName', label: '联系人', type: 'input' },
-  { field: 'contactPhone', label: '联系电话', type: 'input' },
-  { field: 'email', label: '邮箱', type: 'input' },
+  { field: 'code', label: t('scm.supplier.code'), type: 'input', required: true },
+  { field: 'name', label: t('scm.supplier.name'), type: 'input', required: true },
+  { field: 'grade', label: t('scm.supplier.lbl1636'), type: 'select', required: true, options: ['A','B','C','D'].map(v => ({ label: v, value: v })) },
+  { field: 'contactName', label: t('scm.supplier.lbl1637'), type: 'input' },
+  { field: 'contactPhone', label: t('scm.supplier.lbl1638'), type: 'input' },
+  { field: 'email', label: t('scm.supplier.lbl1639'), type: 'input' },
 ]
 
 const query = reactive({ status: '', grade: '' })
@@ -91,10 +91,10 @@ const detailItems = computed(() => {
   const s = currentSupplier.value
   if (!s) return []
   return [
-    { label: '编码', value: s.code }, { label: '名称', value: s.name },
-    { label: '等级', value: s.grade }, { label: '状态', value: statusLabel(s.status) },
-    { label: '联系人', value: s.contactName }, { label: '联系电话', value: s.contactPhone },
-    { label: '邮箱', value: s.email },
+    { label: t('scm.supplier.code'), value: s.code }, { label: t('scm.supplier.name'), value: s.name },
+    { label: t('scm.supplier.lbl1640'), value: s.grade }, { label: t('scm.supplier.status'), value: statusLabel(s.status) },
+    { label: t('scm.supplier.lbl1641'), value: s.contactName }, { label: t('scm.supplier.lbl1642'), value: s.contactPhone },
+    { label: t('scm.supplier.lbl1643'), value: s.email },
   ]
 })
 
@@ -116,10 +116,10 @@ async function handleCreate(data: Record<string, unknown>) {
   submitting.value = true
   try {
     await scmApi.createSupplier(data as Parameters<typeof scmApi.createSupplier>[0])
-    Message.success('创建成功')
+    Message.success(t('scm.创建成功'))
     createVisible.value = false
     loadData()
-  } finally { submitting.value = false }
+  } catch { Message.error(t('scm.创建失败')) } finally { submitting.value = false }
 }
 
 loadData()

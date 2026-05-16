@@ -7,7 +7,7 @@
           <a-option v-for="s in statusOptions" :key="s.value" :value="s.value">{{ s.label }}</a-option>
         </a-select>
         <a-button type="primary" @click="loadData">{{ $t('common.search') }}</a-button>
-        <a-button style="margin-left:auto" type="primary" @click="openReport">上报故障</a-button>
+        <a-button style="margin-left:auto" type="primary" @click="openReport">{{ $t('eam.fault.lbl1094') }}</a-button>
       </div>
 
       <MTable :columns="columns" :data="list" :loading="loading" :total="total" @change="onTableChange">
@@ -39,13 +39,13 @@ import type { MFormField } from '@/components/MForm/index.vue'
 import { eamApi, type FaultRecord } from '@/api/eam'
 
 const statusOptions = [
-  { label: '已上报', value: 'reported' }, { label: '响应中', value: 'responding' },
-  { label: '诊断中', value: 'diagnosing' }, { label: '维修中', value: 'repairing' }, { label: '已关闭', value: 'closed' },
+  { label: t('eam.fault.lbl1095'), value: 'reported' }, { label: t('eam.fault.lbl1096'), value: 'responding' },
+  { label: t('eam.fault.lbl1097'), value: 'diagnosing' }, { label: t('eam.fault.lbl1098'), value: 'repairing' }, { label: t('eam.fault.closed'), value: 'closed' },
 ]
 const severityColorMap: Record<string, string> = { critical: 'red', high: 'orange', medium: 'blue', low: 'gray' }
-const severityLabelMap: Record<string, string> = { critical: '严重', high: '高', medium: '中', low: '低' }
+const severityLabelMap: Record<string, string> = { critical: t('eam.fault.lbl1099'), high: t('eam.fault.lbl1100'), medium: t('eam.fault.lbl1101'), low: t('eam.fault.lbl1102') }
 const statusColorMap: Record<string, string> = { reported: 'blue', responding: 'orange', diagnosing: 'orange', repairing: 'orange', closed: 'green' }
-const statusLabelMap: Record<string, string> = { reported: '已上报', responding: '响应中', diagnosing: '诊断中', repairing: '维修中', closed: '已关闭' }
+const statusLabelMap: Record<string, string> = { reported: t('eam.fault.lbl1103'), responding: t('eam.fault.lbl1104'), diagnosing: t('eam.fault.lbl1105'), repairing: t('eam.fault.lbl1106'), closed: t('eam.fault.closed') }
 
 const columns: MTableColumn[] = [
   { key: 'equipmentName', title: t('eam.fault.index.设备名称') },
@@ -57,11 +57,11 @@ const columns: MTableColumn[] = [
 ]
 
 const reportSchema: MFormField[] = [
-  { field: 'equipmentId', label: '设备ID', type: 'input', required: true },
-  { field: 'faultType', label: '故障类型', type: 'input', required: true },
-  { field: 'severity', label: '严重程度', type: 'select', required: true,
-    options: [{ label: '严重', value: 'critical' }, { label: '高', value: 'high' }, { label: '中', value: 'medium' }, { label: '低', value: 'low' }] },
-  { field: 'description', label: '描述', type: 'textarea' },
+  { field: 'equipmentId', label: t('eam.fault.lbl1107'), type: 'input', required: true },
+  { field: 'faultType', label: t('eam.fault.lbl1108'), type: 'input', required: true },
+  { field: 'severity', label: t('eam.fault.lbl1109'), type: 'select', required: true,
+    options: [{ label: t('eam.fault.lbl1110'), value: 'critical' }, { label: t('eam.fault.lbl1111'), value: 'high' }, { label: t('eam.fault.lbl1112'), value: 'medium' }, { label: t('eam.fault.lbl1113'), value: 'low' }] },
+  { field: 'description', label: t('eam.fault.description'), type: 'textarea' },
 ]
 
 const query = reactive({ equipmentId: '', status: '' })
@@ -93,10 +93,11 @@ async function handleReport(data: Record<string, unknown>) {
   submitting.value = true
   try {
     await eamApi.reportFault(data as Parameters<typeof eamApi.reportFault>[0])
-    Message.success('上报成功')
+    Message.success(t('eam.上报成功'))
     reportVisible.value = false
     loadData()
-  } finally { submitting.value = false }
+  } catch { Message.error(t('eam.上报失败')) }
+  finally { submitting.value = false }
 }
 
 loadData()

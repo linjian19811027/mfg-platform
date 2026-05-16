@@ -11,10 +11,10 @@
         >
           <template #prefix><icon-search /></template>
         </a-input>
-        <a-button type="primary" @click="handleSearch">搜索</a-button>
+        <a-button type="primary" @click="handleSearch">{{ $t('eam.knowledge.search') }}</a-button>
         <a-button @click="resetQuery">{{ $t('common.reset') }}</a-button>
       </a-space>
-      <template #extra><a-button type="primary" @click="openDrawer(null)">新建知识条目</a-button></template>
+      <template #extra><a-button type="primary" @click="openDrawer(null)">{{ $t('eam.knowledge.lbl1119') }}</a-button></template>
     </a-card>
 
     <a-card :bordered="false">
@@ -35,7 +35,7 @@
     </a-card>
 
     <!-- 新建/编辑抽屉 -->
-    <a-drawer v-model:visible="drawerVisible" :title="editing ? '编辑知识条目' : '新建知识条目'" :width="560" @cancel="drawerVisible = false">
+    <a-drawer v-model:visible="drawerVisible" :title="editing ? $t('eam.knowledge.index.编辑知识条目') : $t('eam.knowledge.index.新建知识条目')" :width="560" @cancel="drawerVisible = false">
       <MForm :schema="formSchema" v-model="formData" :loading="saving" :submit-text="$t('eam.knowledge.index.保存')" @submit="handleSave" @cancel="drawerVisible = false" />
     </a-drawer>
 
@@ -79,11 +79,11 @@ const columns: MTableColumn[] = [
 ]
 
 const formSchema: MFormField[] = [
-  { field: 'equipmentType', label: '设备类型', type: 'input', props: { placeholder: '如 数控机床/液压系统' } },
-  { field: 'symptom', label: '故障现象', type: 'textarea', required: true, props: { autoSize: { minRows: 2 } } },
-  { field: 'cause', label: '原因分析', type: 'textarea', props: { autoSize: { minRows: 2 } } },
-  { field: 'solution', label: '解决方案', type: 'textarea', required: true, props: { autoSize: { minRows: 3 } } },
-  { field: 'preventionMeasure', label: '预防措施', type: 'textarea', props: { autoSize: { minRows: 2 } } },
+  { field: 'equipmentType', label: t('eam.knowledge.lbl1120'), type: 'input', props: { placeholder: t('eam.knowledge.r33014') } },
+  { field: 'symptom', label: t('eam.knowledge.lbl1121'), type: 'textarea', required: true, props: { autoSize: { minRows: 2 } } },
+  { field: 'cause', label: t('eam.knowledge.lbl1122'), type: 'textarea', props: { autoSize: { minRows: 2 } } },
+  { field: 'solution', label: t('eam.knowledge.lbl1123'), type: 'textarea', required: true, props: { autoSize: { minRows: 3 } } },
+  { field: 'preventionMeasure', label: t('eam.knowledge.lbl1124'), type: 'textarea', props: { autoSize: { minRows: 2 } } },
 ]
 
 function highlight(text: string): string {
@@ -133,7 +133,7 @@ async function handleSave(data: Record<string, unknown>) {
   saving.value = true
   try {
     await eamApi.createKnowledge(data)
-    Message.success(editing.value ? '更新成功' : '创建成功')
+    Message.success(editing.value ? t('eam.knowledge.lbl1125') : t('eam.knowledge.lbl1126'))
     drawerVisible.value = false
     loadData()
   } catch { /* handled */ } finally { saving.value = false }

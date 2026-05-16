@@ -16,16 +16,16 @@
           allow-clear
           style="width: 140px"
         >
-          <a-option value="trial">试用</a-option>
-          <a-option value="formal">正式</a-option>
-          <a-option value="expired">已过期</a-option>
-          <a-option value="disabled">已停用</a-option>
+          <a-option value="trial">{{ $t('sys.tenant.lbl1783') }}</a-option>
+          <a-option value="formal">{{ $t('sys.tenant.lbl1784') }}</a-option>
+          <a-option value="expired">{{ $t('sys.tenant.expired') }}</a-option>
+          <a-option value="disabled">{{ $t('sys.tenant.lbl1785') }}</a-option>
         </a-select>
         <a-button type="primary" @click="handleSearch">{{ $t('common.search') }}</a-button>
         <a-button @click="resetQuery">{{ $t('common.reset') }}</a-button>
         <a-button style="margin-left: auto" type="primary" @click="openCreate">
           <template #icon><icon-plus /></template>
-          新建租户
+          {{ $t('sys.tenant.createTenant') }}
         </a-button>
       </div>
 
@@ -50,14 +50,14 @@
               color="red"
               size="small"
             >
-              {{ record.expireAt }} 已过期
+              {{ $t('sys.tenant.r33082', {expireAt: record.expireAt}) }}
             </a-tag>
             <a-tag
               v-else-if="isExpiringSoon(record.expireAt as string)"
               color="orangered"
               size="small"
             >
-              {{ record.expireAt }} 即将到期
+              {{ $t('sys.tenant.r33083', {expireAt: record.expireAt}) }}
             </a-tag>
             <span v-else>{{ record.expireAt }}</span>
           </template>
@@ -65,7 +65,7 @@
 
         <template #action="{ record }">
           <a-space>
-            <a-button type="text" size="small" @click="openEdit(record as unknown as Tenant)">编辑</a-button>
+            <a-button type="text" size="small" @click="openEdit(record as unknown as Tenant)">{{ $t('sys.tenant.edit') }}</a-button>
             <a-popconfirm
               v-if="record.status !== 'disabled'"
               :content="$t('sys.tenant.index.确认停用该租户停用后租户将无法')"
@@ -77,7 +77,7 @@
                 status="danger"
                 :loading="toggleLoadingId === record.id"
               >
-                停用
+                {{ $t('sys.tenant.disable') }}
               </a-button>
             </a-popconfirm>
             <a-popconfirm
@@ -91,7 +91,7 @@
                 status="success"
                 :loading="toggleLoadingId === record.id"
               >
-                启用
+                {{ $t('sys.tenant.enable') }}
               </a-button>
             </a-popconfirm>
           </a-space>
@@ -102,7 +102,7 @@
     <!-- 新建/编辑抽屉 -->
     <a-drawer
       v-model:visible="drawerVisible"
-      :title="editingTenant ? '编辑租户' : '新建租户'"
+      ::title="t('sys.tenant.lbl1786')"
       :width="520"
       @cancel="drawerVisible = false"
     >
@@ -115,7 +115,7 @@
         <a-form-item
           field="name"
           :label="$t('sys.tenant.index.租户名称')"
-          :rules="[{ required: true, message: '请输入租户名称' }]"
+          :rules="[{ required: true, message: t('sys.tenant.input') }]"
           validate-trigger="blur"
         >
           <a-input v-model="formData.name" :placeholder="$t('sys.tenant.index.请输入租户名称')" />
@@ -124,7 +124,7 @@
         <a-form-item
           field="code"
           :label="$t('sys.tenant.index.租户编码')"
-          :rules="[{ required: true, message: '请输入租户编码' }]"
+          :rules="[{ required: true, message: t('sys.tenant.input2') }]"
           validate-trigger="blur"
         >
           <a-input
@@ -137,7 +137,7 @@
         <a-form-item
           field="contact"
           :label="$t('sys.tenant.index.联系人')"
-          :rules="[{ required: true, message: '请输入联系人' }]"
+          :rules="[{ required: true, message: t('sys.tenant.input3') }]"
           validate-trigger="blur"
         >
           <a-input v-model="formData.contact" :placeholder="$t('sys.tenant.index.请输入联系人姓名')" />
@@ -162,10 +162,10 @@
 
         <a-form-item field="status" :label="$t('common.status')">
           <a-select v-model="formData.status">
-            <a-option value="trial">试用</a-option>
-            <a-option value="formal">正式</a-option>
-            <a-option value="expired">已过期</a-option>
-            <a-option value="disabled">已停用</a-option>
+            <a-option value="trial">{{ $t('sys.tenant.lbl1787') }}</a-option>
+            <a-option value="formal">{{ $t('sys.tenant.lbl1788') }}</a-option>
+            <a-option value="expired">{{ $t('sys.tenant.expired') }}</a-option>
+            <a-option value="disabled">{{ $t('sys.tenant.lbl1789') }}</a-option>
           </a-select>
         </a-form-item>
 
@@ -206,10 +206,10 @@ const STATUS_COLOR: Record<TenantStatus, string> = {
 }
 
 const STATUS_LABEL: Record<TenantStatus, string> = {
-  formal: '正式',
-  trial: '试用',
-  expired: '已过期',
-  disabled: '已停用',
+  formal: t('sys.tenant.lbl1790'),
+  trial: t('sys.tenant.lbl1791'),
+  expired: t('sys.tenant.expired'),
+  disabled: t('sys.tenant.lbl1792')
 }
 
 function statusColor(s: TenantStatus) { return STATUS_COLOR[s] ?? 'gray' }
@@ -327,13 +327,15 @@ async function handleSubmit() {
     if (!payload.expireAt) delete payload.expireAt
     if (editingTenant.value) {
       await tenantApi.updateTenant(editingTenant.value.id, payload)
-      Message.success('保存成功')
+      Message.success(t('sys.保存成功'))
     } else {
       await tenantApi.createTenant(payload)
-      Message.success('创建成功')
+      Message.success(t('sys.创建成功'))
     }
     drawerVisible.value = false
     loadData()
+  } catch {
+    Message.error(t('sys.保存失败'))
   } finally {
     submitting.value = false
   }
@@ -346,8 +348,10 @@ async function handleToggleStatus(tenant: Tenant, status: TenantStatus) {
   toggleLoadingId.value = tenant.id
   try {
     await tenantApi.toggleTenantStatus(tenant.id, status)
-    Message.success(status === 'disabled' ? '已停用' : '已启用')
+    Message.success(status === 'disabled' ? t('sys.已停用') : t('sys.已启用'))
     loadData()
+  } catch {
+    Message.error(t('sys.操作失败'))
   } finally {
     toggleLoadingId.value = null
   }

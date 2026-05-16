@@ -3,13 +3,13 @@
     <a-card :bordered="false" style="margin-bottom: 16px">
       <a-space wrap>
         <a-select v-model="query.status" :placeholder="$t('common.status')" allow-clear style="width: 130px">
-          <a-option value="DRAFT">草稿</a-option><a-option value="SENT">已发送</a-option>
-          <a-option value="ACCEPTED">已接受</a-option><a-option value="REJECTED">已拒绝</a-option><a-option value="EXPIRED">已过期</a-option>
+          <a-option value="DRAFT">{{ $t('erp.quotation.draft') }}</a-option><a-option value="SENT">{{ $t('erp.quotation.lbl1198') }}</a-option>
+          <a-option value="ACCEPTED">{{ $t('erp.quotation.lbl1199') }}</a-option><a-option value="REJECTED">{{ $t('erp.quotation.rejected') }}</a-option><a-option value="EXPIRED">{{ $t('erp.quotation.expired') }}</a-option>
         </a-select>
         <a-button type="primary" @click="loadData">{{ $t('common.search') }}</a-button>
         <a-button @click="resetQuery">{{ $t('common.reset') }}</a-button>
       </a-space>
-      <template #extra><a-button type="primary" @click="openDrawer(null)">新建报价单</a-button></template>
+      <template #extra><a-button type="primary" @click="openDrawer(null)">{{ $t('erp.quotation.lbl1200') }}</a-button></template>
     </a-card>
     <a-card :bordered="false">
       <MTable :columns="columns" :data="tableData" :loading="loading" :total="total" :page-size="20" @change="onTableChange">
@@ -18,9 +18,9 @@
         </template>
         <template #action="{ record }">
           <a-space>
-            <a-popconfirm v-if="record.status === 'DRAFT'" :content="$t('erp.quotation.index.确认发送报价')" @ok="handleSend(record.id as string)"><a-link>发送</a-link></a-popconfirm>
-            <a-popconfirm v-if="record.status === 'SENT'" :content="$t('erp.quotation.index.确认客户已接受')" @ok="handleAccept(record.id as string)"><a-link>接受</a-link></a-popconfirm>
-            <a-link v-if="record.status === 'ACCEPTED'" @click="handleConvert(record.id as string)">转订单</a-link>
+            <a-popconfirm v-if="record.status === 'DRAFT'" :content="$t('erp.quotation.index.确认发送报价')" @ok="handleSend(record.id as string)"><a-link>{{ $t('erp.quotation.r33017') }}</a-link></a-popconfirm>
+            <a-popconfirm v-if="record.status === 'SENT'" :content="$t('erp.quotation.index.确认客户已接受')" @ok="handleAccept(record.id as string)"><a-link>{{ $t('erp.quotation.r33018') }}</a-link></a-popconfirm>
+            <a-link v-if="record.status === 'ACCEPTED'" @click="handleConvert(record.id as string)">{{ $t('erp.quotation.lbl1201') }}</a-link>
           </a-space>
         </template>
       </MTable>
@@ -43,8 +43,8 @@ import { erpExtApi } from '@/api/erp-ext'
 const loading = ref(false); const tableData = ref<any[]>([]); const total = ref(0)
 const query = reactive({ status: '', page: 1, pageSize: 20 })
 const STATUS_MAP: Record<string, { label: string; color: string }> = {
-  DRAFT: { label: '草稿', color: 'gray' }, SENT: { label: '已发送', color: 'blue' },
-  ACCEPTED: { label: '已接受', color: 'green' }, REJECTED: { label: '已拒绝', color: 'red' }, EXPIRED: { label: '已过期', color: 'gray' },
+  DRAFT: { label: t('erp.quotation.draft'), color: 'gray' }, SENT: { label: t('erp.quotation.lbl1202'), color: 'blue' },
+  ACCEPTED: { label: t('erp.quotation.lbl1203'), color: 'green' }, REJECTED: { label: t('erp.quotation.rejected'), color: 'red' }, EXPIRED: { label: t('erp.quotation.expired'), color: 'gray' },
 }
 const columns: MTableColumn[] = [
   { key: 'code', title: t('erp.quotation.index.报价单号'), dataIndex: 'code', width: 130 },
@@ -56,9 +56,10 @@ const columns: MTableColumn[] = [
   { key: 'action', title: t('erp.quotation.index.操作'), slotName: 'action', width: 160 },
 ]
 const formSchema: MFormField[] = [
-  { field: 'customerId', label: '客户ID', type: 'input', required: true },
-  { field: 'currency', label: '币种', type: 'input', required: true, props: { placeholder: 'CNY' } },
-  { field: 'validUntil', label: '有效期', type: 'date' },
+  { field: 'customerId', label: t('erp.quotation.lbl1204'), type: 'select', required: true, placeholder: t('erp.quotation.r33019') },
+  { field: 'quotationDate', label: t('erp.quotation.lbl1205'), type: 'date', required: true },
+  { field: 'currency', label: t('erp.quotation.lbl1206'), type: 'select', required: true, options: [{ label: 'CNY', value: 'CNY' }, { label: 'USD', value: 'USD' }, { label: 'EUR', value: 'EUR' }, { label: 'GBP', value: 'GBP' }, { label: 'JPY', value: 'JPY' }, { label: 'HKD', value: 'HKD' }] },
+  { field: 'validUntil', label: t('erp.quotation.lbl1207'), type: 'date' },
 ]
 function statusColor(s: string) { return STATUS_MAP[s]?.color ?? 'gray' }
 function statusLabel(s: string) { return STATUS_MAP[s]?.label ?? s }
@@ -73,13 +74,13 @@ const drawerVisible = ref(false); const saving = ref(false); const formData = re
 function openDrawer(_item: null) { formData.value = {}; drawerVisible.value = true }
 async function handleCreate(data: Record<string, unknown>) {
   saving.value = true
-  try { await erpExtApi.createQuotation(data); Message.success('创建成功'); drawerVisible.value = false; loadData() }
+  try { await erpExtApi.createQuotation(data); Message.success(t('erp.创建成功')); drawerVisible.value = false; loadData() }
   catch { /* handled */ } finally { saving.value = false }
 }
-async function handleSend(id: string) { try { await erpExtApi.sendQuotation(id); Message.success('已发送'); loadData() } catch { /* handled */ } }
-async function handleAccept(id: string) { try { await erpExtApi.acceptQuotation(id); Message.success('已接受'); loadData() } catch { /* handled */ } }
+async function handleSend(id: string) { try { await erpExtApi.sendQuotation(id); Message.success(t('erp.已发送')); loadData() } catch { /* handled */ } }
+async function handleAccept(id: string) { try { await erpExtApi.acceptQuotation(id); Message.success(t('erp.已接受')); loadData() } catch { /* handled */ } }
 async function handleConvert(id: string) {
-  try { await erpExtApi.convertQuotation(id); Message.success('销售订单已创建'); loadData() } catch { /* handled */ }
+  try { await erpExtApi.convertQuotation(id); Message.success(t('erp.销售订单已创建')); loadData() } catch { /* handled */ }
 }
 onMounted(loadData)
 </script>

@@ -6,19 +6,19 @@
         <a-button type="primary" @click="loadData">{{ $t('common.search') }}</a-button>
         <a-button @click="resetQuery">{{ $t('common.reset') }}</a-button>
       </a-space>
-      <template #extra><a-button type="primary" @click="openDrawer(null)">新建成本要素</a-button></template>
+      <template #extra><a-button type="primary" @click="openDrawer(null)">{{ $t('erp.cost-element.lbl1172') }}</a-button></template>
     </a-card>
     <a-card :bordered="false">
       <MTable :columns="columns" :data="tableData" :loading="loading" :total="total" :page-size="20" @change="onTableChange">
         <template #status="{ record }">
-          <a-tag :color="record.status === 'ACTIVE' ? 'green' : 'gray'">{{ record.status === 'ACTIVE' ? '启用' : '停用' }}</a-tag>
+          <a-tag :color="record.status === 'ACTIVE' ? 'green' : 'gray'">{{ record.status === 'ACTIVE' ? $t('erp.cost-element.enable') : $t('erp.cost-element.disable') }}</a-tag>
         </template>
         <template #action="{ record }">
           <a-link @click="openDrawer(record as unknown as ErpCostElement)">{{ $t('common.edit') }}</a-link>
         </template>
       </MTable>
     </a-card>
-    <a-drawer v-model:visible="drawerVisible" :title="editing ? '编辑成本要素' : '新建成本要素'" :width="480" @cancel="drawerVisible = false">
+    <a-drawer v-model:visible="drawerVisible" ::title="t('erp.cost-element.lbl1173')" :width="480" @cancel="drawerVisible = false">
       <MForm :schema="formSchema" v-model="formData" :loading="saving" :submit-text="$t('erp.cost-element.index.保存')" @submit="handleSave" @cancel="drawerVisible = false" />
     </a-drawer>
   </div>
@@ -43,13 +43,13 @@ const columns: MTableColumn[] = [
   { key: 'action', title: t('erp.cost-element.index.操作'), slotName: 'action', width: 80 },
 ]
 const formSchema: MFormField[] = [
-  { field: 'code', label: '编码', type: 'input', required: true },
-  { field: 'name', label: '名称', type: 'input', required: true },
-  { field: 'type', label: '类型', type: 'select', required: true, options: [
-    { label: '材料成本', value: 'MATERIAL' }, { label: '人工成本', value: 'LABOR' },
-    { label: '制造费用', value: 'OVERHEAD' }, { label: '其他', value: 'OTHER' },
+  { field: 'code', label: t('erp.cost-element.code'), type: 'input', required: true },
+  { field: 'name', label: t('erp.cost-element.name'), type: 'input', required: true },
+  { field: 'type', label: t('erp.cost-element.type'), type: 'select', required: true, options: [
+    { label: t('erp.cost-element.lbl1174'), value: 'MATERIAL' }, { label: t('erp.cost-element.lbl1175'), value: 'LABOR' },
+    { label: t('erp.cost-element.lbl1176'), value: 'OVERHEAD' }, { label: t('erp.cost-element.lbl1177'), value: 'OTHER' },
   ]},
-  { field: 'status', label: '状态', type: 'select', options: [{ label: '启用', value: 'ACTIVE' }, { label: '停用', value: 'INACTIVE' }] },
+  { field: 'status', label: t('erp.cost-element.status'), type: 'select', options: [{ label: t('erp.cost-element.enable'), value: 'ACTIVE' }, { label: t('erp.cost-element.disable'), value: 'INACTIVE' }] },
 ]
 async function loadData() {
   loading.value = true
@@ -63,8 +63,8 @@ function openDrawer(item: ErpCostElement | null) { editing.value = item; formDat
 async function handleSave(data: Record<string, unknown>) {
   saving.value = true
   try {
-    if (editing.value) { await erpExtApi.updateCostElement(editing.value.id, data); Message.success('更新成功') }
-    else { await erpExtApi.createCostElement(data); Message.success('创建成功') }
+    if (editing.value) { await erpExtApi.updateCostElement(editing.value.id, data); Message.success(t('erp.更新成功')) }
+    else { await erpExtApi.createCostElement(data); Message.success(t('erp.创建成功')) }
     drawerVisible.value = false; loadData()
   } catch { /* handled */ } finally { saving.value = false }
 }

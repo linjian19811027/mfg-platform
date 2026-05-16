@@ -9,9 +9,9 @@
           allow-clear
           style="width: 140px"
         >
-          <a-option value="MATERIAL">物料</a-option>
+          <a-option value="MATERIAL">{{ $t('plm.document.material') }}</a-option>
           <a-option value="BOM">BOM</a-option>
-          <a-option value="ROUTING">工艺路线</a-option>
+          <a-option value="ROUTING">{{ $t('plm.document.lbl1371') }}</a-option>
         </a-select>
         <a-input
           v-model="query.keyword"
@@ -26,7 +26,7 @@
       <template #extra>
         <a-button type="primary" @click="openUploadDrawer">
           <template #icon><icon-upload /></template>
-          上传文档
+          {{ $t('plm.document.uploadDoc') }}
         </a-button>
       </template>
     </a-card>
@@ -56,7 +56,7 @@
               :href="record.downloadUrl as string"
               target="_blank"
             >
-              下载
+              {{ $t('plm.document.download') }}
             </a-link>
             <a-popconfirm
               :content="$t('plm.document.确认删除该文档')"
@@ -80,22 +80,22 @@
         <a-form-item
           :label="$t('plm.document.对象类型')"
           field="refType"
-          :rules="[{ required: true, message: '请选择对象类型' }]"
+          :rules="[{ required: true, message: t('plm.document.select') }]"
         >
           <a-select v-model="uploadForm.refType" :placeholder="$t('plm.document.请选择对象类型')">
-            <a-option value="MATERIAL">物料</a-option>
+            <a-option value="MATERIAL">{{ $t('plm.document.material') }}</a-option>
             <a-option value="BOM">BOM</a-option>
-            <a-option value="ROUTING">工艺路线</a-option>
+            <a-option value="ROUTING">{{ $t('plm.document.lbl1372') }}</a-option>
           </a-select>
         </a-form-item>
         <a-form-item
           :label="$t('plm.document.关联ID')"
           field="refId"
-          :rules="[{ required: true, message: '关联ID不能为空' }]"
+          :rules="[{ required: true, message: t('plm.document.lbl1373') }]"
         >
           <a-input v-model="uploadForm.refId" :placeholder="$t('plm.document.请输入关联对象的ID')" />
         </a-form-item>
-        <a-form-item :label="$t('plm.document.选择文件')" field="file" :rules="[{ required: true, message: '请选择文件' }]">
+        <a-form-item :label="t('plm.document.r33037')" field="file" :rules="[{ required: true, message: t('plm.document.pleaseSelectFile') }]">
           <a-upload
             :limit="1"
             accept=".pdf,.doc,.docx,.xlsx,.jpg,.png"
@@ -105,19 +105,19 @@
             <template #upload-button>
               <a-button>
                 <template #icon><icon-upload /></template>
-                选择文件（≤50MB）
+                {{ $t('plm.document.selectFile') }}
               </a-button>
             </template>
           </a-upload>
           <div style="margin-top: 4px; color: var(--color-text-3); font-size: 12px">
-            支持 PDF、Word、Excel、图片，单文件不超过 50MB
+            {{ $t('plm.document.fileHint') }}
           </div>
         </a-form-item>
       </a-form>
 
       <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--color-border)">
         <a-button @click="uploadDrawerVisible = false">{{ $t('common.cancel') }}</a-button>
-        <a-button type="primary" :loading="uploading" @click="handleUpload">上传</a-button>
+        <a-button type="primary" :loading="uploading" @click="handleUpload">{{ $t('plm.document.upload') }}</a-button>
       </div>
     </a-drawer>
   </div>
@@ -156,9 +156,9 @@ function refTypeColor(type: string) {
 }
 
 function refTypeLabel(type: string) {
-  if (type === 'MATERIAL') return '物料'
+  if (type === 'MATERIAL') return t('plm.document.material')
   if (type === 'BOM') return 'BOM'
-  if (type === 'ROUTING') return '工艺路线'
+  if (type === 'ROUTING') return t('plm.document.lbl1374')
   return type
 }
 
@@ -201,7 +201,7 @@ function onTableChange(e: { page: number; pageSize: number }) {
 async function handleDelete(id: string) {
   try {
     await plmApi.deleteDocument(id)
-    Message.success('删除成功')
+    Message.success(t('plm.删除成功'))
     loadData()
   } catch {
     // handled
@@ -232,12 +232,12 @@ async function handleUpload() {
     return
   }
   if (!uploadForm.file) {
-    Message.warning('请选择文件')
+    Message.warning(t('plm.请选择文件'))
     return
   }
   const fileSizeMB = uploadForm.file.size / 1024 / 1024
   if (fileSizeMB > 50) {
-    Message.error('文件大小不能超过 50MB')
+    Message.error(t('plm.文件大小不能超过 50MB'))
     return
   }
   uploading.value = true
@@ -247,7 +247,7 @@ async function handleUpload() {
     fd.append('refType', uploadForm.refType)
     fd.append('refId', uploadForm.refId)
     await plmApi.uploadDocument(fd)
-    Message.success('上传成功')
+    Message.success(t('plm.上传成功'))
     uploadDrawerVisible.value = false
     loadData()
   } catch {

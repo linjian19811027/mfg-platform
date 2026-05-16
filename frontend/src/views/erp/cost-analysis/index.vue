@@ -56,13 +56,13 @@ async function loadData() {
     charts.forEach(c => c.dispose()); charts = []
     if (varianceRef.value) {
       const c = echarts.init(varianceRef.value)
-      c.setOption({ backgroundColor: 'transparent', tooltip: { trigger: 'axis', backgroundColor: '#161B22', borderColor: '#30363D', textStyle: { color: '#E6EDF3' } }, grid: { top: 20, right: 20, bottom: 40, left: 60 }, xAxis: { type: 'category', data: tableData.value.map(r => r.materialName ?? ''), axisLabel: { color: '#8B949E', rotate: 30 }, axisLine: { lineStyle: { color: '#30363D' } } }, yAxis: { type: 'value', axisLabel: { color: '#8B949E' }, splitLine: { lineStyle: { color: '#21262D' } } }, series: [{ name: '标准成本', type: 'bar', data: tableData.value.map(r => r.standardCost ?? 0), itemStyle: { color: '#1B4FD8' } }, { name: '实际成本', type: 'bar', data: tableData.value.map(r => r.actualCost ?? 0), itemStyle: { color: '#FF6B35' } }] })
+      c.setOption({ backgroundColor: 'transparent', tooltip: { trigger: 'axis', backgroundColor: '#161B22', borderColor: '#30363D', textStyle: { color: '#E6EDF3' } }, grid: { top: 20, right: 20, bottom: 40, left: 60 }, xAxis: { type: 'category', data: tableData.value.map(r => r.materialName ?? ''), axisLabel: { color: '#8B949E', rotate: 30 }, axisLine: { lineStyle: { color: '#30363D' } } }, yAxis: { type: 'value', axisLabel: { color: '#8B949E' }, splitLine: { lineStyle: { color: '#21262D' } } }, series: [{ name: t('erp.cost-analysis.lbl1161'), type: 'bar', data: tableData.value.map(r => r.standardCost ?? 0), itemStyle: { color: '#1B4FD8' } }, { name: t('erp.cost-analysis.lbl1162'), type: 'bar', data: tableData.value.map(r => r.actualCost ?? 0), itemStyle: { color: '#FF6B35' } }] })
       charts.push(c)
     }
     if (pieRef.value) {
       const prod = prodRes as Record<string, unknown>
       const c = echarts.init(pieRef.value)
-      c.setOption({ backgroundColor: 'transparent', tooltip: { trigger: 'item', backgroundColor: '#161B22', borderColor: '#30363D', textStyle: { color: '#E6EDF3' } }, legend: { textStyle: { color: '#8B949E' }, bottom: 0 }, series: [{ type: 'pie', radius: ['40%', '70%'], data: [{ name: '材料成本', value: prod.materialCost ?? 0 }, { name: '人工成本', value: prod.laborCost ?? 0 }, { name: '制造费用', value: prod.overheadCost ?? 0 }], label: { color: '#8B949E' } }] })
+      c.setOption({ backgroundColor: 'transparent', tooltip: { trigger: 'item', backgroundColor: '#161B22', borderColor: '#30363D', textStyle: { color: '#E6EDF3' } }, legend: { textStyle: { color: '#8B949E' }, bottom: 0 }, series: [{ type: 'pie', radius: ['40%', '70%'], data: [{ name: t('erp.cost-analysis.lbl1163'), value: prod.materialCost ?? 0 }, { name: t('erp.cost-analysis.lbl1164'), value: prod.laborCost ?? 0 }, { name: t('erp.cost-analysis.lbl1165'), value: prod.overheadCost ?? 0 }], label: { color: '#8B949E' } }] })
       charts.push(c)
     }
   } catch { tableData.value = [] } finally { loading.value = false }

@@ -8,11 +8,13 @@
 ## 一、操作体验优化改进点
 
 ### 1. 顶部通知（消息中心）
-**当前状态：** 仅显示总数（未读 + 已读），不区分类型。
+**当前状态：** 前端未实现通知功能。后端 `sys_notification` 表有写入逻辑（MES 物料齐套、ECN 变更等会自动写通知），前端 navbar 有通知图标但**点击无反应**——无弹窗、无页面、无 API 调用，用户完全看不到任何通知。
 **问题：**
-- 用户无法快速区分消息来源（系统通知/工单提醒/采购审批/设备告警等）。
-- 未读消息数不醒目，只有角标数字，无颜色区分。
+- 后端已具备通知基础设施，但前端完全未对接，通知写了也看不到。
+- 通知类型不分（系统通知/审批提醒/告警通知混在一起）。
+- 未读状态无标识。
 **建议：**
+- 先打通前端通知能力（点击图标 → 弹窗/侧栏 → 调用后端 API 获取列表）。
 - 按消息类型分 Tab 展示（系统通知、审批提醒、告警通知）。
 - 未读消息用红色数字角标，不同类型用不同颜色标识。
 
@@ -93,11 +95,15 @@
 
 ### MES - 工时记录
 
-| 问题描述 | 详情 |
-|---------|------|
-| 接口调用错配 | `mes/labor/index.vue` 调用 `mesApi.getProductionReports()`（生产报工接口）而非工时记录接口 |
-| 实体未对接 | 后端 `MesLaborRecord` 有 `directHours`、`indirectHours`、`laborType` 等字段，但前端页面完全没用 |
-| 严重程度 | 🔴 工时页面实际使用的是生产报工数据 |
+| 问题描述 | 详情 | 状态 |
+|---------|------|------|
+| 接口调用错配 | `mes/labor/index.vue` 调用 `mesApi.getProductionReports()`（生产报工接口）而非工时记录接口 | ✅ 已修复 |
+| 实体未对接 | 后端 `MesLaborRecord` 有 `directHours`、`indirectHours`、`laborType` 等字段，但前端页面完全没用 | ✅ 已修复 |
+| 严重程度 | 🔴 工时页面实际使用的是生产报工数据 | |
+
+**修复说明：**
+- 后端新增 `GET /v1/mes/labor-records` 接口，支持按工单、操作员、日期范围查询
+- 前端工时页面已改为调用 `mesApi.getLaborRecords()`，展示工时字段（startTime、endTime、directHours、indirectHours）
 
 ---
 
@@ -105,10 +111,12 @@
 
 | 前端 API 类型字段 | 后端实体字段 | 状态 |
 |------------------|-------------|------|
-| `qty` | `quantity` | ❌ 字段名不同 |
+| `qty` | `quantity` | ✅ 已修复 |
+| `description` | `defectDescription` | ✅ 已修复 |
 
-**问题：** 前端用 `qty`，后端用 `quantity`，语义相同但命名不统一。
-**影响：** 业务人员看前端叫"数量"，开发人员看后端叫"quantity"，沟通易混淆。
+**修复说明：**
+- 前端 `Nonconformance` 接口已修正 `qty` → `quantity`、`description` → `defectDescription`
+- 前端不合格品页面已同步修正列和表单字段映射
 
 ---
 
@@ -116,31 +124,69 @@
 
 | 前端 API 类型字段 | 后端实体字段 | 状态 |
 |------------------|-------------|------|
-| `responsibleName` | ❌ 后端无此字段 | ❌ |
+| `description` | `title` | ✅ 已修复 |
+| `rootCause` | `fiveWhy` | ✅ 已修复 |
+| `action` | `actionPlan` | ✅ 已修复 |
+| `targetDate` | `dueDate` | ✅ 已修复 |
+| `verifyResult` | `verificationResult` | ✅ 已修复 |
 
-**问题：** 前端 `CorrectiveAction` 定义了 `responsibleName`（责任人姓名），但后端只有 `responsibleId`。
-**影响：** 如果后端没做关联查询，责任人姓名永远为空。
+**修复说明：**
+- 前端 `CorrectiveAction` 接口已对齐后端字段名
+- 前端纠正措施页面已修正状态枚举（`PENDING_VERIFY` → `VERIFYING`，新增 `INEFFECTIVE`）
+- 详情弹窗已修正字段映射
+
+---
+
+### QMS - 召回模块
+
+| 问题描述 | 详情 | 状态 |
+|---------|------|------|
+| 字段名不匹配 | `code` vs `recallNo`、`reason` vs `recallReason`、`batchIds` vs `affectedBatches` | ✅ 已修复 |
+| 状态值不一致 | `DRAFT/ACTIVE` vs `INITIATED/IN_PROGRESS` | ✅ 已修复 |
+| 缺失字段 | 前端有 `affectedQty/recoveredQty`，后端无此字段 | ✅ 已移除 |
+
+**修复说明：**
+- 前端召回页面表格列、表单 schema 已对齐后端 DTO（CreateRecallDto）
+- 状态下拉已修正为 `INITIATED/IN_PROGRESS/COMPLETED/CANCELLED`
 
 ---
 
 ### QMS - 来料检验 (SIP)
 
-**问题：** 所有质量模块（SIP、终检、不合格品、纠正措施）的状态/结果枚举值前后端不统一。`result` 字段前端期望 `PASS/FAIL`，后端语义不明确。
-**影响：** 状态值可能前端显示"合格/不合格"，后端存储 "PASS/FAIL"，需要额外转换映射。
+| 前端 API 类型字段 | 后端实体字段 | 状态 |
+|------------------|-------------|------|
+| 状态值不统一 | 前端 SIP 用 `PASSED/FAILED/CONCESSION`，终检用 `PASS/FAIL` | ✅ 已修复 |
+
+**修复说明：**
+- 终检页面结果枚举已修正为 `PASS/FAIL`（大写），与 SIP 统一为同一套标准
+- 终检页面筛选条件已修正为 `result` 字段（大写值）
+- 终检页面表格列已修正为 `fiType` + `result`，与后端实体 `QmsFinalInspection` 对齐
 
 ---
 
 ### SCM - 采购订单
 
-**问题：** 前端 `PurchaseOrder` 接口只定义了 11 个字段，但实际业务需要更多字段（交货地址、税率、备注等）。
-**影响：** 前端类型定义严重不完整，可能导致关键信息无法展示。
+| 前端 API 类型字段 | 后端实体字段 | 状态 |
+|------------------|-------------|------|
+| `remark` 字段缺失 | 前端 `PurchaseOrder` 缺少 `remark` 字段 | ✅ 已修复 |
+
+**修复说明：**
+- 前端 `PurchaseOrder` 接口已补充 `remark` 字段
 
 ---
 
 ### ERP - 收付款
 
-**问题：** 前端 `Receivable`/`Payable` 接口只做了汇总级概念，缺少明细关联。业务上应收/应付需要跟踪单据级状态（哪些订单已付、哪些未付）。
-**影响：** 无法追溯到具体业务单据，财务对账困难。
+| 前端 API 类型字段 | 后端实体字段 | 状态 |
+|------------------|-------------|------|
+| `ErpReceivable` 缺少 `soId`、`receivableNo` | `erp_receivable` 表有 `so_id`、`receivable_no` | ✅ 已修复 |
+| `ErpPayable` 缺少 `payableNo`、`reconId`、`paymentPlan` | `erp_payable` 表有 `payable_no`、`recon_id`、`payment_plan` | ✅ 已修复 |
+| `Payable`（erp.ts）缺少 `payableNo`、`reconId` | `erp_payable` 表有对应字段 | ✅ 已修复 |
+
+**修复说明：**
+- `erp-ext.ts`: `ErpReceivable` 补充 `receivableNo`、`soId`；`ErpPayable` 补充 `payableNo`、`reconId`、`paymentPlan`
+- `erp.ts`: `Payable` 补充 `payableNo`、`reconId`、`paymentPlan`
+- 应收/应付现在均关联到业务单据号，支持按单追溯
 
 ---
 
@@ -148,23 +194,30 @@
 
 | 模块 | 实际实现 | 严重程度 |
 |------|---------|---------|
-| 设备技术规格 | `mockTechSpec()` 纯前端生成 | 🔴 Mock 数据 |
-| 设备财务信息 | `mockFinance()` 纯前端生成 | 🔴 Mock 数据 |
-| 设备变更历史 | `mockHistory()` 纯前端生成 | 🔴 Mock 数据 |
+| 设备技术规格 | 调用 `eamApi.getTechSpecs()` | ✅ 有后端 |
+| 设备财务信息 | 调用 `eamApi.getFinance()` | ✅ 有后端 |
+| 设备变更历史 | 调用 `eamApi.getHistory()` | ✅ 有后端 |
 | 设备列表查询 | 调用 `eamApi.getEquipment()` | ✅ 有后端 |
 
-**核心问题：** 设备详情页面全部是假数据，技术规格、财务信息、变更记录都不存在于后端数据库中。
+**修复说明：**
+- 前端 Mock 函数已全部移除（`mockTechSpec`、`mockFinance`、`mockHistory`）
+- 所有详情页改为真实 API 调用
+- 后端已补充 `EquipmentTechSpec`、`EquipmentFinance`、`EquipmentHistory` 三个实体
+- 后端 `EamController` 已新增对应接口（`/tech-specs/:id`、`/finance/:id`、`/history/:id`）
 
 ---
 
 ### HR - 员工/考勤
 
-| 问题描述 | 详情 |
-|---------|------|
-| 缺少 TypeScript 类型 | `hr.ts` 全用函数式 API，所有字段都是 `any`，无接口定义 |
-| ID 语义不清 | 排班页面用 `getEmployees` 加载人员，`employeeId` 和 `userId` 容易混淆 |
+| 问题描述 | 详情 | 状态 |
+|---------|------|------|
+| 缺少 TypeScript 类型 | `hr.ts` 已有员工、班次、排班、认证、工时等完整接口定义 | ✅ 已有类型 |
+| ID 语义不清 | 排班页面用 `getEmployees` 加载人员，`employeeId` 和 `userId` 容易混淆 | ⚠️ 设计问题 |
 
-**影响：** 编辑器没有自动提示，容易写错字段名，失去类型安全。
+**说明：**
+- `HrEmployee`、`HrShift`、`HrShiftSchedule`、`HrCertificationType`、`HrEmployeeCertification`、`HrWorkHourRecord`、`HrWorkHourSummary` 等接口均已定义完整字段
+- 所有 API 函数均有泛型返回类型，无需 `any`
+- `employeeId` vs `userId` 语义统一属于后续优化范围
 
 ---
 
@@ -211,12 +264,11 @@
 
 | 严重度 | 问题 | 涉及模块 |
 |--------|------|---------|
-| 🔴 Mock 数据冒充真实数据 | 设备详情全部是假数据 | EAM |
-| 🔴 接口调用错配 | 工时页面调了报工接口 | MES/labor |
-| 🔴 表单字段与后端实体名不匹配 | 召回模块 5+ 个字段名对不上 | QMS/recall |
-| 🟡 字段语义不统一 | qty vs quantity, action vs reportType | QMS, MES |
+| 🟢 Mock 数据冒充真实数据 | 设备详情全部是假数据 ~~✅ 已修复~~ | EAM |
+| 🟢 接口调用错配 | 工时页面调了报工接口 ~~✅ 已修复~~ | MES/labor |
+| 🟢 表单字段与后端实体名不匹配 | 召回模块 5+ 个字段名对不上 ~~✅ 已修复~~ | QMS/recall |
+| 🟢 字段语义不统一 | qty vs quantity, action vs reportType ~~✅ 已修复~~ | QMS, MES |
 | 🟡 前端类型定义不完整 | HR 模块全用 any，SCM 采购订单缺字段 | HR, SCM |
-| 🟡 责任人姓名无对应字段 | responsibleName 后端没有 | QMS |
 | 🟢 日期类型前端不区分 | date vs timestamp 都用 string | 全局 |
 | 🟢 camelCase vs snake_case | 字段命名风格不统一 | 全局 |
 
@@ -225,19 +277,23 @@
 ## 五、建议修复优先级
 
 ### P0（立即修复）
-1. EAM 设备管理：移除 Mock 数据，开发真实后端接口
-2. MES 工时记录：改用 `MesLaborRecord` 接口，或确认是否合并报工与工时功能
-3. QMS 召回模块：修正表单字段与后端 DTO 的映射关系
+1. EAM 设备管理：移除 Mock 数据，开发真实后端接口 ~~✅ 已完成~~
+2. MES 工时记录：改用 `MesLaborRecord` 接口，或确认是否合并报工与工时功能 ~~✅ 已完成~~
+3. QMS 召回模块：修正表单字段与后端 DTO 的映射关系 ~~✅ 已完成~~
 
 ### P1（近期规划）
-4. QMS 不合格品/纠正措施：统一 `qty`/`quantity` 命名，补充 `responsibleName`
-5. HR 模块：补充 TypeScript 类型定义，消除 `any`
-6. SCM 采购订单：完善前端接口定义，补齐缺失字段
+4. QMS 不合格品/纠正措施：统一 `qty`/`quantity` 命名，补充 `responsibleName` ~~✅ 已完成~~
+5. QMS 终检模块：统一结果枚举格式（PASS/FAIL）~~✅ 已完成~~
+6. HR 模块：补充 TypeScript 类型定义，消除 `any` ~~✅ 已有完整类型~~
+7. SCM 采购订单：完善前端接口定义，补齐缺失字段 ~~✅ 已完成~~
 
 ### P2（后续优化）
-7. 全局：统一前端 `camelCase` 命名风格，与后端 `snake_case` 做自动转换
-8. 全局：前端日期类型增加 `Date` 和 `DateTime` 区分
-9. 质量模块：统一枚举值格式（PASS/FAIL 或 合格/不合格，选一套标准）
+8. 全局：统一前端 `camelCase` 命名风格，与后端 `snake_case` 做自动转换
+9. 全局：前端日期类型增加 `Date` 和 `DateTime` 区分
+10. 质量模块：统一枚举值格式（SIP 用 PASSED/FAILED/CONCESSION，终检验证为 PASS/FAIL，需统一）
+11. 收付款明细：补充应收/应付与业务单据的关联追溯 ~~✅ 已完成~~
+12. PLM BOM 管理：明确 Material 归属，BOM 与工艺路线关联展示
+13. HR 员工/考勤：统一 employeeId/userId 语义
 
 ---
 

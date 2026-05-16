@@ -7,7 +7,7 @@
           <a-option v-for="s in statusOptions" :key="s.value" :value="s.value">{{ s.label }}</a-option>
         </a-select>
         <a-button type="primary" @click="loadData">{{ $t('common.search') }}</a-button>
-        <a-button style="margin-left:auto" type="primary" @click="openCreate">新建不合格品</a-button>
+        <a-button style="margin-left:auto" type="primary" @click="openCreate">{{ $t('qms.nonconformance.lbl1505') }}</a-button>
       </div>
 
       <MTable :columns="columns" :data="list" :loading="loading" :total="total" @change="onTableChange">
@@ -15,7 +15,7 @@
           <a-tag :color="statusColor(record.status as string)">{{ statusLabel(record.status as string) }}</a-tag>
         </template>
         <template #action="{ record }">
-          <a-button type="text" size="small" @click="openDispose(record as Nonconformance)">处置</a-button>
+          <a-button type="text" size="small" @click="openDispose(record as Nonconformance)">{{ $t('qms.nonconformance.lbl1506') }}</a-button>
         </template>
       </MTable>
     </a-card>
@@ -44,14 +44,14 @@ import type { MFormField } from '@/components/MForm/index.vue'
 import { qmsApi, type Nonconformance } from '@/api/qms'
 
 const statusOptions = [
-  { label: '待处理', value: 'OPEN' }, { label: '审核中', value: 'IN_REVIEW' },
-  { label: '已关闭', value: 'CLOSED' },
+  { label: t('qms.nonconformance.pending'), value: 'OPEN' }, { label: t('qms.nonconformance.lbl1507'), value: 'IN_REVIEW' },
+  { label: t('qms.nonconformance.closed'), value: 'CLOSED' },
 ]
 const statusColorMap: Record<string, string> = {
   OPEN: 'red', IN_REVIEW: 'orange', CLOSED: 'gray',
 }
 const statusLabelMap: Record<string, string> = {
-  OPEN: '待处理', IN_REVIEW: '审核中', CLOSED: '已关闭',
+  OPEN: t('qms.nonconformance.pending')
 }
 const statusColor = (s: string) => statusColorMap[s] ?? 'gray'
 const statusLabel = (s: string) => statusLabelMap[s] ?? s
@@ -60,7 +60,7 @@ const columns: MTableColumn[] = [
   { key: 'materialName', title: t('qms.nonconformance.index.物料名称') },
   { key: 'batchId', title: t('qms.nonconformance.index.批次号') },
   { key: 'defectType', title: t('qms.nonconformance.index.缺陷类型'), width: 110 },
-  { key: 'qty', title: t('qms.nonconformance.index.数量'), width: 80 },
+  { key: 'quantity', title: t('qms.nonconformance.index.数量'), width: 80 },
   { key: 'status', title: t('qms.nonconformance.index.状态'), width: 90, slotName: 'status' },
   { key: 'disposition', title: t('qms.nonconformance.index.处置方式') },
   { key: 'createdAt', title: t('qms.nonconformance.index.创建时间'), width: 160 },
@@ -68,17 +68,17 @@ const columns: MTableColumn[] = [
 ]
 
 const createSchema: MFormField[] = [
-  { field: 'materialId', label: '物料ID', type: 'input', required: true },
-  { field: 'batchId', label: '批次号', type: 'input' },
-  { field: 'defectType', label: '缺陷类型', type: 'input', required: true },
-  { field: 'qty', label: '数量', type: 'number', required: true },
-  { field: 'description', label: '描述', type: 'textarea' },
+  { field: 'materialId', label: t('qms.nonconformance.material'), type: 'material-select', required: true },
+  { field: 'batchId', label: t('qms.nonconformance.lbl1508'), type: 'input' },
+  { field: 'defectType', label: t('qms.nonconformance.lbl1509'), type: 'select', required: true, options: [{ label: t('qms.nonconformance.lbl1510'), value: t('qms.nonconformance.r33045') }, { label: t('qms.nonconformance.lbl1511'), value: t('qms.nonconformance.r33046') }, { label: t('qms.nonconformance.lbl1512'), value: t('qms.nonconformance.r33047') }, { label: t('qms.nonconformance.lbl1513'), value: t('qms.nonconformance.r33048') }, { label: t('qms.nonconformance.lbl1514'), value: t('qms.nonconformance.r33049') }, { label: t('qms.nonconformance.lbl1515'), value: t('qms.nonconformance.r33050') }] },
+  { field: 'quantity', label: t('qms.nonconformance.quantity'), type: 'number', required: true },
+  { field: 'defectDescription', label: t('qms.nonconformance.lbl1516'), type: 'textarea' },
 ]
 
 const disposeSchema: MFormField[] = [
-  { field: 'status', label: '处置结论', type: 'select', required: true,
-    options: [{ label: '返工', value: 'REWORK' }, { label: '报废', value: 'SCRAP' }, { label: '让步接收', value: 'CONCESSION' }] },
-  { field: 'disposition', label: '处置说明', type: 'textarea', required: true },
+  { field: 'status', label: t('qms.nonconformance.lbl1517'), type: 'select', required: true,
+    options: [{ label: t('qms.nonconformance.lbl1518'), value: 'REWORK' }, { label: t('qms.nonconformance.scrapped'), value: 'SCRAP' }, { label: t('qms.nonconformance.lbl1519'), value: 'CONCESSION' }] },
+  { field: 'disposition', label: t('qms.nonconformance.lbl1520'), type: 'textarea', required: true },
 ]
 
 const query = reactive({ status: '' })
@@ -119,20 +119,20 @@ async function handleCreate(data: Record<string, unknown>) {
   submitting.value = true
   try {
     await qmsApi.createNonconformance(data as Parameters<typeof qmsApi.createNonconformance>[0])
-    Message.success('创建成功')
+    Message.success(t('qms.创建成功'))
     createVisible.value = false
     loadData()
-  } finally { submitting.value = false }
+  } catch { Message.error(t('qms.创建失败')) } finally { submitting.value = false }
 }
 
 async function handleDispose(data: Record<string, unknown>) {
   submitting.value = true
   try {
     await qmsApi.updateDisposition(currentId.value, data as { status: string; disposition: string })
-    Message.success('处置成功')
+    Message.success(t('qms.处置成功'))
     disposeVisible.value = false
     loadData()
-  } finally { submitting.value = false }
+  } catch { Message.error(t('qms.处置失败')) } finally { submitting.value = false }
 }
 
 loadData()

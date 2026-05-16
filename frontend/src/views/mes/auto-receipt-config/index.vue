@@ -4,33 +4,33 @@
       <div class="action-bar">
         <a-button type="primary" @click="handleCreate">
           <template #icon><icon-plus /></template>
-          新建配置
+          {{ $t('mes.auto-receipt-config.createConfig') }}
         </a-button>
       </div>
 
       <a-table :columns="columns" :data="tableData" :loading="loading"
         :pagination="pagination" @page-change="handlePageChange" row-key="id">
         <template #matchType="{ record }">
-          <a-tag>{{ record.matchType === 'MATERIAL' ? '物料' : '物料分类' }}</a-tag>
+          <a-tag>{{ record.matchType === 'MATERIAL' ? $t('mes.auto-receipt-config.material') : $t('mes.auto-receipt-config.lbl1268') }}</a-tag>
         </template>
         <template #requireFqc="{ record }">
           <a-tag :color="record.requireFqc ? 'orange' : 'green'">
-            {{ record.requireFqc ? '需要FQC' : '直接入库' }}
+            {{ record.requireFqc ? $t('mes.auto-receipt-config.lbl1269') : $t('mes.auto-receipt-config.lbl1270') }}
           </a-tag>
         </template>
         <template #enabled="{ record }">
           <a-tag :color="record.enabled ? 'green' : 'gray'">
-            {{ record.enabled ? '启用' : '停用' }}
+            {{ record.enabled ? $t('mes.auto-receipt-config.enable') : $t('mes.auto-receipt-config.disable') }}
           </a-tag>
         </template>
         <template #action="{ record }">
           <a-space>
-            <a-button type="text" size="small" @click="handleEdit(record)">编辑</a-button>
+            <a-button type="text" size="small" @click="handleEdit(record)">{{ $t('mes.auto-receipt-config.edit') }}</a-button>
             <a-button type="text" size="small" @click="handleToggle(record)">
-              {{ record.enabled ? '停用' : '启用' }}
+              {{ record.enabled ? $t('mes.auto-receipt-config.disable') : $t('mes.auto-receipt-config.enable') }}
             </a-button>
             <a-popconfirm :content="$t('mes.auto-receipt-config.index.确定删除此配置')" @ok="handleDelete(record)">
-              <a-button type="text" size="small" status="danger">删除</a-button>
+              <a-button type="text" size="small" status="danger">{{ $t('mes.auto-receipt-config.delete') }}</a-button>
             </a-popconfirm>
           </a-space>
         </template>
@@ -42,8 +42,8 @@
       <a-form :model="form" :rules="rules" ref="formRef" layout="vertical">
         <a-form-item :label="$t('mes.auto-receipt-config.index.匹配类型')" field="matchType">
           <a-select v-model="form.matchType">
-            <a-option value="MATERIAL">物料</a-option>
-            <a-option value="CATEGORY">物料分类</a-option>
+            <a-option value="MATERIAL">{{ $t('mes.auto-receipt-config.material') }}</a-option>
+            <a-option value="CATEGORY">{{ $t('mes.auto-receipt-config.lbl1271') }}</a-option>
           </a-select>
         </a-form-item>
         <a-form-item :label="$t('mes.auto-receipt-config.index.匹配值物料编码或分类代码')" field="matchValue">
@@ -86,13 +86,13 @@ const columns = [
 ]
 
 const modalVisible = ref(false)
-const modalTitle = ref('新建配置')
+const modalTitle = ref(t('mes.auto-receipt-config.lbl1272'))
 const submitLoading = ref(false)
 const formRef = ref()
 const form = reactive({ id: '', matchType: 'MATERIAL', matchValue: '', requireFqc: false, targetWarehouseId: '', targetLocationId: '' })
 const rules = {
-  matchType: [{ required: true, message: '请选择匹配类型' }],
-  matchValue: [{ required: true, message: '请输入匹配值' }],
+  matchType: [{ required: true, message: t('mes.auto-receipt-config.select') }],
+  matchValue: [{ required: true, message: t('mes.auto-receipt-config.input') }],
 }
 
 onMounted(fetchData)
@@ -103,7 +103,7 @@ async function fetchData() {
     const res = await getAutoReceiptConfigs({ page: pagination.current, pageSize: pagination.pageSize })
     tableData.value = (res as any).data?.items ?? (res as any).data ?? []
     pagination.total = (res as any).data?.total ?? 0
-  } catch (e: any) { Message.error(e.message || '加载失败') }
+  } catch (e: any) { Message.error(e.message || t('mes.加载失败')) }
   finally { loading.value = false }
 }
 
@@ -111,13 +111,13 @@ function handlePageChange(page: number) { pagination.current = page; fetchData()
 
 function handleCreate() {
   Object.assign(form, { id: '', matchType: 'MATERIAL', matchValue: '', requireFqc: false, targetWarehouseId: '', targetLocationId: '' })
-  modalTitle.value = '新建配置'
+  modalTitle.value = t('mes.auto-receipt-config.lbl1273')
   modalVisible.value = true
 }
 
 function handleEdit(record: any) {
   Object.assign(form, record)
-  modalTitle.value = '编辑配置'
+  modalTitle.value = t('mes.auto-receipt-config.lbl1274')
   modalVisible.value = true
 }
 
@@ -127,10 +127,10 @@ async function handleSubmit() {
     submitLoading.value = true
     if (form.id) {
       await updateAutoReceiptConfig(form.id, form)
-      Message.success('更新成功')
+      Message.success(t('mes.更新成功'))
     } else {
       await createAutoReceiptConfig(form)
-      Message.success('创建成功')
+      Message.success(t('mes.创建成功'))
     }
     modalVisible.value = false
     fetchData()
@@ -141,17 +141,17 @@ async function handleSubmit() {
 async function handleToggle(record: any) {
   try {
     await toggleAutoReceiptConfig(record.id)
-    Message.success('操作成功')
+    Message.success(t('mes.操作成功'))
     fetchData()
-  } catch (e: any) { Message.error(e.message || '操作失败') }
+  } catch (e: any) { Message.error(e.message || t('mes.操作失败')) }
 }
 
 async function handleDelete(record: any) {
   try {
     await deleteAutoReceiptConfig(record.id)
-    Message.success('删除成功')
+    Message.success(t('mes.删除成功'))
     fetchData()
-  } catch (e: any) { Message.error(e.message || '删除失败') }
+  } catch (e: any) { Message.error(e.message || t('mes.删除失败')) }
 }
 </script>
 

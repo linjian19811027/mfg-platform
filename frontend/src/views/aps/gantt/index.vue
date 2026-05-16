@@ -3,19 +3,19 @@
     <!-- 顶部工具栏 -->
     <div class="gantt-toolbar">
       <a-space wrap>
-        <span class="toolbar-label">开始日期</span>
+        <span class="toolbar-label">{{ $t('aps.gantt.lbl1001') }}</span>
         <a-date-picker v-model="dateRange.start" style="width: 150px" @change="handleQuery" />
-        <span class="toolbar-label">结束日期</span>
+        <span class="toolbar-label">{{ $t('aps.gantt.lbl1002') }}</span>
         <a-date-picker v-model="dateRange.end" style="width: 150px" @change="handleQuery" />
         <a-button type="primary" :loading="loading" @click="handleQuery">{{ $t('common.search') }}</a-button>
         <a-divider direction="vertical" />
         <!-- 图例 -->
         <div class="legend">
-          <span class="legend-item"><span class="legend-dot" style="background:#58A6FF"></span>待排程</span>
-          <span class="legend-item"><span class="legend-dot" style="background:#F78166"></span>进行中</span>
-          <span class="legend-item"><span class="legend-dot" style="background:#3FB950"></span>已完成</span>
-          <span class="legend-item"><span class="legend-dot" style="background:#6E7681"></span>已取消</span>
-          <span class="legend-item"><span class="legend-dot conflict-dot"></span>冲突</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#58A6FF"></span>{{ $t('aps.gantt.lbl1003') }}</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#F78166"></span>{{ $t('aps.gantt.inProgress') }}</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#3FB950"></span>{{ $t('aps.gantt.completed') }}</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#6E7681"></span>{{ $t('aps.gantt.lbl1004') }}</span>
+          <span class="legend-item"><span class="legend-dot conflict-dot"></span>{{ $t('aps.gantt.lbl1005') }}</span>
         </div>
       </a-space>
     </div>
@@ -23,7 +23,7 @@
     <!-- 甘特图容器 -->
     <div class="gantt-body">
       <div v-if="loading" class="gantt-loading">
-        <a-spin tip="加载中..." />
+        <a-spin :tip="t('aps.gantt.loading')" />
       </div>
       <div v-else-if="resources.length === 0" class="gantt-empty">
         <a-empty :description="$t('aps.gantt.index.暂无数据')" />
@@ -43,6 +43,8 @@ import { Message } from '@arco-design/web-vue'
 import { apsApi } from '@/api/aps'
 import type { ApsSchedule, ApsResource } from '@/api/aps'
 import { request } from '@/utils/request'
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 
 // ─── 常量 ────────────────────────────────────────────────────────────────────
 const LEFT_WIDTH = 160   // 左侧资源列宽
@@ -127,7 +129,7 @@ function snapToDay(ms: number): number {
 // ─── 数据加载 ────────────────────────────────────────────────────────────────
 async function handleQuery() {
   if (!dateRange.start || !dateRange.end) {
-    Message.warning('请选择日期范围')
+    Message.warning(t('aps.gantt.index.请选择日期范围'))
     return
   }
   loading.value = true
@@ -143,7 +145,7 @@ async function handleQuery() {
     initCanvas()
     draw()
   } catch (e) {
-    Message.error('数据加载失败')
+    Message.error(t('aps.gantt.index.数据加载失败'))
   } finally {
     loading.value = false
   }

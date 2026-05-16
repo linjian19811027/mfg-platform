@@ -6,7 +6,7 @@
         <a-date-picker v-model="query.startDate" :placeholder="$t('eam.oee.index.开始日期')" style="width: 140px" />
         <a-date-picker v-model="query.endDate" :placeholder="$t('eam.oee.index.结束日期')" style="width: 140px" />
         <a-button type="primary" @click="loadData">{{ $t('common.search') }}</a-button>
-        <a-button @click="openInputModal">录入 OEE 数据</a-button>
+        <a-button @click="openInputModal">{{ $t('eam.oee.lbl1136') }}</a-button>
       </a-space>
     </a-card>
 
@@ -45,9 +45,9 @@
         <!-- 自动计算预览 -->
         <a-form-item :label="$t('eam.oee.index.OEE预览')">
           <a-space>
-            <span>可用率: {{ calcAvailability }}%</span>
-            <span>性能率: {{ calcPerformance }}%</span>
-            <span>质量率: {{ calcQuality }}%</span>
+            <span>{{ $t('eam.oee.r22002', {calcAvailability: calcAvailability}) }}</span>
+            <span>{{ $t('eam.oee.r22003', {calcPerformance: calcPerformance}) }}</span>
+            <span>{{ $t('eam.oee.r22004', {calcQuality: calcQuality}) }}</span>
             <span style="font-weight:600;color:#1B4FD8">OEE: {{ calcOee }}%</span>
           </a-space>
         </a-form-item>
@@ -146,11 +146,11 @@ function openInputModal() {
 }
 
 async function handleInput() {
-  if (!inputForm.equipmentId || !inputForm.date) { Message.warning('请填写设备ID和日期'); return }
+  if (!inputForm.equipmentId || !inputForm.date) { Message.warning(t('eam.请填写设备ID和日期')); return }
   inputting.value = true
   try {
     await eamApi.createOee({ ...inputForm })
-    Message.success('OEE 数据录入成功')
+    Message.success(t('eam.oee.lbl1137'))
     inputModalVisible.value = false
     loadData()
   } catch { /* handled */ } finally { inputting.value = false }

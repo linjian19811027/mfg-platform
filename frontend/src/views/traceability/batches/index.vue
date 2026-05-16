@@ -20,9 +20,9 @@
         </a-form-item>
         <a-form-item :label="$t('traceability.batches.index.检验状态')">
           <a-select v-model="searchForm.inspectionStatus" :placeholder="$t('traceability.batches.index.全部')" allow-clear style="width: 120px">
-            <a-option value="PASSED">合格</a-option>
-            <a-option value="FAILED">不合格</a-option>
-            <a-option value="PENDING">待检</a-option>
+            <a-option value="PASSED">{{ $t('traceability.batches.qualified') }}</a-option>
+            <a-option value="FAILED">{{ $t('traceability.batches.unqualified') }}</a-option>
+            <a-option value="PENDING">{{ $t('traceability.batches.uninspected') }}</a-option>
           </a-select>
         </a-form-item>
         <a-form-item>
@@ -38,11 +38,11 @@
         <a-space>
           <a-button type="primary" @click="handleManualCreate">
             <template #icon><icon-plus /></template>
-            手动补录
+            {{ $t('traceability.batches.manualEntry') }}
           </a-button>
           <a-button @click="handleExport" :loading="exportLoading">
             <template #icon><icon-download /></template>
-            导出Excel
+            {{ $t('traceability.batches.exportExcel') }}
           </a-button>
         </a-space>
       </div>
@@ -61,25 +61,25 @@
           <a-link @click="handleView(record)">{{ record.traceCode }}</a-link>
         </template>
         <template #inspectionStatus="{ record }">
-          <a-tag v-if="record.inspectionStatus === 'PASSED'" color="green">合格</a-tag>
-          <a-tag v-else-if="record.inspectionStatus === 'FAILED'" color="red">不合格</a-tag>
-          <a-tag v-else-if="record.inspectionStatus === 'PENDING'" color="orange">待检</a-tag>
+          <a-tag v-if="record.inspectionStatus === 'PASSED'" color="green">{{ $t('traceability.batches.qualified') }}</a-tag>
+          <a-tag v-else-if="record.inspectionStatus === 'FAILED'" color="red">{{ $t('traceability.batches.unqualified') }}</a-tag>
+          <a-tag v-else-if="record.inspectionStatus === 'PENDING'" color="orange">{{ $t('traceability.batches.uninspected') }}</a-tag>
         </template>
         <template #inventoryStatus="{ record }">
-          <a-tag v-if="record.inventoryStatus === 'IN_STOCK'" color="blue">在库</a-tag>
-          <a-tag v-else-if="record.inventoryStatus === 'SHIPPED'" color="gray">已发货</a-tag>
-          <a-tag v-else-if="record.inventoryStatus === 'CONSUMED'" color="purple">已消耗</a-tag>
-          <a-tag v-else-if="record.inventoryStatus === 'FROZEN'" color="red">已冻结</a-tag>
+          <a-tag v-if="record.inventoryStatus === 'IN_STOCK'" color="blue">{{ $t('traceability.batches.lbl1821') }}</a-tag>
+          <a-tag v-else-if="record.inventoryStatus === 'SHIPPED'" color="gray">{{ $t('traceability.batches.lbl1822') }}</a-tag>
+          <a-tag v-else-if="record.inventoryStatus === 'CONSUMED'" color="purple">{{ $t('traceability.batches.lbl1823') }}</a-tag>
+          <a-tag v-else-if="record.inventoryStatus === 'FROZEN'" color="red">{{ $t('traceability.batches.lbl1824') }}</a-tag>
         </template>
         <template #isFrozen="{ record }">
-          <a-tag v-if="record.isFrozen" color="red">是</a-tag>
-          <span v-else>否</span>
+          <a-tag v-if="record.isFrozen" color="red">{{ $t('traceability.batches.r33088') }}</a-tag>
+          <span v-else>{{ $t('traceability.batches.r33089') }}</span>
         </template>
         <template #action="{ record }">
           <a-space>
-            <a-button type="text" size="small" @click="handleView(record)">详情</a-button>
-            <a-button type="text" size="small" @click="handleForwardTrace(record)">正向追溯</a-button>
-            <a-button type="text" size="small" @click="handleBackwardTrace(record)">反向追溯</a-button>
+            <a-button type="text" size="small" @click="handleView(record)">{{ $t('traceability.batches.detail') }}</a-button>
+            <a-button type="text" size="small" @click="handleForwardTrace(record)">{{ $t('traceability.batches.lbl1825') }}</a-button>
+            <a-button type="text" size="small" @click="handleBackwardTrace(record)">{{ $t('traceability.batches.lbl1826') }}</a-button>
           </a-space>
         </template>
       </a-table>
@@ -182,11 +182,11 @@ const formData = reactive({
 })
 
 const formRules = {
-  materialCode: [{ required: true, message: '请输入物料编码' }],
-  materialName: [{ required: true, message: '请输入物料名称' }],
-  batchNo: [{ required: true, message: '请输入批次号' }],
-  actualQty: [{ required: true, message: '请输入数量' }],
-  manualReason: [{ required: true, message: '请说明补录原因' }],
+  materialCode: [{ required: true, message: t('traceability.batches.input') }],
+  materialName: [{ required: true, message: t('traceability.batches.input2') }],
+  batchNo: [{ required: true, message: t('traceability.batches.input3') }],
+  actualQty: [{ required: true, message: t('traceability.batches.input4') }],
+  manualReason: [{ required: true, message: t('traceability.batches.lbl1827') }],
 }
 
 onMounted(() => {
@@ -205,7 +205,7 @@ async function fetchData() {
     tableData.value = (res as any).list ?? (res as any).items ?? []
     pagination.total = (res as any).total ?? 0
   } catch (error: any) {
-    Message.error(error.message || '加载失败')
+    Message.error(error.message || t('traceability.加载失败'))
   } finally {
     loading.value = false
   }
@@ -253,7 +253,7 @@ async function handleSubmit() {
   try {
     await formRef.value?.validate()
     await manualCreateBatch(formData)
-    Message.success('补录成功')
+    Message.success(t('traceability.补录成功'))
     modalVisible.value = false
     fetchData()
   } catch (error: any) {
@@ -288,12 +288,12 @@ async function handleExport() {
     const url = window.URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `追溯批次_${new Date().getTime()}.xlsx`
+    a.download = `${t('traceability.batches.r33090')}_${new Date().getTime()}.xlsx`
     a.click()
     window.URL.revokeObjectURL(url)
-    Message.success('导出成功')
+    Message.success(t('traceability.导出成功'))
   } catch (error: any) {
-    Message.error(error.message || '导出失败')
+    Message.error(error.message || t('traceability.导出失败'))
   } finally {
     exportLoading.value = false
   }

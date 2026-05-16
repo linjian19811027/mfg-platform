@@ -1,20 +1,20 @@
 <template>
   <div class="page-container">
     <a-card :bordered="false">
-      <template #title>应付账款</template>
+      <template #title>{{ $t('erp.payable.lbl1190') }}</template>
       <template #extra>
         <a-select v-model="query.status" :placeholder="$t('common.status')" allow-clear style="width: 120px" @change="loadData">
-          <a-option value="OPEN">未付</a-option><a-option value="PARTIAL">部分付</a-option><a-option value="PAID">已付</a-option>
+          <a-option value="OPEN">{{ $t('erp.payable.lbl1191') }}</a-option><a-option value="PARTIAL">{{ $t('erp.payable.lbl1192') }}</a-option><a-option value="PAID">{{ $t('erp.payable.lbl1193') }}</a-option>
         </a-select>
       </template>
       <MTable :columns="columns" :data="tableData" :loading="loading" :total="total" :page-size="20" @change="onTableChange">
         <template #status="{ record }">
           <a-tag :color="record.status === 'PAID' ? 'green' : record.status === 'PARTIAL' ? 'orange' : 'blue'">
-            {{ { OPEN: '未付', PARTIAL: '部分付', PAID: '已付' }[record.status as string] ?? record.status }}
+            {{ { OPEN: t('erp.payable.lbl1194'), PARTIAL: t('erp.payable.lbl1195'), PAID: t('erp.payable.lbl1196') }[record.status as string] ?? record.status }}
           </a-tag>
         </template>
         <template #action="{ record }">
-          <a-link v-if="record.status !== 'PAID'" @click="openPaymentModal(record.id as string)">付款</a-link>
+          <a-link v-if="record.status !== 'PAID'" @click="openPaymentModal(record.id as string)">{{ $t('erp.payable.lbl1197') }}</a-link>
         </template>
       </MTable>
     </a-card>
@@ -22,7 +22,7 @@
       <a-form layout="vertical">
         <a-form-item :label="$t('erp.payable.index.付款金额')" required><a-input-number v-model="paymentForm.amount" :min="0.01" :precision="2" style="width:100%" /></a-form-item>
         <a-form-item :label="$t('erp.payable.index.付款日期')" required><a-date-picker v-model="paymentForm.paymentDate" style="width:100%" /></a-form-item>
-        <a-form-item :label="$t('erp.payable.index.付款方式')"><a-select v-model="paymentForm.method"><a-option value="BANK_TRANSFER">银行转账</a-option><a-option value="CHECK">支票</a-option><a-option value="CASH">现金</a-option></a-select></a-form-item>
+        <a-form-item :label="t('erp.payable.r33016')"><a-select v-model="paymentForm.method"><a-option value="BANK_TRANSFER">{{ $t('erp.payable.bankTransfer') }}</a-option><a-option value="CHECK">{{ $t('erp.payable.r44001') }}</a-option><a-option value="CASH">{{ $t('erp.payable.cash') }}</a-option></a-select></a-form-item>
       </a-form>
     </a-modal>
   </div>
@@ -55,9 +55,9 @@ function onTableChange(e: { page: number; pageSize: number }) { query.page = e.p
 const paymentModalVisible = ref(false); const paying = ref(false); const currentId = ref(''); const paymentForm = reactive({ amount: 0, paymentDate: '', method: 'BANK_TRANSFER' })
 function openPaymentModal(id: string) { currentId.value = id; paymentForm.amount = 0; paymentForm.paymentDate = ''; paymentModalVisible.value = true }
 async function handlePayment() {
-  if (!paymentForm.amount || !paymentForm.paymentDate) { Message.warning('请填写付款金额和日期'); return }
+  if (!paymentForm.amount || !paymentForm.paymentDate) { Message.warning(t('erp.请填写付款金额和日期')); return }
   paying.value = true
-  try { await erpExtApi.recordPayablePayment(currentId.value, paymentForm); Message.success('付款记录成功'); paymentModalVisible.value = false; loadData() }
+  try { await erpExtApi.recordPayablePayment(currentId.value, paymentForm); Message.success(t('erp.付款记录成功')); paymentModalVisible.value = false; loadData() }
   catch { /* handled */ } finally { paying.value = false }
 }
 onMounted(loadData)

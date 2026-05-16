@@ -11,6 +11,22 @@ import { TenantModule } from './shared/tenant/tenant.module.js';
 import { LogModule } from './shared/logger/log.module.js';
 import { GlobalExceptionFilter } from './shared/logger/global-exception.filter.js';
 import { SysAuditLog } from './modules/auth/entities/sys-audit-log.entity.js';
+import { SysTenant } from './modules/auth/entities/sys-tenant.entity.js';
+import { SysUser } from './modules/auth/entities/sys-user.entity.js';
+import { SysRole } from './modules/auth/entities/sys-role.entity.js';
+import { SysUserRole } from './modules/auth/entities/sys-user-role.entity.js';
+import { SysOrganization } from './modules/base/entities/sys-organization.entity.js';
+import { SysUom, SysUomConversion } from './modules/base/entities/sys-uom.entity.js';
+import { SysNumberingRule } from './modules/base/entities/sys-numbering-rule.entity.js';
+import { MfgWorkCenter } from './modules/base/entities/mfg-work-center.entity.js';
+import { HrShift } from './modules/hr/entities/hr-shift.entity.js';
+import { HrJobType } from './modules/hr/entities/hr-job-type.entity.js';
+import { PlmMaterialCategory } from './modules/plm/entities/plm-material-category.entity.js';
+import { WmsWarehouse } from './modules/wms/entities/wms-warehouse.entity.js';
+import { WmsZone } from './modules/wms/entities/wms-zone.entity.js';
+import { WmsLocation } from './modules/wms/entities/wms-location.entity.js';
+import { ErpAccount } from './modules/erp/entities/erp-account.entity.js';
+import { ErpCostCenter } from './modules/erp/entities/erp-cost-center.entity.js';
 import { AuthModule } from './modules/auth/auth.module.js';
 import { BaseModule } from './modules/base/base.module.js';
 import { ConversionModule } from './modules/conversion/conversion.module.js';
@@ -29,6 +45,7 @@ import { OutsourcingModule } from './modules/outsourcing/outsourcing.module.js';
 import { HrModule } from './modules/hr/hr.module.js';
 import { TraceabilityModule } from './modules/traceability/traceability.module.js';
 import { getDatabaseConfig } from './config/database.config.js';
+import { InitSeedService } from './modules/shared/seed/init-seed.service.js';
 
 @Module({
   imports: [
@@ -50,7 +67,26 @@ import { getDatabaseConfig } from './config/database.config.js';
     MessageModule,
     TenantModule,
     LogModule,
-    TypeOrmModule.forFeature([SysAuditLog]),
+    TypeOrmModule.forFeature([
+      SysAuditLog,
+      SysTenant,
+      SysUser,
+      SysRole,
+      SysUserRole,
+      SysOrganization,
+      SysUom,
+      SysUomConversion,
+      SysNumberingRule,
+      MfgWorkCenter,
+      HrShift,
+      HrJobType,
+      PlmMaterialCategory,
+      WmsWarehouse,
+      WmsZone,
+      WmsLocation,
+      ErpAccount,
+      ErpCostCenter,
+    ]),
     AuthModule,
     BaseModule,
     ConversionModule,
@@ -75,6 +111,8 @@ import { getDatabaseConfig } from './config/database.config.js';
     ...(process.env.THROTTLE_DISABLE === '1' ? [] : [{ provide: APP_GUARD, useClass: ThrottlerGuard }]),
     // 全局异常过滤器（记录系统错误和业务错误日志）
     { provide: APP_FILTER, useClass: GlobalExceptionFilter },
+    // 基础种子数据初始化
+    InitSeedService,
   ],
 })
 export class AppModule implements OnApplicationBootstrap {

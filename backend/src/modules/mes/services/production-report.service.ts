@@ -418,6 +418,31 @@ export class ProductionReportService {
     return { items, total };
   }
 
+  async findAllLabor(query: {
+    operatorId?: string;
+    woId?: string;
+    startDate?: string;
+    endDate?: string;
+    page?: number;
+    pageSize?: number;
+  }) {
+    const tenantId = TenantContext.requireCurrentTenant();
+    const { operatorId, woId, startDate, endDate, page = 1, pageSize = 20 } = query;
+    const qb = this.laborRepo
+      .createQueryBuilder('l')
+      .where('l.tenant_id = :tenantId', { tenantId });
+    if (operatorId) qb.andWhere('l.operator_id = :operatorId', { operatorId });
+    if (woId) qb.andWhere('l.wo_id = :woId', { woId });
+    if (startDate) qb.andWhere('l.start_time >= :startDate', { startDate });
+    if (endDate) qb.andWhere('l.start_time <= :endDate', { endDate });
+    const [items, total] = await qb
+      .orderBy('l.start_time', 'DESC')
+      .skip((page - 1) * pageSize)
+      .take(pageSize)
+      .getManyAndCount();
+    return { items, total };
+  }
+
   // ── 私有辅助 ──────────────────────────────────────────────────────────────
 
   private async saveReport(

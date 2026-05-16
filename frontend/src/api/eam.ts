@@ -2,9 +2,10 @@ import { request } from '@/utils/request'
 
 export interface Equipment {
   id: string
-  code: string
-  name: string
-  type: string
+  equipmentCode: string
+  equipmentName: string
+  equipmentType: string
+  category: string
   status: string
   workshopId?: string
   model?: string
@@ -54,6 +55,15 @@ export interface InspectionRecord {
   items?: { name: string; value: string; normal: boolean }[]
   status: string
   createdAt: string
+}
+
+export interface ChangeRecord {
+  id: string
+  changedAt: string
+  changeType: string
+  beforeValue: string
+  afterValue: string
+  operator: string
 }
 
 export interface LubricationPoint {
@@ -145,28 +155,24 @@ export const eamApi = {
       equipmentType: d.type ?? d.equipmentType,
       category: d.category ?? d.type ?? 'GENERAL',
     }
-    try { return await request.post<{ id: string }>('/v1/eam/equipment', mapped) }
-    catch { return null as unknown as { id: string } }
+    return await request.post<{ id: string }>('/v1/eam/equipment', mapped)
   },
   updateEquipment: async (id: string, data: object) => {
-    try { return await request.put<Equipment>(`/v1/eam/equipment/${id}`, data) }
-    catch { return null as unknown as Equipment }
+    return await request.put<Equipment>(`/v1/eam/equipment/${id}`, data)
   },
   getTechSpecs: async (id: string) => {
     try { return await request.get<Record<string, unknown>>(`/v1/eam/equipment/${id}/tech-specs`) }
     catch { return {} as Record<string, unknown> }
   },
   saveTechSpecs: async (id: string, data: object) => {
-    try { return await request.post<void>(`/v1/eam/equipment/${id}/tech-specs`, data) }
-    catch { return }
+    return await request.post<void>(`/v1/eam/equipment/${id}/tech-specs`, data)
   },
   getFinance: async (id: string) => {
     try { return await request.get<Record<string, unknown>>(`/v1/eam/equipment/${id}/finance`) }
     catch { return {} as Record<string, unknown> }
   },
   saveFinance: async (id: string, data: object) => {
-    try { return await request.post<void>(`/v1/eam/equipment/${id}/finance`, data) }
-    catch { return }
+    return await request.post<void>(`/v1/eam/equipment/${id}/finance`, data)
   },
 
   // 维保计划
@@ -181,12 +187,10 @@ export const eamApi = {
     catch { return { list: [], total: 0 } }
   },
   createStrategy: async (data: object) => {
-    try { return await request.post<MaintenanceStrategy>('/v1/eam/maintenance/strategies', data) }
-    catch { return null as unknown as MaintenanceStrategy }
+    return await request.post<MaintenanceStrategy>('/v1/eam/maintenance/strategies', data)
   },
   updateStrategy: async (id: string, data: object) => {
-    try { return await request.put<MaintenanceStrategy>(`/v1/eam/maintenance/strategies/${id}`, data) }
-    catch { return null as unknown as MaintenanceStrategy }
+    return await request.put<MaintenanceStrategy>(`/v1/eam/maintenance/strategies/${id}`, data)
   },
 
   // 故障
@@ -195,16 +199,13 @@ export const eamApi = {
     catch { return { list: [], total: 0 } }
   },
   reportFault: async (data: object) => {
-    try { return await request.post<{ id: string }>('/v1/eam/fault-records', data) }
-    catch { return null as unknown as { id: string } }
+    return await request.post<{ id: string }>('/v1/eam/fault-records', data)
   },
   respondFault: async (id: string, data: object) => {
-    try { return await request.put<void>(`/v1/eam/fault-records/${id}/respond`, data) }
-    catch { return }
+    return await request.put<void>(`/v1/eam/fault-records/${id}/respond`, data)
   },
   completeFaultRepair: async (id: string, data: object) => {
-    try { return await request.put<void>(`/v1/eam/fault-records/${id}/complete-repair`, data) }
-    catch { return }
+    return await request.put<void>(`/v1/eam/fault-records/${id}/complete-repair`, data)
   },
 
   // 点检
@@ -213,8 +214,7 @@ export const eamApi = {
     catch { return { list: [], total: 0 } }
   },
   createInspection: async (data: object) => {
-    try { return await request.post<InspectionRecord>('/v1/eam/inspection-records', data) }
-    catch { return null as unknown as InspectionRecord }
+    return await request.post<InspectionRecord>('/v1/eam/inspection-records', data)
   },
 
   // 润滑
@@ -227,8 +227,7 @@ export const eamApi = {
     catch { return { list: [] } }
   },
   recordLubrication: async (id: string, data: object) => {
-    try { return await request.put<void>(`/v1/eam/lubrication-records/${id}`, data) }
-    catch { return }
+    return await request.put<void>(`/v1/eam/lubrication-records/${id}`, data)
   },
 
   // 备件
@@ -237,20 +236,16 @@ export const eamApi = {
     catch { return { list: [], total: 0 } }
   },
   createSparePart: async (data: object) => {
-    try { return await request.post<SparePart>('/v1/eam/spare-parts', data) }
-    catch { return null as unknown as SparePart }
+    return await request.post<SparePart>('/v1/eam/spare-parts', data)
   },
   updateSparePart: async (id: string, data: object) => {
-    try { return await request.put<SparePart>(`/v1/eam/spare-parts/${id}`, data) }
-    catch { return null as unknown as SparePart }
+    return await request.put<SparePart>(`/v1/eam/spare-parts/${id}`, data)
   },
   issueSparePart: async (id: string, data: object) => {
-    try { return await request.post<void>(`/v1/eam/spare-parts/${id}/issue`, data) }
-    catch { return }
+    return await request.post<void>(`/v1/eam/spare-parts/${id}/issue`, data)
   },
   receiveSparePart: async (id: string, data: object) => {
-    try { return await request.post<void>(`/v1/eam/spare-parts/${id}/receive`, data) }
-    catch { return }
+    return await request.post<void>(`/v1/eam/spare-parts/${id}/receive`, data)
   },
   getSparePartTransactions: async (params: object) => {
     try { return await request.get<{ list: SparePartTransaction[] }>('/v1/eam/spare-part-transactions', params) }
@@ -263,8 +258,7 @@ export const eamApi = {
     catch { return { list: [], total: 0 } }
   },
   createOee: async (data: object) => {
-    try { return await request.post<OeeRecord>('/v1/eam/oee', data) }
-    catch { return null as unknown as OeeRecord }
+    return await request.post<OeeRecord>('/v1/eam/oee', data)
   },
 
   // 故障知识库
@@ -277,8 +271,7 @@ export const eamApi = {
     catch { return { list: [] } }
   },
   createKnowledge: async (data: object) => {
-    try { return await request.post<FaultKnowledge>('/v1/eam/fault-knowledge', data) }
-    catch { return null as unknown as FaultKnowledge }
+    return await request.post<FaultKnowledge>('/v1/eam/fault-knowledge', data)
   },
 
   // 分析
@@ -292,5 +285,12 @@ export const eamApi = {
         faultPareto: [{ type: '电气故障', count: 28, cumRate: 0.35 }, { type: '机械磨损', count: 22, cumRate: 0.62 }, { type: '液压泄漏', count: 15, cumRate: 0.81 }, { type: '传感器故障', count: 9, cumRate: 0.92 }, { type: '其他', count: 6, cumRate: 1.0 }]
       }
     }
+  },
+
+  // 变更历史
+  getEquipmentHistory: async (id: string) => {
+    try {
+      return await request.get<ChangeRecord[]>(`/v1/eam/equipment/${id}/history`)
+    } catch { return [] as ChangeRecord[] }
   },
 }

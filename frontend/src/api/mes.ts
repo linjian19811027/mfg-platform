@@ -28,11 +28,46 @@ export interface WorkOrderOperation {
 export interface ProductionReport {
   id: string
   woId: string
+  wooId?: string
   operatorId?: string
   completedQty: number
   scrapQty?: number
   reportTime: string
-  action: string
+  reportType: string  // START / COMPLETE / SCRAP / TRANSFER / EXCEPTION
+  uomId?: string
+  equipmentId?: string
+  shiftId?: string
+  inputBatchIds?: string[]
+  outputBatchId?: string
+  exceptionType?: string
+  exceptionReason?: string
+  correctionReason?: string
+  originalReportId?: string
+}
+
+export interface MesLaborRecord {
+  id: string
+  woId: string
+  wooId?: string
+  operatorId: string
+  operatorName?: string
+  startTime: string
+  endTime?: string
+  directHours: number
+  indirectHours: number
+  shiftId?: string
+  laborType: string  // DIRECT / INDIRECT
+  createdAt?: string
+}
+
+export interface ProductionReportQuery {
+  woId?: string
+  operatorId?: string
+  startDate?: string
+  endDate?: string
+  reportType?: string
+  page?: number
+  pageSize?: number
 }
 
 export interface MaterialIssue {
@@ -79,29 +114,29 @@ export const mesApi = {
       plannedEnd: d.plannedEnd ?? d.plannedEndDate,
       uomId: d.uomId ?? '1',  // 默认单位
     }
-    try { return await request.post<WorkOrder>('/v1/mes/work-orders', mapped) }
-    catch { return null as unknown as WorkOrder }
+    return await request.post<WorkOrder>('/v1/mes/work-orders', mapped)
   },
   transitionWorkOrder: async (id: string, status: string) => {
-    try {
-      return await request.patch<WorkOrder>(`/v1/mes/work-orders/${id}/status`, { status })
-    } catch { return null as unknown as WorkOrder }
+    return await request.patch<WorkOrder>(`/v1/mes/work-orders/${id}/status`, { status })
   },
   splitWorkOrder: async (id: string, data: object) => {
-    try {
-      return await request.post<WorkOrder[]>(`/v1/mes/work-orders/${id}/split`, data)
-    } catch { return [] as WorkOrder[] }
+    return await request.post<WorkOrder[]>(`/v1/mes/work-orders/${id}/split`, data)
   },
   mergeWorkOrders: async (data: object) => {
-    try {
-      return await request.post<WorkOrder>('/v1/mes/work-orders/merge', data)
-    } catch { return null as unknown as WorkOrder }
+    return await request.post<WorkOrder>('/v1/mes/work-orders/merge', data)
   },
 
   // 报工
   getProductionReports: async (params: object) => {
     try {
       return await request.get<{ list: ProductionReport[]; total: number }>('/v1/mes/production-reports', params)
+    } catch { return { list: [], total: 0 } }
+  },
+
+  // 工时记录
+  getLaborRecords: async (params: object) => {
+    try {
+      return await request.get<{ list: any[]; total: number }>('/v1/mes/labor-records', params)
     } catch { return { list: [], total: 0 } }
   },
 
@@ -112,14 +147,10 @@ export const mesApi = {
     } catch { return { list: [], total: 0 } }
   },
   issueMaterials: async (woId: string, data: object) => {
-    try {
-      return await request.post<void>(`/v1/mes/work-orders/${woId}/material-issues`, data)
-    } catch { return }
+    return await request.post<void>(`/v1/mes/work-orders/${woId}/material-issues`, data)
   },
   returnMaterials: async (woId: string, data: object) => {
-    try {
-      return await request.post<void>(`/v1/mes/work-orders/${woId}/material-returns`, data)
-    } catch { return }
+    return await request.post<void>(`/v1/mes/work-orders/${woId}/material-returns`, data)
   },
   kitCheck: async (woId: string) => {
     try {
@@ -129,19 +160,13 @@ export const mesApi = {
 
   // 工序操作
   startOperation: async (opId: string, data: object) => {
-    try {
-      return await request.post<void>(`/v1/mes/operations/${opId}/start`, data)
-    } catch { return }
+    return await request.post<void>(`/v1/mes/operations/${opId}/start`, data)
   },
   completeOperation: async (opId: string, data: object) => {
-    try {
-      return await request.post<void>(`/v1/mes/operations/${opId}/complete`, data)
-    } catch { return }
+    return await request.post<void>(`/v1/mes/operations/${opId}/complete`, data)
   },
   reportException: async (opId: string, data: object) => {
-    try {
-      return await request.post<void>(`/v1/mes/operations/${opId}/exception`, data)
-    } catch { return }
+    return await request.post<void>(`/v1/mes/operations/${opId}/exception`, data)
   },
 
   // 看板

@@ -5,15 +5,15 @@
         <a-space>
           <a-button @click="handleForwardTrace">
             <template #icon><icon-arrow-right /></template>
-            正向追溯
+            {{ $t('traceability.batches.forwardTrace') }}
           </a-button>
           <a-button @click="handleBackwardTrace">
             <template #icon><icon-arrow-left /></template>
-            反向追溯
+            {{ $t('traceability.batches.backwardTrace') }}
           </a-button>
           <a-button type="primary" @click="handleGenerateReport" :loading="reportLoading">
             <template #icon><icon-file /></template>
-            生成报告
+            {{ $t('traceability.batches.genReport') }}
           </a-button>
         </a-space>
       </template>
@@ -51,22 +51,22 @@
               <a-card size="small" :bordered="false" style="background: var(--color-fill-2)">
                 <a-space wrap>
                   <div>
-                    <span class="label">检验状态：</span>
-                    <a-tag v-if="batch.inspectionStatus === 'PASSED'" color="green">合格</a-tag>
-                    <a-tag v-else-if="batch.inspectionStatus === 'FAILED'" color="red">不合格</a-tag>
-                    <a-tag v-else-if="batch.inspectionStatus === 'CONCESSION'" color="orange">让步接收</a-tag>
-                    <a-tag v-else color="gray">待检</a-tag>
+                    <span class="label">{{ $t('traceability.batches.lbl1811') }}</span>
+                    <a-tag v-if="batch.inspectionStatus === 'PASSED'" color="green">{{ $t('traceability.batches.qualified') }}</a-tag>
+                    <a-tag v-else-if="batch.inspectionStatus === 'FAILED'" color="red">{{ $t('traceability.batches.unqualified') }}</a-tag>
+                    <a-tag v-else-if="batch.inspectionStatus === 'CONCESSION'" color="orange">{{ $t('traceability.batches.lbl1812') }}</a-tag>
+                    <a-tag v-else color="gray">{{ $t('traceability.batches.uninspected') }}</a-tag>
                   </div>
                   <div>
-                    <span class="label">库存状态：</span>
-                    <a-tag v-if="batch.inventoryStatus === 'IN_STOCK'" color="blue">在库</a-tag>
-                    <a-tag v-else-if="batch.inventoryStatus === 'SHIPPED'" color="gray">已发货</a-tag>
-                    <a-tag v-else-if="batch.inventoryStatus === 'CONSUMED'" color="purple">已消耗</a-tag>
-                    <a-tag v-else-if="batch.inventoryStatus === 'FROZEN'" color="red">已冻结</a-tag>
+                    <span class="label">{{ $t('traceability.batches.lbl1813') }}</span>
+                    <a-tag v-if="batch.inventoryStatus === 'IN_STOCK'" color="blue">{{ $t('traceability.batches.lbl1814') }}</a-tag>
+                    <a-tag v-else-if="batch.inventoryStatus === 'SHIPPED'" color="gray">{{ $t('traceability.batches.lbl1815') }}</a-tag>
+                    <a-tag v-else-if="batch.inventoryStatus === 'CONSUMED'" color="purple">{{ $t('traceability.batches.lbl1816') }}</a-tag>
+                    <a-tag v-else-if="batch.inventoryStatus === 'FROZEN'" color="red">{{ $t('traceability.batches.lbl1817') }}</a-tag>
                   </div>
                   <div v-if="batch.isFrozen">
-                    <span class="label">冻结原因：</span>
-                    <a-tag color="red">{{ batch.freezeReason || '召回冻结' }}</a-tag>
+                    <span class="label">{{ $t('traceability.batches.lbl1818') }}</span>
+                    <a-tag color="red">{{ batch.freezeReason || t('traceability.batches.lbl1819') }}</a-tag>
                   </div>
                 </a-space>
               </a-card>
@@ -75,11 +75,11 @@
               <a-card v-if="batch.barcodePath || batch.qrcodePath" size="small" :title="$t('traceability.batches.detail.条码二维码')" :bordered="false">
                 <a-space>
                   <div v-if="batch.barcodePath" style="text-align: center">
-                    <img :src="batch.barcodePath" alt="条码" style="max-width: 160px; max-height: 60px" />
+                    <img :src="batch.barcodePath" :alt="t('traceability.batches.barcode')" style="max-width: 160px; max-height: 60px" />
                     <div style="font-size: 11px; color: var(--color-text-3)">Code128</div>
                   </div>
                   <div v-if="batch.qrcodePath" style="text-align: center">
-                    <img :src="batch.qrcodePath" alt="二维码" style="max-width: 80px; max-height: 80px" />
+                    <img :src="batch.qrcodePath" :alt="t('traceability.batches.qrcode')" style="max-width: 80px; max-height: 80px" />
                     <div style="font-size: 11px; color: var(--color-text-3)">QR Code</div>
                   </div>
                 </a-space>
@@ -176,7 +176,7 @@ async function fetchBatch() {
     const res = await getTraceBatch(batchId)
     batch.value = res
   } catch (e: any) {
-    Message.error(e.message || '加载失败')
+    Message.error(e.message || t('traceability.加载失败'))
   } finally {
     loading.value = false
   }
@@ -196,9 +196,9 @@ async function handleGenerateReport() {
   reportLoading.value = true
   try {
     await generateReport({ batchId, format: 'PDF' })
-    Message.success('报告生成中，请稍后下载')
+    Message.success(t('traceability.报告生成中，请稍后下载'))
   } catch (e: any) {
-    Message.error(e.message || '生成失败')
+    Message.error(e.message || t('traceability.生成失败'))
   } finally {
     reportLoading.value = false
   }
@@ -210,7 +210,7 @@ function goToBatch(id: string) {
 
 function linkTypeLabel(type: string) {
   const map: Record<string, string> = {
-    PRODUCTION: '生产', SPLIT: '拆分', MERGE: '合并', REWORK: '返工',
+    PRODUCTION: t('traceability.batches.lbl1820')
   }
   return map[type] ?? type
 }

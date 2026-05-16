@@ -16,6 +16,9 @@ export class SysRole {
   @Column({ length: 50 })
   code!: string;
 
+  @Column({ length: 20, default: 'CUSTOM' })
+  type!: string;
+
   @Column({ length: 100 })
   name!: string;
 

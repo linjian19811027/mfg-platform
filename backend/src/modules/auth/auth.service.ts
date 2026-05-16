@@ -247,6 +247,32 @@ export class AuthService {
     const roles = await this.roleRepo.findBy({ id: In(roleIds) });
     const roleCodes = roles.map((r) => r.code);
 
+    // 管理员角色拥有全部权限
+    if (roles.some((r) => r.type === 'SUPER_ADMIN')) {
+      const allPerms = await this.permRepo.find();
+      const allPermCodes = allPerms.map((p) => p.code);
+      const result = { roles: roleCodes, permissions: allPermCodes };
+      await this.cache.set(cacheKey, result, 1800);
+      return result;
+    }
+
+    // 租户管理员：按租户启用的模块过滤权限
+    if (roles.some((r) => r.type === 'TENANT_ADMIN')) {
+      const tenant = await this.tenantRepo.findOne({
+        where: { code: tenantId },
+        select: ['enabledModules'],
+      });
+      const query = this.permRepo.createQueryBuilder('p');
+      if (tenant?.enabledModules?.length) {
+        query.where('p.module IN (:...modules)', { modules: tenant.enabledModules });
+      }
+      const perms = await query.getMany();
+      const permCodes = perms.map((p) => p.code);
+      const result = { roles: roleCodes, permissions: permCodes };
+      await this.cache.set(cacheKey, result, 1800);
+      return result;
+    }
+
     const rolePerms = await this.rolePermRepo.find({
       where: roleIds.map((id) => ({ roleId: id, tenantId })),
     });

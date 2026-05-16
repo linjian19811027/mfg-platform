@@ -5,8 +5,8 @@
       <a-space wrap>
         <a-input v-model="query.materialId" :placeholder="$t('wms.reports.ledger.物料ID')" allow-clear style="width: 160px" @keyup.enter="loadLedger" />
         <a-input v-model="query.warehouseId" :placeholder="$t('wms.reports.ledger.仓库ID')" allow-clear style="width: 160px" @keyup.enter="loadLedger" />
-        <a-button type="primary" @click="loadLedger">查询台账</a-button>
-        <a-button @click="loadMovement">查询收发存</a-button>
+        <a-button type="primary" @click="loadLedger">{{ $t('wms.reports.queryLedger') }}</a-button>
+        <a-button @click="loadMovement">{{ $t('wms.reports.queryMovement') }}</a-button>
         <a-button @click="resetQuery">{{ $t('common.reset') }}</a-button>
       </a-space>
     </a-card>

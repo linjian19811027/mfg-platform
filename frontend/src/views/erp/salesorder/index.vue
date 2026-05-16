@@ -7,7 +7,7 @@
         </a-select>
         <a-button type="primary" @click="loadData">{{ $t('common.search') }}</a-button>
         <a-button @click="resetQuery">{{ $t('common.reset') }}</a-button>
-        <a-button style="margin-left:auto" type="primary" @click="openCreate">新建订单</a-button>
+        <a-button style="margin-left:auto" type="primary" @click="openCreate">{{ $t('erp.salesorder.lbl1224') }}</a-button>
       </div>
 
       <MTable :columns="columns" :data="list" :loading="loading" :total="total" @change="onTableChange">
@@ -19,12 +19,12 @@
         </template>
         <template #action="{ record }">
           <a-space>
-            <a-button type="text" size="small" @click="viewDetail(record as SalesOrder)">查看</a-button>
+            <a-button type="text" size="small" @click="viewDetail(record as SalesOrder)">{{ $t('erp.salesorder.view') }}</a-button>
             <a-button
               v-if="record.status === 'DRAFT'"
               type="text" size="small" status="success"
               @click="handleConfirm(record as SalesOrder)"
-            >确认</a-button>
+            >{{ $t('erp.salesorder.confirm') }}</a-button>
           </a-space>
         </template>
       </MTable>
@@ -83,15 +83,15 @@ import type { MTableColumn } from '@/components/MTable/index.vue'
 import { erpApi, type SalesOrder, type Customer } from '@/api/erp'
 
 const statusOptions = [
-  { label: '草稿', value: 'DRAFT' }, { label: '已确认', value: 'CONFIRMED' },
-  { label: '生产中', value: 'IN_PRODUCTION' }, { label: '已发货', value: 'SHIPPED' },
-  { label: '已交付', value: 'DELIVERED' }, { label: '已关闭', value: 'CLOSED' },
+  { label: t('erp.salesorder.draft'), value: 'DRAFT' }, { label: t('erp.salesorder.lbl1225'), value: 'CONFIRMED' },
+  { label: t('erp.salesorder.lbl1226'), value: 'IN_PRODUCTION' }, { label: t('erp.salesorder.lbl1227'), value: 'SHIPPED' },
+  { label: t('erp.salesorder.lbl1228'), value: 'DELIVERED' }, { label: t('erp.salesorder.closed'), value: 'CLOSED' },
 ]
 const statusColorMap: Record<string, string> = {
   DRAFT: 'gray', CONFIRMED: 'blue', IN_PRODUCTION: 'orange', SHIPPED: 'arcoblue', DELIVERED: 'green', CLOSED: 'gray',
 }
 const statusLabelMap: Record<string, string> = {
-  DRAFT: '草稿', CONFIRMED: '已确认', IN_PRODUCTION: '生产中', SHIPPED: '已发货', DELIVERED: '已交付', CLOSED: '已关闭',
+  DRAFT: t('erp.salesorder.draft')
 }
 const statusColor = (s: string) => statusColorMap[s] ?? 'gray'
 const statusLabel = (s: string) => statusLabelMap[s] ?? s
@@ -131,10 +131,10 @@ const detailItems = computed(() => {
   if (!currentDetail.value) return []
   const o = currentDetail.value
   return [
-    { label: '订单编号', value: o.code }, { label: '客户ID', value: o.customerId },
-    { label: '客户名称', value: o.customerName ?? '-' }, { label: '状态', value: statusLabel(o.status) },
-    { label: '总金额', value: `${o.totalAmount} ${o.currency}` }, { label: '订单日期', value: o.orderDate },
-    { label: '交货日期', value: o.deliveryDate ?? '-' },
+    { label: t('erp.salesorder.lbl1229'), value: o.code }, { label: t('erp.salesorder.lbl1230'), value: o.customerId },
+    { label: t('erp.salesorder.lbl1231'), value: o.customerName ?? '-' }, { label: t('erp.salesorder.status'), value: statusLabel(o.status) },
+    { label: t('erp.salesorder.lbl1232'), value: `${o.totalAmount} ${o.currency}` }, { label: t('erp.salesorder.lbl1233'), value: o.orderDate },
+    { label: t('erp.salesorder.lbl1234'), value: o.deliveryDate ?? '-' },
   ]
 })
 
@@ -159,18 +159,18 @@ function viewDetail(record: SalesOrder) { currentDetail.value = record; detailVi
 async function handleConfirm(record: SalesOrder) {
   try {
     await erpApi.confirmSalesOrder(record.id)
-    Message.success('订单已确认')
+    Message.success(t('erp.订单已确认'))
     loadData()
   } catch { /* handled by request interceptor */ }
 }
 
 async function handleCreate() {
-  if (!createFormData.customerId) { Message.warning('请选择客户'); return }
-  if (!createFormData.orderDate) { Message.warning('请选择订单日期'); return }
+  if (!createFormData.customerId) { Message.warning(t('erp.请选择客户')); return }
+  if (!createFormData.orderDate) { Message.warning(t('erp.请选择订单日期')); return }
   submitting.value = true
   try {
     await erpApi.createSalesOrder({ ...createFormData } as Parameters<typeof erpApi.createSalesOrder>[0])
-    Message.success('创建成功')
+    Message.success(t('erp.创建成功'))
     createVisible.value = false
     loadData()
   } finally { submitting.value = false }

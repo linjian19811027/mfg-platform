@@ -7,7 +7,7 @@
         </a-select>
         <a-button type="primary" @click="loadData">{{ $t('common.search') }}</a-button>
         <a-button @click="resetQuery">{{ $t('common.reset') }}</a-button>
-        <a-button style="margin-left:auto" type="primary" @click="openCreate">新建设备</a-button>
+        <a-button style="margin-left:auto" type="primary" @click="openCreate">{{ $t('eam.equipment.lbl1052') }}</a-button>
       </div>
 
       <MTable :columns="columns" :data="list" :loading="loading" :total="total" @change="onTableChange">
@@ -15,7 +15,7 @@
           <a-tag :color="statusColorMap[record.status as string] ?? 'gray'">{{ statusLabelMap[record.status as string] ?? record.status }}</a-tag>
         </template>
         <template #action="{ record }">
-          <a-button type="text" size="small" @click="openDetail(record as Equipment)">查看</a-button>
+          <a-button type="text" size="small" @click="openDetail(record as Equipment)">{{ $t('eam.equipment.view') }}</a-button>
         </template>
       </MTable>
     </a-card>
@@ -26,7 +26,7 @@
     </a-drawer>
 
     <!-- 设备详情 -->
-    <a-drawer v-model:visible="detailVisible" :title="`设备详情 - ${currentDetail?.name ?? ''}`" :width="720" @cancel="detailVisible=false">
+    <a-drawer v-model:visible="detailVisible" :title="`${$t('eam.equipment.index.设备详情')} - ${currentDetail?.equipmentName ?? ''}`" :width="720" @cancel="detailVisible=false">
       <a-tabs default-active-key="basic">
         <a-tab-pane key="basic" :title="$t('eam.equipment.index.基本信息')">
           <a-descriptions :data="detailItems" bordered :column="1" />
@@ -36,7 +36,7 @@
           <a-spin :loading="techSpecLoading">
             <div v-if="techSpec">
               <div style="margin-bottom:16px;text-align:right">
-                <a-button v-if="!techSpecEditing" type="primary" size="small" @click="techSpecEditing=true">编辑</a-button>
+                <a-button v-if="!techSpecEditing" type="primary" size="small" @click="techSpecEditing=true">{{ $t('common.edit') }}</a-button>
                 <a-space v-else>
                   <a-button size="small" @click="cancelTechSpecEdit">{{ $t('common.cancel') }}</a-button>
                   <a-button type="primary" size="small" :loading="techSpecSaving" @click="saveTechSpec">{{ $t('common.save') }}</a-button>
@@ -75,7 +75,7 @@
           <a-spin :loading="financeLoading">
             <div v-if="finance">
               <div style="margin-bottom:16px;text-align:right">
-                <a-button v-if="!financeEditing" type="primary" size="small" @click="financeEditing=true">编辑</a-button>
+                <a-button v-if="!financeEditing" type="primary" size="small" @click="financeEditing=true">{{ $t('common.edit') }}</a-button>
                 <a-space v-else>
                   <a-button size="small" @click="cancelFinanceEdit">{{ $t('common.cancel') }}</a-button>
                   <a-button type="primary" size="small" :loading="financeSaving" @click="saveFinance">{{ $t('common.save') }}</a-button>
@@ -91,8 +91,8 @@
                 </a-form-item>
                 <a-form-item :label="$t('eam.equipment.index.折旧方法')">
                   <a-select v-model="financeForm.depreciationMethod" style="width:100%">
-                    <a-option value="straight">直线法</a-option>
-                    <a-option value="double_declining">双倍余额递减法</a-option>
+                    <a-option value="straight">{{ $t('eam.equipment.lbl1053') }}</a-option>
+                    <a-option value="double_declining">{{ $t('eam.equipment.lbl1054') }}</a-option>
                   </a-select>
                 </a-form-item>
                 <a-form-item :label="$t('eam.equipment.index.折旧年限年')">
@@ -117,20 +117,7 @@
         </a-tab-pane>
         
         <a-tab-pane key="history" :title="$t('eam.equipment.index.变更历史')">
-          <div style="margin-bottom:16px">
-            <a-select v-model="historyFilter" :placeholder="$t('eam.equipment.index.变更类型')" allow-clear style="width:150px" @change="filterHistory">
-              <a-option value="location">位置变更</a-option>
-              <a-option value="status">状态变更</a-option>
-              <a-option value="maintenance">维修记录</a-option>
-              <a-option value="param">参数修改</a-option>
-            </a-select>
-          </div>
-          <a-table :columns="historyColumns" :data="filteredHistory" :pagination="false" :loading="historyLoading">
-            <template #changeType="{ record }">
-              <a-tag :color="changeTypeColorMap[record.changeType]">{{ changeTypeLabelMap[record.changeType] }}</a-tag>
-            </template>
-          </a-table>
-          <a-empty v-if="!historyLoading && filteredHistory.length === 0" :description="$t('eam.equipment.index.暂无变更记录')" />
+          <a-empty :description="t('eam.equipment.lbl1055')" />
         </a-tab-pane>
       </a-tabs>
     </a-drawer>
@@ -150,21 +137,17 @@ import { eamApi, type Equipment } from '@/api/eam'
 
 // ---- 状态映射 ----
 const statusOptions = [
-  { label: '运行中', value: 'running' }, { label: '空闲', value: 'idle' },
-  { label: '维保中', value: 'maintenance' }, { label: '故障', value: 'fault' }, { label: '报废', value: 'scrapped' },
+  { label: t('eam.equipment.running'), value: 'running' }, { label: t('eam.equipment.idle'), value: 'idle' },
+  { label: t('eam.equipment.inMaintenance'), value: 'maintenance' }, { label: t('eam.equipment.fault'), value: 'fault' }, { label: t('eam.equipment.scrapped'), value: 'scrapped' },
 ]
 const statusColorMap: Record<string, string> = { running: 'green', idle: 'blue', maintenance: 'orange', fault: 'red', scrapped: 'gray' }
-const statusLabelMap: Record<string, string> = { running: '运行中', idle: '空闲', maintenance: '维保中', fault: '故障', scrapped: '报废' }
-
-// ---- 变更历史类型映射 ----
-const changeTypeColorMap: Record<string, string> = { location: 'blue', status: 'orange', maintenance: 'green', param: 'purple' }
-const changeTypeLabelMap: Record<string, string> = { location: '位置变更', status: '状态变更', maintenance: '维修记录', param: '参数修改' }
+const statusLabelMap: Record<string, string> = { running: t('eam.equipment.running'), idle: t('eam.equipment.idle'), maintenance: t('eam.equipment.inMaintenance'), fault: t('eam.equipment.fault'), scrapped: t('eam.equipment.scrapped') }
 
 // ---- 列表列定义 ----
 const columns: MTableColumn[] = [
-  { key: 'code', title: t('eam.equipment.index.编码'), width: 120 },
-  { key: 'name', title: t('eam.equipment.index.名称') },
-  { key: 'type', title: t('eam.equipment.index.类型'), width: 100 },
+  { key: 'equipmentCode', title: t('eam.equipment.index.编码'), width: 120 },
+  { key: 'equipmentName', title: t('eam.equipment.index.名称') },
+  { key: 'equipmentType', title: t('eam.equipment.index.类型'), width: 100 },
   { key: 'status', title: t('eam.equipment.index.状态'), width: 90, slotName: 'status' },
   { key: 'workshopId', title: t('eam.equipment.index.车间'), width: 100 },
   { key: 'model', title: t('eam.equipment.index.型号'), width: 120 },
@@ -173,23 +156,15 @@ const columns: MTableColumn[] = [
   { key: 'action', title: t('eam.equipment.index.操作'), width: 70, slotName: 'action' },
 ]
 
-// ---- 变更历史表格列 ----
-const historyColumns = [
-  { dataIndex: 'changedAt', title: t('eam.equipment.index.变更时间'), width: 160 },
-  { dataIndex: 'changeType', title: t('eam.equipment.index.变更类型'), width: 110, slotName: 'changeType' },
-  { dataIndex: 'beforeValue', title: t('eam.equipment.index.变更前'), ellipsis: true },
-  { dataIndex: 'afterValue', title: t('eam.equipment.index.变更后'), ellipsis: true },
-  { dataIndex: 'operator', title: t('eam.equipment.index.操作人'), width: 90 },
-]
-
 // ---- 新建表单 ----
 const createSchema: MFormField[] = [
-  { field: 'code', label: '编码', type: 'input', required: true },
-  { field: 'name', label: '名称', type: 'input', required: true },
-  { field: 'type', label: '类型', type: 'input', required: true },
-  { field: 'model', label: '型号', type: 'input' },
-  { field: 'manufacturer', label: '厂商', type: 'input' },
-  { field: 'installDate', label: '安装日期', type: 'date' },
+  { field: 'equipmentCode', label: t('eam.equipment.lbl1056'), type: 'input', required: true },
+  { field: 'equipmentName', label: t('eam.equipment.lbl1057'), type: 'input', required: true },
+  { field: 'equipmentType', label: t('eam.equipment.lbl1058'), type: 'select', required: true, options: [{ label: t('eam.equipment.lbl1059'), value: t('eam.equipment.r33001') }, { label: t('eam.equipment.lbl1060'), value: t('eam.equipment.r33002') }, { label: t('eam.equipment.lbl1061'), value: t('eam.equipment.r33003') }, { label: t('eam.equipment.lbl1062'), value: t('eam.equipment.r33004') }, { label: t('eam.equipment.lbl1063'), value: t('eam.equipment.r33005') }, { label: t('eam.equipment.lbl1064'), value: t('eam.equipment.r33006') }, { label: t('eam.equipment.lbl1065'), value: t('eam.equipment.r33007') }] },
+  { field: 'category', label: t('eam.equipment.lbl1066'), type: 'select', required: true, options: [{ label: t('eam.equipment.lbl1067'), value: 'A' }, { label: t('eam.equipment.lbl1068'), value: 'B' }, { label: t('eam.equipment.lbl1069'), value: 'C' }] },
+  { field: 'model', label: t('eam.equipment.lbl1070'), type: 'input' },
+  { field: 'manufacturer', label: t('eam.equipment.lbl1071'), type: 'input' },
+  { field: 'installDate', label: t('eam.equipment.lbl1072'), type: 'date' },
 ]
 
 // ---- 列表状态 ----
@@ -220,13 +195,13 @@ const techSpecItems = computed(() => {
   const s = techSpec.value
   if (!s) return []
   return [
-    { label: '额定功率 (kW)', value: s.ratedPower != null ? String(s.ratedPower) : '-' },
-    { label: '额定电压 (V)', value: s.ratedVoltage != null ? String(s.ratedVoltage) : '-' },
-    { label: '额定电流 (A)', value: s.ratedCurrent != null ? String(s.ratedCurrent) : '-' },
-    { label: '转速 (rpm)', value: s.speed != null ? String(s.speed) : '-' },
-    { label: '精度等级', value: s.accuracyGrade ?? '-' },
-    { label: '工作温度范围 (℃)', value: s.tempRange ?? '-' },
-    { label: '防护等级', value: s.protectionLevel ?? '-' },
+    { label: t('eam.equipment.lbl1073'), value: s.ratedPower != null ? String(s.ratedPower) : '-' },
+    { label: t('eam.equipment.lbl1074'), value: s.ratedVoltage != null ? String(s.ratedVoltage) : '-' },
+    { label: t('eam.equipment.lbl1075'), value: s.ratedCurrent != null ? String(s.ratedCurrent) : '-' },
+    { label: t('eam.equipment.lbl1076'), value: s.speed != null ? String(s.speed) : '-' },
+    { label: t('eam.equipment.lbl1077'), value: s.accuracyGrade ?? '-' },
+    { label: t('eam.equipment.lbl1078'), value: s.tempRange ?? '-' },
+    { label: t('eam.equipment.lbl1079'), value: s.protectionLevel ?? '-' },
   ]
 })
 
@@ -239,10 +214,11 @@ async function saveTechSpec() {
   if (!currentDetail.value) return
   techSpecSaving.value = true
   try {
-    await new Promise(r => setTimeout(r, 600)) // mock 保存延迟
-    techSpec.value = { ...techSpecForm.value }
+    await eamApi.saveTechSpecs(currentDetail.value.id, techSpecForm.value)
     techSpecEditing.value = false
-    Message.success('技术规格已保存')
+    Message.success(t('eam.技术规格已保存'))
+  } catch {
+    Message.error(t('eam.保存失败'))
   } finally {
     techSpecSaving.value = false
   }
@@ -254,7 +230,7 @@ interface FinanceData {
   depreciationYears?: number; accumulatedDepreciation?: number
   residualRate?: number; purchaseDate?: string; assetCode?: string
 }
-const depreciationMethodLabel: Record<string, string> = { straight: '直线法', double_declining: '双倍余额递减法' }
+const depreciationMethodLabel: Record<string, string> = { straight: t('eam.equipment.lbl1080'), double_declining: t('eam.equipment.lbl1081') }
 const finance = ref<FinanceData | null>(null)
 const financeLoading = ref(false)
 const financeEditing = ref(false)
@@ -265,14 +241,14 @@ const financeItems = computed(() => {
   const f = finance.value
   if (!f) return []
   return [
-    { label: '资产编号', value: f.assetCode ?? '-' },
-    { label: '原值 (元)', value: f.originalValue != null ? f.originalValue.toLocaleString('zh-CN', { minimumFractionDigits: 2 }) : '-' },
-    { label: '净值 (元)', value: f.netValue != null ? f.netValue.toLocaleString('zh-CN', { minimumFractionDigits: 2 }) : '-' },
-    { label: '折旧方法', value: f.depreciationMethod ? (depreciationMethodLabel[f.depreciationMethod] ?? f.depreciationMethod) : '-' },
-    { label: '折旧年限 (年)', value: f.depreciationYears != null ? String(f.depreciationYears) : '-' },
-    { label: '累计折旧 (元)', value: f.accumulatedDepreciation != null ? f.accumulatedDepreciation.toLocaleString('zh-CN', { minimumFractionDigits: 2 }) : '-' },
-    { label: '残值率 (%)', value: f.residualRate != null ? String(f.residualRate) : '-' },
-    { label: '购置日期', value: f.purchaseDate ?? '-' },
+    { label: t('eam.equipment.lbl1082'), value: f.assetCode ?? '-' },
+    { label: t('eam.equipment.lbl1083'), value: f.originalValue != null ? f.originalValue.toLocaleString('zh-CN', { minimumFractionDigits: 2 }) : '-' },
+    { label: t('eam.equipment.lbl1084'), value: f.netValue != null ? f.netValue.toLocaleString('zh-CN', { minimumFractionDigits: 2 }) : '-' },
+    { label: t('eam.equipment.lbl1085'), value: f.depreciationMethod ? (depreciationMethodLabel[f.depreciationMethod] ?? f.depreciationMethod) : '-' },
+    { label: t('eam.equipment.lbl1086'), value: f.depreciationYears != null ? String(f.depreciationYears) : '-' },
+    { label: t('eam.equipment.lbl1087'), value: f.accumulatedDepreciation != null ? f.accumulatedDepreciation.toLocaleString('zh-CN', { minimumFractionDigits: 2 }) : '-' },
+    { label: t('eam.equipment.lbl1088'), value: f.residualRate != null ? String(f.residualRate) : '-' },
+    { label: t('eam.equipment.lbl1089'), value: f.purchaseDate ?? '-' },
   ]
 })
 
@@ -285,10 +261,11 @@ async function saveFinance() {
   if (!currentDetail.value) return
   financeSaving.value = true
   try {
-    await new Promise(r => setTimeout(r, 600)) // mock 保存延迟
-    finance.value = { ...financeForm.value }
+    await eamApi.saveFinance(currentDetail.value.id, financeForm.value)
     financeEditing.value = false
-    Message.success('财务信息已保存')
+    Message.success(t('eam.财务信息已保存'))
+  } catch {
+    Message.error(t('eam.保存失败'))
   } finally {
     financeSaving.value = false
   }
@@ -303,77 +280,15 @@ const historyAll = ref<ChangeRecord[]>([])
 const historyFilter = ref('')
 const historyLoading = ref(false)
 
-const filteredHistory = computed(() =>
-  historyFilter.value ? historyAll.value.filter(r => r.changeType === historyFilter.value) : historyAll.value
-)
-
-function filterHistory() { /* computed 自动响应 */ }
-
-// ---- Mock 数据生成 ----
-function mockTechSpec(id: string): TechSpecData {
-  const seed = id.charCodeAt(0) || 1
-  return {
-    ratedPower: parseFloat((seed * 3.7 % 100 + 5).toFixed(2)),
-    ratedVoltage: [220, 380, 660][seed % 3],
-    ratedCurrent: parseFloat((seed * 1.3 % 50 + 2).toFixed(2)),
-    speed: [750, 1000, 1500, 3000][seed % 4],
-    accuracyGrade: ['±0.01mm', '±0.05mm', 'IT6', 'IT7'][seed % 4],
-    tempRange: ['-10~50', '0~40', '-20~60'][seed % 3],
-    protectionLevel: ['IP54', 'IP65', 'IP67'][seed % 3],
-  }
-}
-
-function mockFinance(id: string): FinanceData {
-  const seed = id.charCodeAt(0) || 1
-  const original = Math.round((seed * 12345 % 900000 + 50000) * 100) / 100
-  const years = [5, 8, 10, 15][seed % 4]
-  const accumulated = Math.round(original * 0.3 * 100) / 100
-  return {
-    assetCode: `FA-${id.slice(0, 6).toUpperCase()}`,
-    originalValue: original,
-    netValue: Math.round((original - accumulated) * 100) / 100,
-    depreciationMethod: seed % 2 === 0 ? 'straight' : 'double_declining',
-    depreciationYears: years,
-    accumulatedDepreciation: accumulated,
-    residualRate: 5,
-    purchaseDate: `202${seed % 4}-0${(seed % 9) + 1}-15`,
-  }
-}
-
-function mockHistory(id: string): ChangeRecord[] {
-  const types = ['location', 'status', 'maintenance', 'param']
-  const operators = ['张三', '李四', '王五', '赵六']
-  const locationPairs = [['车间A-01', '车间B-03'], ['车间C-02', '车间A-01']]
-  const statusPairs = [['idle', 'running'], ['running', 'maintenance'], ['maintenance', 'running']]
-  const seed = id.charCodeAt(0) || 1
-  return Array.from({ length: 8 }, (_, i) => {
-    const type = types[(seed + i) % 4]
-    let before = '', after = ''
-    if (type === 'location') { const p = locationPairs[i % 2]; before = p[0]; after = p[1] }
-    else if (type === 'status') { const p = statusPairs[i % 3]; before = statusLabelMap[p[0]]; after = statusLabelMap[p[1]] }
-    else if (type === 'maintenance') { before = '待维修'; after = '已完成' }
-    else { before = `额定功率: ${(seed * 2 + i).toFixed(1)}kW`; after = `额定功率: ${(seed * 2 + i + 1).toFixed(1)}kW` }
-    const d = new Date(2024, (seed + i) % 12, (i * 3 + 1) % 28 + 1)
-    return {
-      id: `${id}-h${i}`,
-      changedAt: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(8 + i).padStart(2, '0')}:30`,
-      changeType: type,
-      beforeValue: before,
-      afterValue: after,
-      operator: operators[(seed + i) % 4],
-    }
-  }).reverse()
-}
-
 // ---- 详情项 ----
 const detailItems = computed(() => {
   const d = currentDetail.value
   if (!d) return []
   return [
-    { label: '编码', value: d.code }, { label: '名称', value: d.name },
-    { label: '类型', value: d.type }, { label: '状态', value: statusLabelMap[d.status] ?? d.status },
-    { label: '车间', value: d.workshopId ?? '-' }, { label: '型号', value: d.model ?? '-' },
-    { label: '厂商', value: d.manufacturer ?? '-' }, { label: '安装日期', value: d.installDate ?? '-' },
+    { label: t('eam.equipment.code'), value: d.equipmentCode }, { label: t('eam.equipment.name'), value: d.equipmentName },
+    { label: t('eam.equipment.type'), value: d.equipmentType }, { label: t('eam.equipment.status'), value: statusLabelMap[d.status] ?? d.status },
+    { label: t('eam.equipment.lbl1090'), value: d.workshopId ?? '-' }, { label: t('eam.equipment.lbl1091'), value: d.model ?? '-' },
+    { label: t('eam.equipment.lbl1092'), value: d.manufacturer ?? '-' }, { label: t('eam.equipment.lbl1093'), value: d.installDate ?? '-' },
   ]
 })
 
@@ -394,56 +309,59 @@ function onTableChange(e: { page: number; pageSize: number }) {
 function resetQuery() { query.status = ''; loadData() }
 function openCreate() { createForm.value = {}; createVisible.value = true }
 
-function openDetail(record: Equipment) {
+async function openDetail(record: Equipment) {
   currentDetail.value = record
   detailVisible.value = true
   techSpecEditing.value = false
   financeEditing.value = false
   historyFilter.value = ''
 
-  // 技术规格：先尝试 API，失败则用 mock
+  // 技术规格
   techSpec.value = null
   techSpecLoading.value = true
-  eamApi.getTechSpecs(record.id)
-    .then(res => {
-      const data = res as TechSpecData
-      techSpec.value = Object.keys(data).length ? data : mockTechSpec(record.id)
-    })
-    .catch(() => { techSpec.value = mockTechSpec(record.id) })
-    .finally(() => {
-      techSpecForm.value = { ...techSpec.value }
-      techSpecLoading.value = false
-    })
+  try {
+    const data = await eamApi.getTechSpecs(record.id)
+    techSpec.value = data
+  } catch {
+    techSpec.value = null
+  } finally {
+    techSpecForm.value = { ...techSpec.value }
+    techSpecLoading.value = false
+  }
 
-  // 财务信息：先尝试 API，失败则用 mock
+  // 财务信息
   finance.value = null
   financeLoading.value = true
-  eamApi.getFinance(record.id)
-    .then(res => {
-      const data = res as FinanceData
-      finance.value = Object.keys(data).length ? data : mockFinance(record.id)
-    })
-    .catch(() => { finance.value = mockFinance(record.id) })
-    .finally(() => {
-      financeForm.value = { ...finance.value }
-      financeLoading.value = false
-    })
+  try {
+    const data = await eamApi.getFinance(record.id)
+    finance.value = data
+  } catch {
+    finance.value = null
+  } finally {
+    financeForm.value = { ...finance.value }
+    financeLoading.value = false
+  }
 
-  // 变更历史：mock 数据
+  // 变更历史
   historyLoading.value = true
-  setTimeout(() => {
-    historyAll.value = mockHistory(record.id)
+  try {
+    historyAll.value = await eamApi.getEquipmentHistory(record.id)
+  } catch {
+    historyAll.value = []
+  } finally {
     historyLoading.value = false
-  }, 400)
+  }
 }
 
 async function handleCreate(data: Record<string, unknown>) {
   submitting.value = true
   try {
     await eamApi.createEquipment(data as Parameters<typeof eamApi.createEquipment>[0])
-    Message.success('创建成功')
+    Message.success(t('eam.创建成功'))
     createVisible.value = false
     loadData()
+  } catch {
+    Message.error(t('eam.创建失败'))
   } finally { submitting.value = false }
 }
 

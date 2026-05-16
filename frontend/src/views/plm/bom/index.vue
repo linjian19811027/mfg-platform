@@ -16,9 +16,6 @@
           allow-clear
           style="width: 120px"
         >
-          <a-option value="DRAFT">草稿</a-option>
-          <a-option value="ACTIVE">激活</a-option>
-          <a-option value="INACTIVE">停用</a-option>
           <a-option value="DRAFT">{{ $t('plm.bom.status.draft') }}</a-option>
           <a-option value="ACTIVE">{{ $t('plm.bom.status.active') }}</a-option>
           <a-option value="INACTIVE">{{ $t('plm.bom.status.inactive') }}</a-option>
@@ -63,28 +60,28 @@
               :content="$t('plm.bom.确认激活该BOM激活')"
               @ok="handleActivateBom(record.id as string)"
             >
-              <a-link :loading="statusLoadingId === record.id">激活</a-link>
+              <a-link :loading="statusLoadingId === record.id">{{ $t('plm.bom.lbl1359') }}</a-link>
             </a-popconfirm>
             <a-popconfirm
               v-if="record.status === 'ACTIVE'"
               :content="$t('plm.bom.确认停用该BOM')"
               @ok="handleDeactivateBom(record.id as string)"
             >
-              <a-link :loading="statusLoadingId === record.id">停用</a-link>
+              <a-link :loading="statusLoadingId === record.id">{{ $t('plm.bom.disable') }}</a-link>
             </a-popconfirm>
             <a-popconfirm
               v-if="record.status === 'INACTIVE'"
               :content="$t('plm.bom.确认重新激活该BOM')"
               @ok="handleActivateBom(record.id as string)"
             >
-              <a-link :loading="statusLoadingId === record.id">重新激活</a-link>
+              <a-link :loading="statusLoadingId === record.id">{{ $t('plm.bom.lbl1360') }}</a-link>
             </a-popconfirm>
             <a-popconfirm
               v-if="record.status === 'ACTIVE' || record.status === 'INACTIVE'"
               :content="$t('plm.bom.确认废止该BOM此操')"
               @ok="handleObsoleteBom(record.id as string)"
             >
-              <a-link status="warning" :loading="statusLoadingId === record.id">废止</a-link>
+              <a-link status="warning" :loading="statusLoadingId === record.id">{{ $t('plm.bom.lbl1361') }}</a-link>
             </a-popconfirm>
             <a-popconfirm :content="$t('plm.bom.确认删除该BOM')" @ok="handleDelete(record.id as string)">
               <a-link status="danger">{{ $t('common.delete') }}</a-link>
@@ -138,7 +135,7 @@
             />
           </a-select>
           <div v-if="createForm.materialId && copyVersionOptions.length === 0 && !copyVersionLoading" style="color: #86909c; font-size: 12px; margin-top: 4px">
-            该物料暂无历史版本，将空白新建
+            {{ $t('plm.bom.noHistoryCreateNew') }}
           </div>
         </a-form-item>
         <a-form-item :label="$t('plm.bom.生效日期')">
@@ -199,7 +196,7 @@
           </a-form-item>
           <a-form-item>
             <a-space>
-              <a-button type="primary" size="small" :loading="addLineLoading" @click="submitAddLine">确认</a-button>
+              <a-button type="primary" size="small" :loading="addLineLoading" @click="submitAddLine">{{ $t('plm.bom.confirm') }}</a-button>
               <a-button size="small" @click="cancelAddLine">{{ $t('common.cancel') }}</a-button>
             </a-space>
           </a-form-item>
@@ -239,8 +236,8 @@
         <template #lineAction="{ record }">
           <a-space>
             <template v-if="editingLineId === record.id">
-              <a-link :loading="editLineLoading" @click="submitEditLine(record as BomLine)">保存</a-link>
-              <a-link @click="cancelEditLine">取消</a-link>
+              <a-link :loading="editLineLoading" @click="submitEditLine(record as BomLine)">{{ $t('plm.bom.save') }}</a-link>
+              <a-link @click="cancelEditLine">{{ $t('plm.bom.cancel') }}</a-link>
             </template>
             <template v-else>
               <a-link @click="startEditLine(record as BomLine)">{{ $t('common.edit') }}</a-link>
@@ -261,11 +258,11 @@
       @cancel="compareDrawerVisible = false"
     >
       <a-space style="margin-bottom: 16px" wrap>
-        <span>版本 A：</span>
+        <span>{{ $t('plm.bom.lbl1362') }}</span>
         <a-select v-model="compareV1" :placeholder="$t('plm.bom.选择版本A')" style="width: 200px" :options="compareBomOptions" @change="runCompare" />
-        <span>版本 B：</span>
+        <span>{{ $t('plm.bom.lbl1363') }}</span>
         <a-select v-model="compareV2" :placeholder="$t('plm.bom.选择版本B')" style="width: 200px" :options="compareBomOptions" @change="runCompare" />
-        <a-button type="primary" :loading="compareLoading" @click="runCompare">对比</a-button>
+        <a-button type="primary" :loading="compareLoading" @click="runCompare">{{ $t('plm.bom.lbl1364') }}</a-button>
       </a-space>
       <a-table
         :columns="compareColumns"
@@ -283,9 +280,9 @@
         </template>
         <template #cmpQtyV2="{ record }">{{ record.qtyV2 ?? '-' }}</template>
         <template #cmpDiff="{ record }">
-          <a-tag v-if="record.diffType === 'added'" color="green">新增</a-tag>
-          <a-tag v-else-if="record.diffType === 'removed'" color="red">删除</a-tag>
-          <a-tag v-else-if="record.diffType === 'modified'" color="orange">变更</a-tag>
+          <a-tag v-if="record.diffType === 'added'" color="green">{{ $t('plm.bom.lbl1365') }}</a-tag>
+          <a-tag v-else-if="record.diffType === 'removed'" color="red">{{ $t('plm.bom.delete') }}</a-tag>
+          <a-tag v-else-if="record.diffType === 'modified'" color="orange">{{ $t('plm.bom.lbl1366') }}</a-tag>
           <span v-else>-</span>
         </template>
       </a-table>
@@ -297,7 +294,7 @@
       :footer="false"
       @cancel="workOrderModalVisible = false"
     >
-      <p style="margin-bottom: 12px; color: #86909c">以下工单正在使用该 BOM，请先处理完成后再操作：</p>
+      <p style="margin-bottom: 12px; color: #86909c">{{ $t('plm.bom.lbl1367') }}</p>
       <a-table
         :columns="[{ title: t('plm.bom.index.工单号'), dataIndex: 'woNo' }, { title: t('plm.bom.index.状态'), dataIndex: 'status' }]"
         :data="blockedWorkOrders"
@@ -381,7 +378,7 @@ function onTableChange(e: { page: number; pageSize: number }) {
 async function handleDelete(id: string) {
   try {
     await plmApi.deleteBom(id)
-    Message.success('删除成功')
+    Message.success(t('plm.bom.index.删除成功'))
     loadData()
   } catch { /* handled */ }
 }
@@ -395,7 +392,7 @@ async function handleActivateBom(id: string) {
   statusLoadingId.value = id
   try {
     await plmApi.activateBom(id)
-    Message.success('激活成功')
+    Message.success(t('plm.bom.index.激活成功'))
     loadData()
   } catch (e: unknown) {
     const err = e as { response?: { data?: { workOrders?: { woNo: string; status: string }[] } } }
@@ -410,7 +407,7 @@ async function handleDeactivateBom(id: string) {
   statusLoadingId.value = id
   try {
     await plmApi.deactivateBom(id)
-    Message.success('停用成功')
+    Message.success(t('plm.bom.index.停用成功'))
     loadData()
   } catch (e: unknown) {
     const err = e as { response?: { data?: { workOrders?: { woNo: string; status: string }[] } } }
@@ -425,7 +422,7 @@ async function handleObsoleteBom(id: string) {
   statusLoadingId.value = id
   try {
     await plmApi.obsoleteBom(id)
-    Message.success('废止成功')
+    Message.success(t('plm.bom.index.废止成功'))
     loadData()
   } catch (e: unknown) {
     const err = e as { response?: { data?: { workOrders?: { woNo: string; status: string }[] } } }
@@ -484,7 +481,7 @@ function openCreateDrawer() {
 }
 
 async function handleCreate() {
-  if (!createForm.materialId) { Message.warning('请选择物料'); return }
+  if (!createForm.materialId) { Message.warning(t('plm.bom.index.请选择物料')); return }
   submitting.value = true
   try {
     const bom: Record<string, unknown> = { materialId: createForm.materialId }
@@ -494,7 +491,7 @@ async function handleCreate() {
       bom,
       copyFromBomId: createForm.copyFromBomId || undefined,
     })
-    Message.success(createForm.copyFromBomId ? '新建成功，已从选定版本复制明细' : '新建成功')
+    Message.success(createForm.copyFromBomId ? t('plm.bom.index.新建成功已从选定版本复制明细') : t('plm.bom.index.新建成功'))
     createDrawerVisible.value = false
     loadData()
   } catch { /* handled */ } finally {
@@ -556,8 +553,8 @@ function cancelAddLine() { showAddLineForm.value = false }
 
 async function submitAddLine() {
   if (!currentBom.value) return
-  if (!newLineForm.materialId) { Message.warning('请选择子物料'); return }
-  if (!newLineForm.quantity) { Message.warning('请填写数量'); return }
+  if (!newLineForm.materialId) { Message.warning(t('plm.bom.index.请选择子物料')); return }
+  if (!newLineForm.quantity) { Message.warning(t('plm.bom.index.请填写数量')); return }
   addLineLoading.value = true
   try {
     await plmApi.addBomLine(currentBom.value.id, {
@@ -566,7 +563,7 @@ async function submitAddLine() {
       quantity: newLineForm.quantity,
       lossRate: newLineForm.lossRate,
     })
-    Message.success('新增成功')
+    Message.success(t('plm.bom.index.新增成功'))
     showAddLineForm.value = false
     await loadBomLines(currentBom.value.id)
   } catch { /* handled */ } finally {
@@ -578,7 +575,7 @@ async function handleDeleteLine(line: BomLine) {
   if (!currentBom.value) return
   try {
     await plmApi.deleteBomLine(currentBom.value.id, line.id)
-    Message.success('删除成功')
+    Message.success(t('plm.bom.index.删除成功'))
     await loadBomLines(currentBom.value.id)
   } catch { /* handled */ }
 }
@@ -606,7 +603,7 @@ async function submitEditLine(line: BomLine) {
       quantity: editLineForm.quantity,
       lossRate: editLineForm.lossRate,
     })
-    Message.success('保存成功')
+    Message.success(t('plm.bom.index.保存成功'))
     editingLineId.value = null
     await loadBomLines(currentBom.value.id)
   } catch { /* handled */ } finally {

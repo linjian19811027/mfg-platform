@@ -10,6 +10,7 @@ import * as ExcelJS from 'exceljs';
 import { HrEmployee, EmployeeStatus } from '../entities/hr-employee.entity.js';
 import { HrShiftSchedule } from '../entities/hr-shift-schedule.entity.js';
 import { HrWorkHourRecord } from '../entities/hr-work-hour-record.entity.js';
+import { EmployeeHistoryService } from './employee-history.service.js';
 
 // ── DTOs ─────────────────────────────────────────────────────────────────────
 
@@ -70,6 +71,7 @@ export class EmployeeService {
     @InjectRepository(HrWorkHourRecord)
     private readonly workHourRepo: Repository<HrWorkHourRecord>,
     private readonly dataSource: DataSource,
+    private readonly historySvc: EmployeeHistoryService,
   ) {}
 
   // ── 生成工号 ──────────────────────────────────────────────────────────────
@@ -91,7 +93,11 @@ export class EmployeeService {
 
   // ── 创建员工 ──────────────────────────────────────────────────────────────
 
-  async create(tenantId: string, dto: CreateEmployeeDto): Promise<HrEmployee> {
+  async create(
+    tenantId: string,
+    dto: CreateEmployeeDto,
+    operatorId?: string,
+  ): Promise<HrEmployee> {
     const empNo = await this.generateEmpNo(tenantId);
 
     // 校验工号唯一性（理论上自动生成不会重复，但防并发）
@@ -100,13 +106,18 @@ export class EmployeeService {
       throw new ConflictException(`工号 ${empNo} 已存在`);
     }
 
+    // 入职日期不能为空
+    const hireDate = dto.hireDate?.trim()
+      ? dto.hireDate
+      : new Date().toISOString().split('T')[0];
+
     const employee = this.employeeRepo.create({
       tenantId,
       empNo,
       name: dto.name,
       jobType: dto.jobType,
       workCenterId: dto.workCenterId,
-      hireDate: dto.hireDate,
+      hireDate,
       status: EmployeeStatus.ACTIVE,
       phone: dto.phone,
       idCard: dto.idCard,
@@ -115,7 +126,18 @@ export class EmployeeService {
       remark: dto.remark,
     });
 
-    return this.employeeRepo.save(employee);
+    const saved = await this.employeeRepo.save(employee);
+
+    // 记录入职履历
+    await this.historySvc.recordOnboard(
+      tenantId,
+      String(saved.id),
+      saved.jobType,
+      saved.workCenterId,
+      operatorId,
+    );
+
+    return saved;
   }
 
   // ── 分页查询 ──────────────────────────────────────────────────────────────
@@ -174,8 +196,13 @@ export class EmployeeService {
     tenantId: string,
     id: number,
     dto: UpdateEmployeeDto,
+    operatorId?: string,
   ): Promise<HrEmployee> {
     const employee = await this.findOne(tenantId, id);
+
+    // 记录变更前的值
+    const prevJobType = employee.jobType;
+    const prevWorkCenterId = employee.workCenterId;
 
     // 工号不可修改，只更新允许的字段
     if (dto.name !== undefined) employee.name = dto.name;
@@ -191,7 +218,42 @@ export class EmployeeService {
       employee.emergencyPhone = dto.emergencyPhone;
     if (dto.remark !== undefined) employee.remark = dto.remark;
 
-    return this.employeeRepo.save(employee);
+    const saved = await this.employeeRepo.save(employee);
+
+    // 记录调动履历（工种或工作中心变更）
+    const jobTypeChanged = dto.jobType !== undefined && prevJobType !== dto.jobType;
+    const wcChanged = dto.workCenterId !== undefined && prevWorkCenterId !== dto.workCenterId;
+    if (jobTypeChanged || wcChanged) {
+      await this.historySvc.recordTransfer(
+        tenantId,
+        String(saved.id),
+        jobTypeChanged ? prevJobType : undefined,
+        jobTypeChanged ? saved.jobType : undefined,
+        wcChanged ? prevWorkCenterId : undefined,
+        wcChanged ? saved.workCenterId : undefined,
+        operatorId,
+      );
+    }
+
+    // 记录信息修改
+    const otherChangedFields: string[] = [];
+    if (dto.name !== undefined && dto.name !== employee.name) otherChangedFields.push('姓名');
+    if (dto.hireDate !== undefined) otherChangedFields.push('入职日期');
+    if (dto.phone !== undefined) otherChangedFields.push('电话');
+    if (dto.idCard !== undefined) otherChangedFields.push('身份证');
+    if (dto.emergencyContact !== undefined) otherChangedFields.push('紧急联系人');
+    if (dto.emergencyPhone !== undefined) otherChangedFields.push('紧急联系电话');
+    if (dto.remark !== undefined) otherChangedFields.push('备注');
+    if (otherChangedFields.length > 0) {
+      await this.historySvc.recordInfoUpdate(
+        tenantId,
+        String(saved.id),
+        otherChangedFields,
+        operatorId,
+      );
+    }
+
+    return saved;
   }
 
   // ── 更新状态 ──────────────────────────────────────────────────────────────
@@ -200,9 +262,12 @@ export class EmployeeService {
     tenantId: string,
     id: number,
     dto: UpdateStatusDto,
+    operatorId?: string,
   ): Promise<HrEmployee> {
     const employee = await this.findOne(tenantId, id);
     const prevStatus = employee.status;
+
+    if (prevStatus === dto.status) return employee;
 
     employee.status = dto.status;
 
@@ -221,7 +286,19 @@ export class EmployeeService {
       );
     }
 
-    return this.employeeRepo.save(employee);
+    const saved = await this.employeeRepo.save(employee);
+
+    // 记录履历
+    await this.historySvc.recordStatusChange(
+      tenantId,
+      String(saved.id),
+      prevStatus,
+      dto.status,
+      operatorId,
+      dto.reason,
+    );
+
+    return saved;
   }
 
   // ── 删除 ──────────────────────────────────────────────────────────────────

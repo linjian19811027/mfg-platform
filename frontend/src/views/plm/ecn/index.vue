@@ -16,14 +16,14 @@
           allow-clear
           style="width: 130px"
         >
-          <a-option value="ISSUED">已签发</a-option>
-          <a-option value="COMPLETED">已完成</a-option>
+          <a-option value="ISSUED">{{ $t('plm.ecn.lbl1375') }}</a-option>
+          <a-option value="COMPLETED">{{ $t('plm.ecn.completed') }}</a-option>
         </a-select>
         <a-button type="primary" @click="loadData">{{ $t('common.search') }}</a-button>
         <a-button @click="resetQuery">{{ $t('common.reset') }}</a-button>
       </a-space>
       <template #extra>
-        <a-button type="primary" @click="openIssueDrawer">签发 ECN</a-button>
+        <a-button type="primary" @click="openIssueDrawer">{{ $t('plm.ecn.lbl1376') }}</a-button>
       </template>
     </a-card>
 
@@ -50,7 +50,7 @@
               :content="$t('plm.ecn.确认完成该ECN')"
               @ok="handleComplete(record as unknown as Ecn)"
             >
-              <a-link :loading="completingId === record.id">完成</a-link>
+              <a-link :loading="completingId === record.id">{{ $t('plm.ecn.lbl1377') }}</a-link>
             </a-popconfirm>
           </a-space>
         </template>
@@ -114,7 +114,7 @@
         </a-form-item>
         <a-form-item style="margin-top: 24px">
           <a-space>
-            <a-button type="primary" :loading="issuing" @click="handleIssue">签发</a-button>
+            <a-button type="primary" :loading="issuing" @click="handleIssue">{{ $t('plm.ecn.lbl1378') }}</a-button>
             <a-button @click="issueDrawerVisible = false">{{ $t('common.cancel') }}</a-button>
           </a-space>
         </a-form-item>
@@ -157,8 +157,8 @@ function statusColor(status: string) {
 }
 
 function statusLabel(status: string) {
-  if (status === 'ISSUED') return '已签发'
-  if (status === 'COMPLETED') return '已完成'
+  if (status === 'ISSUED') return t('plm.ecn.lbl1379')
+  if (status === 'COMPLETED') return t('plm.ecn.completed')
   return status
 }
 
@@ -198,7 +198,7 @@ async function handleComplete(ecn: Ecn) {
   completingId.value = ecn.id
   try {
     await plmApi.completeEcn(ecn.id)
-    Message.success('ECN 已完成')
+    Message.success(t('plm.ecn.lbl1380'))
     loadData()
   } catch {
     // handled
@@ -240,8 +240,8 @@ function openIssueDrawer() {
 }
 
 async function handleIssue() {
-  if (!issueForm.ecrId) { Message.warning('请选择关联 ECR'); return }
-  if (!issueForm.description) { Message.warning('请填写描述'); return }
+  if (!issueForm.ecrId) { Message.warning(t('plm.请选择关联 ECR')); return }
+  if (!issueForm.description) { Message.warning(t('plm.请填写描述')); return }
   issuing.value = true
   try {
     await plmApi.issueEcn({
@@ -250,7 +250,7 @@ async function handleIssue() {
       effectiveDate: issueForm.effectiveDate || undefined,
       issuedBy: authStore.userId ?? 'system',
     })
-    Message.success('签发成功')
+    Message.success(t('plm.签发成功'))
     issueDrawerVisible.value = false
     loadData()
   } catch { /* handled */ } finally {

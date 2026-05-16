@@ -21,7 +21,7 @@
           <a-space>
             <a-button type="primary" @click="handleTrace" :loading="loading">
               <template #icon><icon-search /></template>
-              追溯
+              {{ $t('traceability.forward.trace') }}
             </a-button>
             <a-button @click="handleReset">{{ $t('common.reset') }}</a-button>
           </a-space>
@@ -35,29 +35,29 @@
         </a-form-item>
         <a-form-item :label="$t('traceability.forward.index.库存状态')">
           <a-select v-model="filterForm.inventoryStatus" :placeholder="$t('traceability.forward.index.全部')" allow-clear style="width: 120px">
-            <a-option value="IN_STOCK">在库</a-option>
-            <a-option value="SHIPPED">已发货</a-option>
-            <a-option value="CONSUMED">已消耗</a-option>
+            <a-option value="IN_STOCK">{{ $t('traceability.forward.lbl1833') }}</a-option>
+            <a-option value="SHIPPED">{{ $t('traceability.forward.lbl1834') }}</a-option>
+            <a-option value="CONSUMED">{{ $t('traceability.forward.lbl1835') }}</a-option>
           </a-select>
         </a-form-item>
         <a-form-item>
-          <a-button @click="applyFilter">应用筛选</a-button>
+          <a-button @click="applyFilter">{{ $t('traceability.forward.lbl1836') }}</a-button>
         </a-form-item>
       </a-form>
 
       <!-- 追溯结果 -->
       <div v-if="traceResult" class="trace-result">
         <a-alert v-if="traceResult.truncated" type="warning" style="margin-bottom: 16px">
-          追溯节点超过 500 个，已截断显示。建议缩小追溯范围。
+          {{ $t('traceability.forward.traceNodesTruncated') }}
         </a-alert>
 
         <a-space style="margin-bottom: 16px">
           <a-button @click="handleExportPdf" :loading="exportLoading">
             <template #icon><icon-download /></template>
-            导出PDF报告
+            {{ $t('traceability.forward.exportPdf') }}
           </a-button>
-          <a-button @click="handleGenerateReport">生成追溯报告</a-button>
-          <a-tag color="blue">总节点数: {{ traceResult.nodeCount }}</a-tag>
+          <a-button @click="handleGenerateReport">{{ $t('traceability.forward.lbl1837') }}</a-button>
+          <a-tag color="blue">{{ $t('traceability.forward.r22019', {nodeCount: traceResult.nodeCount}) }}</a-tag>
         </a-space>
 
         <!-- 树形图展示 -->
@@ -77,22 +77,22 @@
               <a-link @click="handleViewBatch(record)">{{ record.traceCode }}</a-link>
             </template>
             <template #inspectionStatus="{ record }">
-              <a-tag v-if="record.inspectionStatus === 'PASSED'" color="green">合格</a-tag>
-              <a-tag v-else-if="record.inspectionStatus === 'FAILED'" color="red">不合格</a-tag>
-              <a-tag v-else color="orange">待检</a-tag>
+              <a-tag v-if="record.inspectionStatus === 'PASSED'" color="green">{{ $t('traceability.forward.qualified') }}</a-tag>
+              <a-tag v-else-if="record.inspectionStatus === 'FAILED'" color="red">{{ $t('traceability.forward.unqualified') }}</a-tag>
+              <a-tag v-else color="orange">{{ $t('traceability.forward.uninspected') }}</a-tag>
             </template>
             <template #inventoryStatus="{ record }">
-              <a-tag v-if="record.inventoryStatus === 'IN_STOCK'" color="blue">在库</a-tag>
-              <a-tag v-else-if="record.inventoryStatus === 'SHIPPED'" color="gray">已发货</a-tag>
-              <a-tag v-else-if="record.inventoryStatus === 'CONSUMED'" color="purple">已消耗</a-tag>
+              <a-tag v-if="record.inventoryStatus === 'IN_STOCK'" color="blue">{{ $t('traceability.forward.lbl1838') }}</a-tag>
+              <a-tag v-else-if="record.inventoryStatus === 'SHIPPED'" color="gray">{{ $t('traceability.forward.lbl1839') }}</a-tag>
+              <a-tag v-else-if="record.inventoryStatus === 'CONSUMED'" color="purple">{{ $t('traceability.forward.lbl1840') }}</a-tag>
             </template>
             <template #isFrozen="{ record }">
-              <a-tag v-if="record.isFrozen" color="red">是</a-tag>
-              <span v-else>否</span>
+              <a-tag v-if="record.isFrozen" color="red">{{ $t('traceability.forward.r33093') }}</a-tag>
+              <span v-else>{{ $t('traceability.forward.r33094') }}</span>
             </template>
             <template #missingData="{ record }">
-              <a-tag v-if="record.missingData" color="red">数据缺失</a-tag>
-              <span v-else>完整</span>
+              <a-tag v-if="record.missingData" color="red">{{ $t('traceability.forward.lbl1841') }}</a-tag>
+              <span v-else>{{ $t('traceability.forward.lbl1842') }}</span>
             </template>
           </a-table>
         </a-card>
@@ -178,7 +178,7 @@ onUnmounted(() => {
 
 async function handleTrace() {
   if (!queryForm.traceCode) {
-    Message.warning('请输入追溯码')
+    Message.warning(t('traceability.请输入追溯码'))
     return
   }
   
@@ -192,9 +192,9 @@ async function handleTrace() {
       renderTreeChart()
     }, 100)
     
-    Message.success('追溯完成')
+    Message.success(t('traceability.追溯完成'))
   } catch (error: any) {
-    Message.error(error.message || '追溯失败')
+    Message.error(error.message || t('traceability.追溯失败'))
   } finally {
     loading.value = false
   }
@@ -211,7 +211,7 @@ function handleReset() {
 
 function applyFilter() {
   // 筛选逻辑已通过 computed 实现
-  Message.success('筛选已应用')
+  Message.success(t('traceability.筛选已应用'))
 }
 
 function renderTreeChart() {
@@ -231,10 +231,10 @@ function renderTreeChart() {
         return `
           <div>
             <strong>${data.name}</strong><br/>
-            物料: ${data.materialCode}<br/>
-            批次: ${data.batchNo}<br/>
-            检验: ${data.inspectionStatus}<br/>
-            库存: ${data.inventoryStatus}
+            ${t('traceability.forward.material')}: ${data.materialCode}<br/>
+            ${t('traceability.forward.batch')}: ${data.batchNo}<br/>
+            ${t('traceability.forward.inspection')}: ${data.inspectionStatus}<br/>
+            ${t('traceability.forward.inventory')}: ${data.inventoryStatus}
           </div>
         `
       },
@@ -332,12 +332,12 @@ async function handleExportPdf() {
     const url = window.URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `正向追溯_${queryForm.traceCode}_${new Date().getTime()}.pdf`
+    a.download = `${t('traceability.forward.r33095')}_${queryForm.traceCode}_${new Date().getTime()}.pdf`
     a.click()
     window.URL.revokeObjectURL(url)
-    Message.success('导出成功')
+    Message.success(t('traceability.导出成功'))
   } catch (error: any) {
-    Message.error(error.message || '导出失败')
+    Message.error(error.message || t('traceability.导出失败'))
   } finally {
     exportLoading.value = false
   }
@@ -349,9 +349,9 @@ async function handleGenerateReport() {
       traceCode: queryForm.traceCode,
       reportType: 'FORWARD',
     })
-    Message.success('报告生成中，请稍后在报告列表查看')
+    Message.success(t('traceability.报告生成中，请稍后在报告列表查看'))
   } catch (error: any) {
-    Message.error(error.message || '生成失败')
+    Message.error(error.message || t('traceability.生成失败'))
   }
 }
 </script>

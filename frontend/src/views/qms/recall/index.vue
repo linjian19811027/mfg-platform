@@ -3,30 +3,25 @@
     <a-card :bordered="false" style="margin-bottom: 16px">
       <a-space wrap>
         <a-select v-model="query.status" :placeholder="$t('common.status')" allow-clear style="width: 130px">
-          <a-option value="DRAFT">草稿</a-option>
-          <a-option value="ACTIVE">执行中</a-option>
-          <a-option value="COMPLETED">已完成</a-option>
+          <a-option value="INITIATED">{{ $t('qms.recall.lbl1521') }}</a-option>
+          <a-option value="IN_PROGRESS">{{ $t('qms.recall.lbl1522') }}</a-option>
+          <a-option value="COMPLETED">{{ $t('qms.recall.completed') }}</a-option>
+          <a-option value="CANCELLED">{{ $t('qms.recall.lbl1523') }}</a-option>
         </a-select>
         <a-button type="primary" @click="loadData">{{ $t('common.search') }}</a-button>
         <a-button @click="resetQuery">{{ $t('common.reset') }}</a-button>
       </a-space>
       <template #extra>
-        <a-button type="primary" @click="openDrawer(null)">新建召回</a-button>
+        <a-button type="primary" @click="openDrawer(null)">{{ $t('qms.recall.lbl1524') }}</a-button>
       </template>
     </a-card>
 
     <a-card :bordered="false">
       <MTable :columns="columns" :data="tableData" :loading="loading" :total="total" :page-size="20" @change="onTableChange">
         <template #status="{ record }">
-          <a-tag :color="record.status === 'ACTIVE' ? 'red' : record.status === 'COMPLETED' ? 'green' : 'gray'">
-            {{ record.status === 'ACTIVE' ? '执行中' : record.status === 'COMPLETED' ? '已完成' : '草稿' }}
+          <a-tag :color="record.status === 'IN_PROGRESS' ? 'red' : record.status === 'COMPLETED' ? 'green' : 'blue'">
+            {{ record.status === 'IN_PROGRESS' ? t('qms.recall.r33051') : record.status === 'COMPLETED' ? t('qms.recall.r33052') : record.status === 'CANCELLED' ? $t('qms.recall.lbl1525') : $t('qms.recall.lbl1526') }}
           </a-tag>
-        </template>
-        <template #recoveryRate="{ record }">
-          <span v-if="record.affectedQty">
-            {{ (((record.recoveredQty as number || 0) / (record.affectedQty as number)) * 100).toFixed(1) }}%
-          </span>
-          <span v-else>-</span>
         </template>
         <template #action="{ record }">
           <a-link @click="openDrawer(record as unknown as Recall)">{{ $t('common.edit') }}</a-link>
@@ -34,7 +29,7 @@
       </MTable>
     </a-card>
 
-    <a-drawer v-model:visible="drawerVisible" :title="editing ? '编辑召回' : '新建召回'" :width="520" @cancel="drawerVisible = false">
+    <a-drawer v-model:visible="drawerVisible" ::title="t('qms.recall.lbl1527')" :width="520" @cancel="drawerVisible = false">
       <MForm :schema="formSchema" v-model="formData" :loading="saving" :submit-text="$t('qms.recall.index.保存')" @submit="handleSave" @cancel="drawerVisible = false" />
     </a-drawer>
   </div>
@@ -57,26 +52,21 @@ const total = ref(0)
 const query = reactive({ status: '', page: 1, pageSize: 20 })
 
 const columns: MTableColumn[] = [
-  { key: 'code', title: t('qms.recall.index.召回编号'), dataIndex: 'code', width: 130 },
-  { key: 'materialId', title: t('qms.recall.index.物料'), dataIndex: 'materialCode', width: 130 },
-  { key: 'reason', title: t('qms.recall.index.召回原因'), dataIndex: 'reason', width: 200, ellipsis: true },
-  { key: 'affectedQty', title: t('qms.recall.index.影响数量'), dataIndex: 'affectedQty', width: 100 },
-  { key: 'recoveredQty', title: t('qms.recall.index.已回收'), dataIndex: 'recoveredQty', width: 100 },
-  { key: 'recoveryRate', title: t('qms.recall.index.回收率'), slotName: 'recoveryRate', width: 90 },
+  { key: 'recallNo', title: t('qms.recall.index.召回编号'), dataIndex: 'recallNo', width: 140 },
+  { key: 'title', title: t('qms.recall.index.召回标题'), dataIndex: 'title', width: 200, ellipsis: true },
+  { key: 'materialId', title: t('qms.recall.index.物料'), dataIndex: 'materialName', width: 120 },
+  { key: 'affectedBatches', title: t('qms.recall.index.涉及批次'), dataIndex: 'affectedBatches', width: 150 },
   { key: 'status', title: t('qms.recall.index.状态'), slotName: 'status', width: 100 },
+  { key: 'createdAt', title: t('qms.recall.index.发起时间'), dataIndex: 'createdAt', width: 170 },
   { key: 'action', title: t('qms.recall.index.操作'), slotName: 'action', width: 80 },
 ]
 
 const formSchema: MFormField[] = [
-  { field: 'code', label: '召回编号', type: 'input', required: true },
-  { field: 'materialId', label: '物料ID', type: 'input' },
-  { field: 'batchIds', label: '批次号（逗号分隔）', type: 'textarea', props: { autoSize: { minRows: 2 } } },
-  { field: 'reason', label: '召回原因', type: 'textarea', required: true, props: { autoSize: { minRows: 3 } } },
-  { field: 'affectedQty', label: '影响数量', type: 'number', props: { min: 0 } },
-  { field: 'recoveredQty', label: '已回收数量', type: 'number', props: { min: 0 } },
-  { field: 'status', label: '状态', type: 'select', options: [
-    { label: '草稿', value: 'DRAFT' }, { label: '执行中', value: 'ACTIVE' }, { label: '已完成', value: 'COMPLETED' },
-  ]},
+  { field: 'recallNo', label: t('qms.recall.lbl1528'), type: 'input', required: true },
+  { field: 'title', label: t('qms.recall.lbl1529'), type: 'input', required: true },
+  { field: 'materialId', label: t('qms.recall.material'), type: 'material-select', required: true },
+  { field: 'affectedBatches', label: t('qms.recall.lbl1530'), type: 'textarea', required: true, props: { autoSize: { minRows: 2 } } },
+  { field: 'recallReason', label: t('qms.recall.lbl1531'), type: 'textarea', props: { autoSize: { minRows: 3 } } },
 ]
 
 async function loadData() {
@@ -107,8 +97,8 @@ function openDrawer(item: Recall | null) {
 async function handleSave(data: Record<string, unknown>) {
   saving.value = true
   try {
-    if (editing.value) { await qmsApi.updateRecall(editing.value.id, data); Message.success('更新成功') }
-    else { await qmsApi.createRecall(data); Message.success('创建成功') }
+    if (editing.value) { await qmsApi.updateRecall(editing.value.id, data); Message.success(t('qms.更新成功')) }
+    else { await qmsApi.createRecall(data); Message.success(t('qms.创建成功')) }
     drawerVisible.value = false
     loadData()
   } catch { /* handled */ } finally { saving.value = false }

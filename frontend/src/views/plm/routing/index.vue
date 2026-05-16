@@ -16,15 +16,15 @@
           allow-clear
           style="width: 120px"
         >
-          <a-option value="ACTIVE">激活</a-option>
-          <a-option value="DRAFT">草稿</a-option>
-          <a-option value="INACTIVE">停用</a-option>
+          <a-option value="ACTIVE">{{ $t('plm.routing.lbl1420') }}</a-option>
+          <a-option value="DRAFT">{{ $t('plm.routing.draft') }}</a-option>
+          <a-option value="OBSOLETE">{{ $t('plm.routing.lbl1421') }}</a-option>
         </a-select>
         <a-button type="primary" @click="loadData">{{ $t('common.search') }}</a-button>
         <a-button @click="resetQuery">{{ $t('common.reset') }}</a-button>
       </a-space>
       <template #extra>
-        <a-button type="primary" @click="openCreateDrawer">新建路线</a-button>
+        <a-button type="primary" @click="openCreateDrawer">{{ $t('plm.routing.lbl1422') }}</a-button>
       </template>
     </a-card>
 
@@ -45,22 +45,22 @@
         </template>
         <template #action="{ record }">
           <a-space>
-            <a-link @click="openOpsDrawer(record as unknown as Routing)">查看工序</a-link>
+            <a-link @click="openOpsDrawer(record as unknown as Routing)">{{ $t('plm.routing.lbl1423') }}</a-link>
             <a-popconfirm
               v-if="record.status === 'DRAFT'"
               :content="$t('plm.routing.确认激活该路线激活后')"
               @ok="handleActivate(record as unknown as Routing)"
             >
-              <a-link :loading="activatingId === record.id">激活</a-link>
+              <a-link :loading="activatingId === record.id">{{ $t('plm.routing.lbl1424') }}</a-link>
             </a-popconfirm>
             <a-popconfirm
               v-if="record.status === 'ACTIVE'"
               :content="$t('plm.routing.确认废止该路线此操作')"
               @ok="handleRetire(record.id as string)"
             >
-              <a-link status="warning" :loading="retiringId === record.id">废止</a-link>
+              <a-link status="warning" :loading="retiringId === record.id">{{ $t('plm.routing.lbl1425') }}</a-link>
             </a-popconfirm>
-            <a-link @click="openCopyModal(record as unknown as Routing)">复制</a-link>
+            <a-link @click="openCopyModal(record as unknown as Routing)">{{ $t('plm.routing.lbl1426') }}</a-link>
             <a-popconfirm
               :content="$t('plm.routing.确认删除该路线')"
               @ok="handleDelete(record.id as string)"
@@ -130,7 +130,7 @@
           :disabled="currentRouting?.status === 'ACTIVE'"
           @click="startAddOp"
         >
-          新增工序
+          {{ $t('plm.routing.addOperation') }}
         </a-button>
       </div>
 
@@ -173,7 +173,7 @@
           </a-form-item>
           <a-form-item>
             <a-space>
-              <a-button type="primary" size="small" :loading="addOpLoading" @click="submitAddOp">确认</a-button>
+              <a-button type="primary" size="small" :loading="addOpLoading" @click="submitAddOp">{{ $t('plm.routing.confirm') }}</a-button>
               <a-button size="small" @click="cancelAddOp">{{ $t('common.cancel') }}</a-button>
             </a-space>
           </a-form-item>
@@ -246,8 +246,8 @@
         <template #opAction="{ record }">
           <template v-if="editingOpId === record.id">
             <a-space>
-              <a-link :loading="editOpLoading" @click="submitEditOp(record as RoutingOperation)">保存</a-link>
-              <a-link @click="cancelEditOp">取消</a-link>
+              <a-link :loading="editOpLoading" @click="submitEditOp(record as RoutingOperation)">{{ $t('plm.routing.save') }}</a-link>
+              <a-link @click="cancelEditOp">{{ $t('plm.routing.cancel') }}</a-link>
             </a-space>
           </template>
           <template v-else>
@@ -300,7 +300,7 @@
           </a-select>
         </a-form-item>
         <p style="color: #86909c; font-size: 13px; margin: 0">
-          将复制路线「{{ copySourceRouting?.name }}」的所有工序到新路线（状态为草稿）
+          {{ $t('plm.routing.copyHint', { name: copySourceRouting?.name }) }}
         </p>
       </a-form>
     </a-modal>
@@ -311,7 +311,7 @@
       :footer="false"
       @cancel="workOrderModalVisible = false"
     >
-      <p style="margin-bottom: 12px; color: #86909c">以下工单正在使用该路线，请先处理完成后再废止：</p>
+      <p style="margin-bottom: 12px; color: #86909c">{{ $t('plm.routing.lbl1427') }}</p>
       <a-table
         :columns="[{ title: t('plm.routing.index.工单号'), dataIndex: 'woNo' }, { title: t('plm.routing.index.状态'), dataIndex: 'status' }]"
         :data="blockedWorkOrders"
@@ -360,13 +360,14 @@ const opColumns = [
 function statusColor(status: string) {
   if (status === 'ACTIVE') return 'green'
   if (status === 'DRAFT') return 'orange'
+  if (status === 'OBSOLETE') return 'red'
   return 'gray'
 }
 
 function statusLabel(status: string) {
-  if (status === 'ACTIVE') return '激活'
-  if (status === 'DRAFT') return '草稿'
-  if (status === 'INACTIVE') return '停用'
+  if (status === 'ACTIVE') return t('plm.routing.lbl1428')
+  if (status === 'DRAFT') return t('plm.routing.draft')
+  if (status === 'OBSOLETE') return t('plm.routing.lbl1429')
   return status
 }
 
@@ -406,7 +407,7 @@ async function handleActivate(routing: Routing) {
   activatingId.value = routing.id
   try {
     await plmApi.activateRouting(routing.id)
-    Message.success('激活成功')
+    Message.success(t('plm.激活成功'))
     loadData()
   } catch {
     // handled
@@ -424,7 +425,7 @@ async function handleRetire(id: string) {
   retiringId.value = id
   try {
     await plmApi.retireRouting(id)
-    Message.success('废止成功')
+    Message.success(t('plm.废止成功'))
     loadData()
   } catch (e: unknown) {
     const err = e as { response?: { data?: { workOrders?: { woNo: string; status: string }[] } } }
@@ -439,7 +440,7 @@ async function handleRetire(id: string) {
 async function handleDelete(id: string) {
   try {
     await plmApi.deleteRouting(id)
-    Message.success('删除成功')
+    Message.success(t('plm.删除成功'))
     loadData()
   } catch {
     // handled
@@ -470,13 +471,13 @@ function openCreateDrawer() {
 }
 
 async function handleCreate() {
-  if (!createForm.code) { Message.warning('请输入路线编码'); return }
-  if (!createForm.name) { Message.warning('请输入路线名称'); return }
-  if (!createForm.materialId) { Message.warning('请选择物料'); return }
+  if (!createForm.code) { Message.warning(t('plm.请输入路线编码')); return }
+  if (!createForm.name) { Message.warning(t('plm.请输入路线名称')); return }
+  if (!createForm.materialId) { Message.warning(t('plm.请选择物料')); return }
   submitting.value = true
   try {
     await plmApi.createRouting({ routing: { ...createForm } })
-    Message.success('新建成功')
+    Message.success(t('plm.新建成功'))
     createDrawerVisible.value = false
     loadData()
   } catch { /* handled */ } finally {
@@ -572,13 +573,13 @@ function onStdOpChange(val: any) {
 async function submitAddOp() {
   if (!currentRouting.value) return
   if (!newOpForm.name) {
-    Message.warning('请填写工序名称')
+    Message.warning(t('plm.请填写工序名称'))
     return
   }
   addOpLoading.value = true
   try {
     await plmApi.addOperation(currentRouting.value.id, { ...newOpForm })
-    Message.success('新增成功')
+    Message.success(t('plm.新增成功'))
     showAddOpForm.value = false
     await loadOperations(currentRouting.value.id)
   } catch {
@@ -610,7 +611,7 @@ async function submitEditOp(op: RoutingOperation) {
   editOpLoading.value = true
   try {
     await plmApi.updateOperation(op.id, { ...editOpForm })
-    Message.success('保存成功')
+    Message.success(t('plm.保存成功'))
     editingOpId.value = null
     if (currentRouting.value) await loadOperations(currentRouting.value.id)
   } catch {
@@ -623,7 +624,7 @@ async function submitEditOp(op: RoutingOperation) {
 async function handleDeleteOp(op: RoutingOperation) {
   try {
     await plmApi.deleteOperation(op.id)
-    Message.success('删除成功')
+    Message.success(t('plm.删除成功'))
     if (currentRouting.value) await loadOperations(currentRouting.value.id)
   } catch {
     // handled
@@ -661,7 +662,7 @@ async function handleCopy() {
     const data: Record<string, unknown> = {}
     if (copyTargetMaterialId.value) data.targetMaterialId = copyTargetMaterialId.value
     await plmApi.copyRouting(copySourceRouting.value.id, data)
-    Message.success('复制成功，新路线已创建为草稿状态')
+    Message.success(t('plm.复制成功，新路线已创建为草稿状态'))
     copyModalVisible.value = false
     loadData()
   } catch { /* handled */ } finally {

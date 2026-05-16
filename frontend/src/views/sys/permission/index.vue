@@ -27,8 +27,8 @@
           </div>
           <div class="expand-actions">
             <a-space>
-              <a-button size="small" @click="expandAll">展开全部</a-button>
-              <a-button size="small" @click="collapseAll">折叠全部</a-button>
+              <a-button size="small" @click="expandAll">{{ $t('sys.permission.lbl1751') }}</a-button>
+              <a-button size="small" @click="collapseAll">{{ $t('sys.permission.lbl1752') }}</a-button>
             </a-space>
           </div>
 
@@ -42,14 +42,14 @@
             v-else
             ref="treeRef"
             :data="filteredTree"
-            :default-expand-all="true"
-            :field-names="{ key: 'key', title: 'title', children: 'children' }"
+            v-model:expanded-keys="expandedKeys"
+            :field-names="{ key: 'code', title: 'name', children: 'children' }"
             :selected-keys="selectedKeys"
             class="perm-tree"
             @select="onNodeSelect"
           >
             <template #title="nodeData">
-              <span v-html="highlightTitle(nodeData.title, nodeData.key)" />
+              <span v-html="highlightTitle(nodeData.name, nodeData.code)" />
             </template>
           </a-tree>
         </a-card>
@@ -64,17 +64,17 @@
           <template v-else>
             <a-descriptions :column="1" bordered>
               <a-descriptions-item :label="$t('sys.permission.index.权限编码')">
-                <a-tag color="arcoblue">{{ selectedNode.key }}</a-tag>
+                <a-tag color="arcoblue">{{ selectedNode.code }}</a-tag>
               </a-descriptions-item>
               <a-descriptions-item :label="$t('sys.permission.index.权限名称')">
-                {{ selectedNode.title }}
+                {{ selectedNode.name }}
               </a-descriptions-item>
               <a-descriptions-item :label="$t('sys.permission.index.所属模块')">
-                <a-tag>{{ getModuleTitle(selectedNode.key) }}</a-tag>
+                <a-tag>{{ getModuleTitle(selectedNode.code) }}</a-tag>
               </a-descriptions-item>
               <a-descriptions-item :label="$t('sys.permission.index.节点类型')">
                 <a-tag :color="isLeafNode(selectedNode) ? 'green' : 'orange'">
-                  {{ isLeafNode(selectedNode) ? '操作权限' : '模块权限' }}
+                  {{ isLeafNode(selectedNode) ? $t('sys.permission.lbl1753') : $t('sys.permission.lbl1754') }}
                 </a-tag>
               </a-descriptions-item>
               <a-descriptions-item :label="$t('common.description')">
@@ -83,13 +83,13 @@
               <a-descriptions-item :label="$t('sys.permission.index.关联角色数量')">
                 <a-spin v-if="roleCountLoading" :size="14" />
                 <span v-else>
-                  <a-tag color="purple">{{ roleCount }} 个角色</a-tag>
+                  <a-tag color="purple">{{ $t('sys.permission.r33079', {roleCount: roleCount}) }}</a-tag>
                 </span>
               </a-descriptions-item>
             </a-descriptions>
 
             <div v-if="associatedRoles.length > 0" class="associated-roles">
-              <div class="section-title">关联角色</div>
+              <div class="section-title">{{ $t('sys.permission.lbl1755') }}</div>
               <a-space wrap>
                 <a-tag v-for="role in associatedRoles" :key="role" color="arcoblue">{{ role }}</a-tag>
               </a-space>
@@ -102,9 +102,11 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 
 import { ref, computed, onMounted } from 'vue'
 import { roleApi, type PermissionNode } from '@/api/sys'
+const { t } = useI18n()
 
 // ---- 状态 ----
 const treeLoading = ref(false)
@@ -117,10 +119,23 @@ const roleCountLoading = ref(false)
 const roleCount = ref(0)
 const associatedRoles = ref<string[]>([])
 const treeRef = ref()
+const expandedKeys = ref<string[]>([])
+
+// ---- 收集树中所有节点 key（用于展开全部）----
+function collectAllKeys(nodes: PermissionNode[]): string[] {
+  const keys: string[] = []
+  for (const node of nodes) {
+    keys.push(node.code)
+    if (node.children && node.children.length > 0) {
+      keys.push(...collectAllKeys(node.children))
+    }
+  }
+  return keys
+}
 
 // ---- 模块列表（从树数据动态生成）----
 const modules = computed(() =>
-  allTree.value.map(n => ({ key: n.key, title: n.title }))
+  allTree.value.map(n => ({ key: n.code, title: n.name }))
 )
 
 // ---- 过滤后的树 ----
@@ -129,7 +144,7 @@ const filteredTree = computed(() => {
 
   // 按模块筛选
   if (selectedModule.value) {
-    tree = tree.filter(n => n.key === selectedModule.value)
+    tree = tree.filter(n => n.code === selectedModule.value)
   }
 
   // 按关键词搜索（前端过滤）
@@ -138,7 +153,7 @@ const filteredTree = computed(() => {
 
   function filterNode(node: PermissionNode): PermissionNode | null {
     const matched =
-      node.title.toLowerCase().includes(kw) || node.key.toLowerCase().includes(kw)
+      node.name.toLowerCase().includes(kw) || node.code.toLowerCase().includes(kw)
 
     if (node.children && node.children.length > 0) {
       const filteredChildren = node.children
@@ -173,8 +188,8 @@ function highlightTitle(title: string, _key: string): string {
 // ---- 模块标题 ----
 function getModuleTitle(key: string): string {
   const moduleKey = key.split(':')[0]
-  const module = allTree.value.find(n => n.key === moduleKey)
-  return module?.title ?? moduleKey.toUpperCase()
+  const module = allTree.value.find(n => n.code === moduleKey)
+  return module?.name ?? moduleKey.toUpperCase()
 }
 
 // ---- 是否叶子节点 ----
@@ -184,20 +199,20 @@ function isLeafNode(node: PermissionNode): boolean {
 
 // ---- 权限描述 ----
 const ACTION_DESC: Record<string, string> = {
-  view: '允许查看该模块的数据列表和详情',
-  create: '允许在该模块中新建记录',
-  edit: '允许修改该模块中的已有记录',
-  delete: '允许删除该模块中的记录',
-  approve: '允许对该模块中的记录进行审批操作',
-  manage: '允许管理该模块的配置和用户',
+  view: t('sys.permission.lbl1756'),
+  create: t('sys.permission.lbl1757'),
+  edit: t('sys.permission.lbl1758'),
+  delete: t('sys.permission.lbl1759'),
+  approve: t('sys.permission.lbl1760'),
+  manage: t('sys.permission.lbl1761')
 }
 
 function getDescription(node: PermissionNode): string {
   if (!isLeafNode(node)) {
-    return `${node.title} 模块的所有权限集合`
+    return `${node.name} ${t('sys.permission.r33080')}`
   }
-  const action = node.key.split(':').pop() ?? ''
-  return ACTION_DESC[action] ?? `${node.title} 操作权限`
+  const action = node.code.split(':').pop() ?? ''
+  return ACTION_DESC[action] ?? `${node.name} ${t('sys.permission.r33081')}`
 }
 
 // ---- 事件处理 ----
@@ -208,24 +223,26 @@ function onModuleChange() {
 
 function onSearch() {
   // 搜索时自动展开树
-  if (searchKeyword.value.trim() && treeRef.value) {
-    treeRef.value.expandAll?.()
+  if (searchKeyword.value.trim()) {
+    expandAll()
   }
 }
 
 function expandAll() {
-  treeRef.value?.expandAll?.()
+  if (allTree.value.length > 0) {
+    expandedKeys.value = collectAllKeys(allTree.value)
+  }
 }
 
 function collapseAll() {
-  treeRef.value?.collapseAll?.()
+  expandedKeys.value = []
 }
 
 function onNodeSelect(keys: string[], data: { node: PermissionNode }) {
   if (!keys.length) return
   selectedKeys.value = keys
   selectedNode.value = data.node
-  loadRoleCount(data.node.key)
+  loadRoleCount(data.node.code)
 }
 
 // ---- 加载关联角色数量（mock：统计哪些角色包含该权限）----
@@ -234,7 +251,7 @@ async function loadRoleCount(permKey: string) {
   associatedRoles.value = []
   try {
     // mock：遍历角色权限数据统计
-    const roleNames = ['管理员', '操作员', '查看员', '审批员', '仓库管理员']
+    const roleNames = [t('sys.permission.lbl1762'), t('sys.permission.lbl1763'), t('sys.permission.lbl1764'), t('sys.permission.lbl1765'), t('sys.permission.lbl1766')]
     const roleIds = ['1', '2', '3', '4', '5']
     const matched: string[] = []
 
@@ -260,6 +277,8 @@ onMounted(async () => {
   } finally {
     treeLoading.value = false
   }
+  // 加载完成后默认展开全部
+  expandAll()
 })
 </script>
 

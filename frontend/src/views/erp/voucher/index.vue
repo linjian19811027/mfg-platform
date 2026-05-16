@@ -9,7 +9,7 @@
           <a-option v-for="s in statusOptions" :key="s.value" :value="s.value">{{ s.label }}</a-option>
         </a-select>
         <a-button type="primary" @click="loadData">{{ $t('common.search') }}</a-button>
-        <a-button style="margin-left:auto" type="primary" @click="openCreate">新建凭证</a-button>
+        <a-button style="margin-left:auto" type="primary" @click="openCreate">{{ $t('erp.voucher.lbl1255') }}</a-button>
       </div>
 
       <MTable :columns="columns" :data="list" :loading="loading" :total="total" @change="onTableChange">
@@ -21,7 +21,7 @@
             v-if="record.status === 'draft'"
             type="text" size="small" status="success"
             @click="handleApprove(record as Voucher)"
-          >审批</a-button>
+          >{{ $t('erp.voucher.lbl1256') }}</a-button>
         </template>
       </MTable>
     </a-card>
@@ -48,14 +48,14 @@ const typeOptions = [
   { label: 'PRODUCTION', value: 'PRODUCTION' }, { label: 'ADJUST', value: 'ADJUST' },
 ]
 const statusOptions = [
-  { label: '草稿', value: 'draft' }, { label: '已审批', value: 'approved' },
-  { label: '已过账', value: 'posted' }, { label: '已冲销', value: 'reversed' },
+  { label: t('erp.voucher.draft'), value: 'draft' }, { label: t('erp.voucher.lbl1257'), value: 'approved' },
+  { label: t('erp.voucher.lbl1258'), value: 'posted' }, { label: t('erp.voucher.lbl1259'), value: 'reversed' },
 ]
 const statusColorMap: Record<string, string> = {
   draft: 'gray', approved: 'blue', posted: 'green', reversed: 'red',
 }
 const statusLabelMap: Record<string, string> = {
-  draft: '草稿', approved: '已审批', posted: '已过账', reversed: '已冲销',
+  draft: t('erp.voucher.draft')
 }
 const statusColor = (s: string) => statusColorMap[s] ?? 'gray'
 const statusLabel = (s: string) => statusLabelMap[s] ?? s
@@ -73,10 +73,9 @@ const columns: MTableColumn[] = [
 ]
 
 const createSchema: MFormField[] = [
-  { field: 'code', label: '凭证编号', type: 'input', required: true },
-  { field: 'type', label: '凭证类型', type: 'select', required: true, options: typeOptions },
-  { field: 'period', label: '期间', type: 'input', required: true, props: { placeholder: '如 2024-01' } },
-  { field: 'description', label: '描述', type: 'textarea' },
+  { field: 'voucherDate', label: t('erp.voucher.lbl1260'), type: 'date', required: true },
+  { field: 'voucherType', label: t('erp.voucher.lbl1261'), type: 'select', required: true, options: typeOptions },
+  { field: 'description', label: t('erp.voucher.description'), type: 'textarea' },
 ]
 
 const query = reactive({ type: '', status: '' })
@@ -104,7 +103,7 @@ function openCreate() { createForm.value = {}; createVisible.value = true }
 async function handleApprove(record: Voucher) {
   try {
     await erpApi.approveVoucher(record.id)
-    Message.success('审批成功')
+    Message.success(t('erp.审批成功'))
     loadData()
   } catch { /* handled by request interceptor */ }
 }
@@ -112,8 +111,8 @@ async function handleApprove(record: Voucher) {
 async function handleCreate(data: Record<string, unknown>) {
   submitting.value = true
   try {
-    await erpApi.createVoucher(data as Parameters<typeof erpApi.createVoucher>[0])
-    Message.success('创建成功')
+    await erpApi.createVoucher({ data, lines: [] })
+    Message.success(t('erp.创建成功'))
     createVisible.value = false
     loadData()
   } finally { submitting.value = false }

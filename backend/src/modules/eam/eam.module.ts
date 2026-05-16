@@ -21,6 +21,7 @@ import { EquipmentService } from './services/equipment.service.js';
 import { EquipmentFinanceService } from './services/equipment-finance.service.js';
 import { EquipmentTechSpecService } from './services/equipment-tech-spec.service.js';
 import { EquipmentDocumentService } from './services/equipment-document.service.js';
+import { EquipmentHistoryService } from './services/equipment-history.service.js';
 import { MaintenanceService } from './services/maintenance.service.js';
 import { MaintenanceAnalyticsService } from './services/maintenance-analytics.service.js';
 import { InspectionService } from './services/inspection.service.js';
@@ -59,6 +60,7 @@ import { MessageModule } from '../../shared/message/message.module.js';
     EquipmentFinanceService,
     EquipmentTechSpecService,
     EquipmentDocumentService,
+    EquipmentHistoryService,
     MaintenanceService,
     MaintenanceAnalyticsService,
     InspectionService,

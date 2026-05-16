@@ -32,8 +32,8 @@
           allow-clear
           style="width: 110px"
         >
-          <a-option value="success">成功</a-option>
-          <a-option value="fail">失败</a-option>
+          <a-option value="success">{{ $t('sys.audit-log.lbl1645') }}</a-option>
+          <a-option value="fail">{{ $t('sys.audit-log.lbl1646') }}</a-option>
         </a-select>
         <a-range-picker
           v-model="dateRange"
@@ -44,7 +44,7 @@
         <a-button @click="resetQuery">{{ $t('common.reset') }}</a-button>
         <a-button style="margin-left: auto" @click="handleExport" :loading="exporting">
           <template #icon><icon-download /></template>
-          导出 Excel
+          {{ $t('sys.auditLog.exportExcel') }}
         </a-button>
       </div>
 
@@ -62,12 +62,12 @@
         </template>
         <template #result="{ record }">
           <a-tag :color="record.result === 'success' ? 'green' : 'red'" size="small">
-            {{ record.result === 'success' ? '成功' : '失败' }}
+            {{ record.result === 'success' ? $t('sys.audit-log.lbl1647') : $t('sys.audit-log.lbl1648') }}
           </a-tag>
         </template>
         <template #action="{ record }">
           <a-button type="text" size="small" @click="openDetail(record as unknown as AuditLog)">
-            详情
+            {{ $t('sys.audit-log.detail') }}
           </a-button>
         </template>
       </MTable>
@@ -94,7 +94,7 @@
           <a-descriptions-item :label="$t('sys.audit-log.index.IP地址')">{{ detailRecord.ip }}</a-descriptions-item>
           <a-descriptions-item :label="$t('sys.audit-log.index.操作结果')" :span="2">
             <a-tag :color="detailRecord.result === 'success' ? 'green' : 'red'" size="small">
-              {{ detailRecord.result === 'success' ? '成功' : '失败' }}
+              {{ detailRecord.result === 'success' ? $t('sys.audit-log.lbl1649') : $t('sys.audit-log.lbl1650') }}
             </a-tag>
             <span v-if="detailRecord.errorMsg" style="margin-left: 8px; color: var(--color-danger-6)">
               {{ detailRecord.errorMsg }}
@@ -103,12 +103,12 @@
         </a-descriptions>
 
         <div style="margin-top: 16px">
-          <div class="detail-section-title">请求参数</div>
+          <div class="detail-section-title">{{ $t('sys.audit-log.lbl1651') }}</div>
           <pre class="json-block">{{ formatJson(detailRecord.requestParams) }}</pre>
         </div>
 
         <div v-if="detailRecord.responseData" style="margin-top: 12px">
-          <div class="detail-section-title">响应结果</div>
+          <div class="detail-section-title">{{ $t('sys.audit-log.lbl1652') }}</div>
           <pre class="json-block">{{ formatJson(detailRecord.responseData) }}</pre>
         </div>
       </template>
@@ -127,17 +127,17 @@ import { auditLogApi, type AuditLog, type AuditActionType } from '@/api/sys'
 
 // ---- 常量 ----
 const MODULE_OPTIONS = [
-  '系统认证', '用户管理', '角色管理', '权限管理', '设备管理',
-  '生产计划', '质量检验', '仓储管理', '采购管理', '销售管理', '系统配置',
+  t('sys.audit-log.lbl1653'), t('sys.audit-log.lbl1654'), t('sys.audit-log.lbl1655'), t('sys.audit-log.lbl1656'), t('sys.audit-log.lbl1657'),
+  t('sys.audit-log.lbl1658'), t('sys.audit-log.lbl1659'), t('sys.audit-log.lbl1660'), t('sys.audit-log.lbl1661'), t('sys.audit-log.lbl1662'), t('sys.audit-log.lbl1663'),
 ]
 
 const ACTION_TYPE_OPTIONS: { value: AuditActionType; label: string }[] = [
-  { value: 'create', label: '新建' },
-  { value: 'edit', label: '编辑' },
-  { value: 'delete', label: '删除' },
-  { value: 'login', label: '登录' },
-  { value: 'logout', label: '登出' },
-  { value: 'approve', label: '审批' },
+  { value: 'create', label: t('sys.audit-log.create') },
+  { value: 'edit', label: t('sys.audit-log.edit') },
+  { value: 'delete', label: t('sys.audit-log.delete') },
+  { value: 'login', label: t('sys.audit-log.lbl1664') },
+  { value: 'logout', label: t('sys.audit-log.lbl1665') },
+  { value: 'approve', label: t('sys.audit-log.lbl1666') },
 ]
 
 const ACTION_TYPE_COLOR: Record<AuditActionType, string> = {
@@ -214,7 +214,7 @@ async function handleExport() {
       pageSize: 10000,
     })
     const rows = res.list
-    const headers = ['操作时间', '操作人', '操作模块', '操作类型', '操作对象', 'IP地址', '操作结果']
+    const headers = [t('sys.audit-log.lbl1667'), t('sys.audit-log.lbl1668'), t('sys.audit-log.lbl1669'), t('sys.audit-log.lbl1670'), t('sys.audit-log.lbl1671'), t('sys.audit-log.lbl1672'), t('sys.audit-log.lbl1673')]
     const csvLines = [
       headers.join(','),
       ...rows.map(r => [
@@ -224,7 +224,7 @@ async function handleExport() {
         actionTypeLabel(r.actionType),
         `"${r.target}"`,
         r.ip,
-        r.result === 'success' ? '成功' : '失败',
+        r.result === 'success' ? t('sys.audit-log.lbl1674') : t('sys.audit-log.lbl1675'),
       ].join(',')),
     ]
     const bom = '\uFEFF'
@@ -232,12 +232,12 @@ async function handleExport() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `审计日志_${new Date().toLocaleDateString('zh-CN').replace(/\//g, '')}.csv`
+    a.download = `${t('sys.audit-log.r33066')}_${new Date().toLocaleDateString('zh-CN').replace(/\//g, '')}.csv`
     a.click()
     URL.revokeObjectURL(url)
-    Message.success('导出成功')
+    Message.success(t('sys.导出成功'))
   } catch {
-    Message.error('导出失败')
+    Message.error(t('sys.导出失败'))
   } finally {
     exporting.value = false
   }

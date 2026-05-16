@@ -29,7 +29,7 @@ export function setupRouterGuard(router: Router) {
 
     // 3. 检查权限（ADMIN 角色跳过权限检查）
     if (to.meta.permission) {
-      const isAdmin = authStore.roles.includes('ADMIN') || authStore.roles.includes('admin')
+      const isAdmin = authStore.roles.some(r => r === 'ADMIN' || r === 'admin' || r === 'SUPER_ADMIN')
       if (!isAdmin && !authStore.permissions.includes(to.meta.permission)) {
         return next('/403')
       }

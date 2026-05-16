@@ -2,22 +2,22 @@
   <div class="page-container">
     <a-card :bordered="false" style="margin-bottom: 16px">
       <a-space wrap>
-        <a-button type="primary" :loading="calculating" @click="openCalcModal">触发 MRP 计算</a-button>
-        <a-button @click="loadData">刷新列表</a-button>
+        <a-button type="primary" :loading="calculating" @click="openCalcModal">{{ $t('aps.mrp.lbl1006') }}</a-button>
+        <a-button @click="loadData">{{ $t('aps.mrp.lbl1007') }}</a-button>
       </a-space>
     </a-card>
     <a-card :bordered="false">
       <MTable :columns="columns" :data="tableData" :loading="loading" :total="total" :page-size="20" @change="onTableChange">
         <template #status="{ record }">
           <a-tag :color="record.status === 'COMPLETED' ? 'green' : record.status === 'RUNNING' ? 'orange' : record.status === 'FAILED' ? 'red' : 'gray'">
-            {{ { RUNNING: '计算中', COMPLETED: '已完成', FAILED: '失败', PENDING: '待计算' }[record.status as string] ?? record.status }}
+            {{ { RUNNING: t('aps.mrp.lbl1008'), COMPLETED: t('aps.mrp.completed'), FAILED: t('aps.mrp.lbl1009'), PENDING: t('aps.mrp.lbl1010') }[record.status as string] ?? record.status }}
           </a-tag>
         </template>
         <template #action="{ record }">
           <a-space>
-            <a-link v-if="record.status === 'COMPLETED'" @click="openDetailDrawer(record.id as string)">查看结果</a-link>
+            <a-link v-if="record.status === 'COMPLETED'" @click="openDetailDrawer(record.id as string)">{{ $t('aps.mrp.lbl1011') }}</a-link>
             <a-popconfirm v-if="record.status === 'COMPLETED'" :content="$t('aps.mrp.index.确认发布MRP计划将自动生成采')" @ok="handleRelease(record.id as string)">
-              <a-link>发布</a-link>
+              <a-link>{{ $t('aps.mrp.lbl1012') }}</a-link>
             </a-popconfirm>
           </a-space>
         </template>
@@ -30,8 +30,8 @@
         <a-form-item :label="$t('aps.mrp.index.计划周期天')"><a-input-number v-model="calcForm.planDays" :min="1" :max="365" style="width:100%" /></a-form-item>
         <a-form-item :label="$t('aps.mrp.index.需求来源')">
           <a-checkbox-group v-model="calcForm.sources">
-            <a-checkbox value="SALES_ORDER">销售订单</a-checkbox>
-            <a-checkbox value="FORECAST">预测需求</a-checkbox>
+            <a-checkbox value="SALES_ORDER">{{ $t('aps.mrp.lbl1013') }}</a-checkbox>
+            <a-checkbox value="FORECAST">{{ $t('aps.mrp.lbl1014') }}</a-checkbox>
           </a-checkbox-group>
         </a-form-item>
       </a-form>
@@ -82,12 +82,12 @@ async function handleCalculate() {
   calculating.value = true
   try {
     await apsApi.calculateMrp({ planDays: calcForm.planDays, sources: calcForm.sources })
-    Message.success('MRP 计算已触发，请稍后刷新查看结果')
+    Message.success(t('aps.mrp.lbl1015'))
     calcModalVisible.value = false; loadData()
   } catch { /* handled */ } finally { calculating.value = false }
 }
 async function handleRelease(id: string) {
-  try { await apsApi.releaseMrp(id); Message.success('MRP 计划已发布'); loadData() }
+  try { await apsApi.releaseMrp(id); Message.success(t('aps.mrp.lbl1016')); loadData() }
   catch { /* handled */ }
 }
 const detailDrawerVisible = ref(false); const linesLoading = ref(false); const mrpLines = ref<any[]>([])

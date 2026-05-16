@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Put,
   Patch,
   Delete,
   Param,
@@ -12,6 +13,8 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
+import { CurrentUser } from '../auth/decorators/current-user.decorator.js';
+import { JwtPayload } from '../auth/strategies/jwt.strategy.js';
 import { TenantContext } from '../../shared/tenant/tenant.context.js';
 
 import {
@@ -39,6 +42,9 @@ import {
   GetSummaryDto,
   GetRecordsDto,
 } from './services/work-hour.service.js';
+import { JobTypeService } from './services/job-type.service.js';
+import { EmployeeHistoryService } from './services/employee-history.service.js';
+import { HrJobType } from './entities/hr-job-type.entity.js';
 
 @UseGuards(JwtAuthGuard)
 @Controller('api/v1/hr')
@@ -48,6 +54,8 @@ export class HrController {
     private readonly certSvc: CertificationService,
     private readonly shiftSvc: ShiftService,
     private readonly workHourSvc: WorkHourService,
+    private readonly jobTypeSvc: JobTypeService,
+    private readonly historySvc: EmployeeHistoryService,
   ) {}
 
   // ── 员工 ──────────────────────────────────────────────────────────────────
@@ -71,9 +79,12 @@ export class HrController {
   }
 
   @Post('employees')
-  createEmployee(@Body() dto: CreateEmployeeDto) {
+  createEmployee(
+    @Body() dto: CreateEmployeeDto,
+    @CurrentUser() user: JwtPayload,
+  ) {
     const tenantId = TenantContext.requireCurrentTenant();
-    return this.employeeSvc.create(tenantId, dto);
+    return this.employeeSvc.create(tenantId, dto, user.sub);
   }
 
   @Get('employees/:id')
@@ -83,15 +94,31 @@ export class HrController {
   }
 
   @Patch('employees/:id')
-  updateEmployee(@Param('id') id: string, @Body() dto: UpdateEmployeeDto) {
+  updateEmployee(
+    @Param('id') id: string,
+    @Body() dto: UpdateEmployeeDto,
+    @CurrentUser() user: JwtPayload,
+  ) {
     const tenantId = TenantContext.requireCurrentTenant();
-    return this.employeeSvc.update(tenantId, Number(id), dto);
+    return this.employeeSvc.update(tenantId, Number(id), dto, user.sub);
   }
 
   @Patch('employees/:id/status')
-  updateEmployeeStatus(@Param('id') id: string, @Body() dto: UpdateStatusDto) {
+  updateEmployeeStatus(
+    @Param('id') id: string,
+    @Body() dto: UpdateStatusDto,
+    @CurrentUser() user: JwtPayload,
+  ) {
     const tenantId = TenantContext.requireCurrentTenant();
-    return this.employeeSvc.updateStatus(tenantId, Number(id), dto);
+    return this.employeeSvc.updateStatus(tenantId, Number(id), dto, user.sub);
+  }
+
+  // ── 员工履历 ──────────────────────────────────────────────────────────────
+
+  @Get('employees/:id/history')
+  findEmployeeHistory(@Param('id') id: string) {
+    const tenantId = TenantContext.requireCurrentTenant();
+    return this.historySvc.findByEmployee(tenantId, id);
   }
 
   // ── 技能认证 ──────────────────────────────────────────────────────────────
@@ -271,5 +298,34 @@ export class HrController {
       'attachment; filename="work-hours.xlsx"',
     );
     res.send(buffer);
+  }
+
+  // ── 工种基础数据 ──────────────────────────────────────────────────────────
+
+  @Get('job-types')
+  findJobTypes() {
+    const tenantId = TenantContext.requireCurrentTenant();
+    return this.jobTypeSvc.findAll(tenantId);
+  }
+
+  @Post('job-types')
+  createJobType(@Body() dto: { name: string; code?: string; description?: string }) {
+    const tenantId = TenantContext.requireCurrentTenant();
+    return this.jobTypeSvc.create(tenantId, dto);
+  }
+
+  @Put('job-types/:id')
+  updateJobType(
+    @Param('id') id: string,
+    @Body() dto: { name?: string; code?: string; description?: string; enabled?: number },
+  ) {
+    const tenantId = TenantContext.requireCurrentTenant();
+    return this.jobTypeSvc.update(tenantId, Number(id), dto);
+  }
+
+  @Delete('job-types/:id')
+  deleteJobType(@Param('id') id: string) {
+    const tenantId = TenantContext.requireCurrentTenant();
+    return this.jobTypeSvc.delete(tenantId, Number(id));
   }
 }

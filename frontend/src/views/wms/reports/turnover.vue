@@ -79,7 +79,7 @@ function renderChart() {
       axisLabel: { color: '#8B949E', rotate: 30, fontSize: 11 },
       axisLine: { lineStyle: { color: '#30363D' } },
     },
-    yAxis: { type: 'value', name: '周转率', axisLabel: { color: '#8B949E' }, splitLine: { lineStyle: { color: '#21262D' } } },
+    yAxis: { type: 'value', name: t('wms.reports.lbl1935'), axisLabel: { color: '#8B949E' }, splitLine: { lineStyle: { color: '#21262D' } } },
     series: [{
       type: 'bar',
       data: top10.map(r => r.turnoverRate ?? 0),

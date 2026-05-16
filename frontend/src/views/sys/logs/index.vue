@@ -5,10 +5,10 @@
       <a-form :model="searchForm" layout="inline" class="search-form" @keyup.enter="handleSearch">
         <a-form-item :label="$t('sys.logs.index.日志类型')">
           <a-select v-model="searchForm.logType" :placeholder="$t('sys.logs.index.全部')" allow-clear style="width: 130px">
-            <a-option value="LOGIN">登录日志</a-option>
-            <a-option value="OPERATION">操作日志</a-option>
-            <a-option value="SYSTEM_ERROR">系统错误</a-option>
-            <a-option value="BIZ_ERROR">业务错误</a-option>
+            <a-option value="LOGIN">{{ $t('sys.logs.lbl1676') }}</a-option>
+            <a-option value="OPERATION">{{ $t('sys.logs.lbl1677') }}</a-option>
+            <a-option value="SYSTEM_ERROR">{{ $t('sys.logs.lbl1678') }}</a-option>
+            <a-option value="BIZ_ERROR">{{ $t('sys.logs.lbl1679') }}</a-option>
           </a-select>
         </a-form-item>
         <a-form-item :label="$t('sys.logs.index.用户名')">
@@ -49,14 +49,14 @@
         </template>
         <template #loginResult="{ record }">
           <template v-if="record.loginResult">
-            <a-tag v-if="record.loginResult === 'SUCCESS'" color="green" size="small">成功</a-tag>
-            <a-tag v-else-if="record.loginResult === 'FAILED'" color="red" size="small">失败</a-tag>
-            <a-tag v-else color="orange" size="small">锁定</a-tag>
+            <a-tag v-if="record.loginResult === 'SUCCESS'" color="green" size="small">{{ $t('sys.logs.lbl1680') }}</a-tag>
+            <a-tag v-else-if="record.loginResult === 'FAILED'" color="red" size="small">{{ $t('sys.logs.lbl1681') }}</a-tag>
+            <a-tag v-else color="orange" size="small">{{ $t('sys.logs.lbl1682') }}</a-tag>
           </template>
           <span v-else>-</span>
         </template>
         <template #action="{ record }">
-          <a-button type="text" size="small" @click="handleViewDetail(record)">详情</a-button>
+          <a-button type="text" size="small" @click="handleViewDetail(record)">{{ $t('sys.logs.detail') }}</a-button>
         </template>
       </a-table>
     </a-card>
@@ -77,15 +77,15 @@
         <a-descriptions-item :label="$t('sys.logs.index.请求URL')" :span="2">{{ detail.requestUrl || '-' }}</a-descriptions-item>
       </a-descriptions>
       <div v-if="detail.requestBody" style="margin-top: 12px">
-        <div style="font-weight: 500; margin-bottom: 6px">请求体：</div>
+        <div style="font-weight: 500; margin-bottom: 6px">{{ $t('sys.logs.lbl1683') }}</div>
         <a-typography-paragraph code style="white-space: pre-wrap; font-size: 12px; max-height: 150px; overflow: auto">{{ formatJson(detail.requestBody) }}</a-typography-paragraph>
       </div>
       <div v-if="detail.errorMessage" style="margin-top: 12px">
-        <div style="font-weight: 500; margin-bottom: 6px; color: #f53f3f">错误信息：</div>
+        <div style="font-weight: 500; margin-bottom: 6px; color: #f53f3f">{{ $t('sys.logs.lbl1684') }}</div>
         <a-typography-paragraph code style="white-space: pre-wrap; font-size: 12px; color: #f53f3f">{{ detail.errorMessage }}</a-typography-paragraph>
       </div>
       <div v-if="detail.errorStack" style="margin-top: 12px">
-        <div style="font-weight: 500; margin-bottom: 6px; color: #8b949e">错误堆栈：</div>
+        <div style="font-weight: 500; margin-bottom: 6px; color: #8b949e">{{ $t('sys.logs.lbl1685') }}</div>
         <a-typography-paragraph code style="white-space: pre-wrap; font-size: 11px; max-height: 200px; overflow: auto; color: #8b949e">{{ detail.errorStack }}</a-typography-paragraph>
       </div>
     </a-modal>
@@ -146,7 +146,7 @@ async function fetchData() {
     tableData.value = data.items ?? []
     pagination.total = data.total ?? 0
   } catch (e: any) {
-    Message.error(e.message || '加载失败')
+    Message.error(e.message || t('sys.加载失败'))
   } finally {
     loading.value = false
   }
@@ -162,8 +162,8 @@ function handlePageSizeChange(pageSize: number) { pagination.pageSize = pageSize
 
 function handleViewDetail(record: any) { detail.value = record; detailVisible.value = true }
 
-function logTypeLabel(t: string) {
-  return { LOGIN: '登录', OPERATION: '操作', SYSTEM_ERROR: '系统错误', BIZ_ERROR: '业务错误' }[t] ?? t
+function logTypeLabel(type: string) {
+  return { LOGIN: t('sys.logs.lbl1686'), OPERATION: t('sys.logs.action'), SYSTEM_ERROR: t('sys.logs.lbl1687'), BIZ_ERROR: t('sys.logs.lbl1688') }[type] ?? type
 }
 function logTypeColor(t: string) {
   return { LOGIN: 'blue', OPERATION: 'green', SYSTEM_ERROR: 'red', BIZ_ERROR: 'orange' }[t] ?? 'gray'

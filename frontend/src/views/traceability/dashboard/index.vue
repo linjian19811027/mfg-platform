@@ -4,14 +4,14 @@
     <a-row :gutter="16" style="margin-bottom: 16px">
       <a-col :span="6">
         <a-card :bordered="false" :loading="dashLoading">
-          <a-statistic :title="$t('traceability.dashboard.index.本月新增批次')" :value="dash.newBatchCount ?? 0" suffix="个">
+          <a-statistic :title="$t('traceability.dashboard.r33091')" :value="dash.newBatchCount ?? 0" :suffix="t('traceability.dashboard.unit')">
             <template #prefix><icon-plus-circle style="color: #165dff" /></template>
           </a-statistic>
         </a-card>
       </a-col>
       <a-col :span="6">
         <a-card :bordered="false" :loading="dashLoading">
-          <a-statistic :title="$t('traceability.dashboard.index.本月追溯查询')" :value="dash.queryCount ?? 0" suffix="次">
+          <a-statistic :title="$t('traceability.dashboard.r33092')" :value="dash.queryCount ?? 0" :suffix="t('traceability.dashboard.times')">
             <template #prefix><icon-search style="color: #00b42a" /></template>
           </a-statistic>
         </a-card>
@@ -21,7 +21,7 @@
           <a-statistic
             :title="$t('traceability.dashboard.index.当前冻结批次')"
             :value="dash.frozenBatchCount ?? 0"
-            suffix="个"
+            :suffix="t('traceability.dashboard.unit')"
             :value-style="{ color: '#f53f3f' }"
           >
             <template #prefix><icon-lock style="color: #f53f3f" /></template>
@@ -33,7 +33,7 @@
           <a-statistic
             :title="$t('traceability.dashboard.index.待处理召回评估')"
             :value="dash.pendingRecallCount ?? 0"
-            suffix="个"
+            :suffix="t('traceability.dashboard.unit')"
             :value-style="{ color: '#ff7d00' }"
           >
             <template #prefix><icon-exclamation-circle style="color: #ff7d00" /></template>
@@ -71,6 +71,8 @@ import {
 } from '@arco-design/web-vue/es/icon'
 import * as echarts from 'echarts'
 import { getAnalyticsDashboard, getCoverageStats } from '@/api/traceability'
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 
 const dashLoading = ref(false)
 const dash = ref<any>({})
@@ -99,7 +101,7 @@ async function fetchDashboard() {
     const res = await getAnalyticsDashboard()
     dash.value = res ?? {}
   } catch (e: any) {
-    Message.error(e.message || '加载看板失败')
+    Message.error(e.message || t('traceability.加载看板失败'))
   } finally {
     dashLoading.value = false
   }
@@ -116,7 +118,7 @@ async function fetchCoverage() {
       if (categoryData.value.length) initCategoryChart()
     }, 100)
   } catch (e: any) {
-    Message.error(e.message || '加载覆盖率失败')
+    Message.error(e.message || t('traceability.加载覆盖率失败'))
   }
 }
 
@@ -127,20 +129,20 @@ function initCoverageChart() {
   const rates = coverageData.value.map((d: any) => d.coverageRate)
 
   coverageChart.setOption({
-    tooltip: { trigger: 'axis', formatter: (p: any) => `${p[0].name}<br/>覆盖率: ${p[0].value}%` },
+    tooltip: { trigger: 'axis', formatter: (p: any) => `${p[0].name}<br/>${t('traceability.dashboard.coverageRate')}: ${p[0].value}%` },
     grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
     xAxis: { type: 'category', data: months },
-    yAxis: { type: 'value', name: '覆盖率(%)', min: 0, max: 100,
+    yAxis: { type: 'value', name: t('traceability.dashboard.lbl1828'), min: 0, max: 100,
       axisLabel: { formatter: '{value}%' } },
     series: [{
-      name: '追溯覆盖率',
+      name: t('traceability.dashboard.lbl1829'),
       type: 'line',
       data: rates,
       smooth: true,
       areaStyle: { opacity: 0.2 },
       itemStyle: { color: '#165dff' },
       markLine: {
-        data: [{ type: 'average', name: '平均值' }],
+        data: [{ type: 'average', name: t('traceability.dashboard.lbl1830') }],
         lineStyle: { color: '#ff7d00', type: 'dashed' },
       },
     }],
@@ -155,13 +157,13 @@ function initCategoryChart() {
 
   categoryChart.setOption({
     tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' },
-      formatter: (p: any) => `${p[0].name}<br/>覆盖率: ${p[0].value}%` },
+      formatter: (p: any) => `${p[0].name}<br/>${t('traceability.dashboard.coverageRate')}: ${p[0].value}%` },
     grid: { left: '3%', right: '4%', bottom: '8%', containLabel: true },
     xAxis: { type: 'category', data: categories, axisLabel: { interval: 0, rotate: 30 } },
-    yAxis: { type: 'value', name: '覆盖率(%)', min: 0, max: 100,
+    yAxis: { type: 'value', name: t('traceability.dashboard.lbl1831'), min: 0, max: 100,
       axisLabel: { formatter: '{value}%' } },
     series: [{
-      name: '覆盖率',
+      name: t('traceability.dashboard.lbl1832'),
       type: 'bar',
       data: rates,
       barWidth: '60%',
