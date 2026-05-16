@@ -21,14 +21,14 @@ export class VoucherAutoService implements OnModuleInit {
     this.messageService.subscribe('PRODUCTION_COMPLETED', (event) =>
       this.handleProductionCompleted(event),
     );
-    this.messageService.subscribe('SALES_ORDER_SHIPPED', (event) =>
-      this.handleSalesOrderShipped(event),
+    this.messageService.subscribe('SALES_ORDER_CONFIRMED', (event) =>
+      this.handleSalesOrderConfirmed(event),
     );
     this.messageService.subscribe('RECEIPT_CONFIRMED', (event) =>
       this.handleReceiptConfirmed(event),
     );
     this.logger.log(
-      'VoucherAutoService 已订阅事件：PRODUCTION_COMPLETED, SALES_ORDER_SHIPPED, RECEIPT_CONFIRMED',
+      'VoucherAutoService 已订阅事件：PRODUCTION_COMPLETED, SALES_ORDER_CONFIRMED, RECEIPT_CONFIRMED',
     );
   }
 
@@ -127,74 +127,42 @@ export class VoucherAutoService implements OnModuleInit {
     }
   }
 
-  // ── 2. 销售出库凭证 ───────────────────────────────────────────────────────
+  // ── 2. 销售订单确认凭证：借：应收账款  贷：主营业务收入 ──────────────────
 
-  private async handleSalesOrderShipped(event: {
+  private async handleSalesOrderConfirmed(event: {
     payload: Record<string, unknown>;
     tenantId: string;
   }): Promise<void> {
     const { tenantId, payload } = event;
-    const {
-      shipmentId,
-      shipmentNo,
-      soId,
-      items = [],
-      totalCost,
-    } = payload as {
-      shipmentId: string;
-      shipmentNo: string;
-      soId?: string;
-      customerId?: string;
-      items?: Array<{ quantity?: number; unitPrice?: number }>;
-      totalCost?: number;
+    const { soId, soNo, customerId, totalAmount } = payload as {
+      soId: string; soNo: string; customerId: string; totalAmount: number;
     };
+    if (!soId || !totalAmount) return;
 
     try {
-      // 优先使用 payload.totalCost，否则从 items 计算
-      const cost =
-        totalCost != null
-          ? Number(totalCost)
-          : (items as Array<{ quantity?: number; unitPrice?: number }>).reduce(
-              (sum, item) =>
-                sum +
-                (Number(item.quantity) || 0) * (Number(item.unitPrice) || 0),
-              0,
-            );
-
-      const [acc5101, acc1405] = await Promise.all([
-        this.resolveAccountId(tenantId, '5101'),
-        this.resolveAccountId(tenantId, '1405'),
+      const [acc1122, acc6001] = await Promise.all([
+        this.resolveAccountId(tenantId, '1122'), // 应收账款
+        this.resolveAccountId(tenantId, '6001'), // 主营业务收入
       ]);
 
+      const amount = Number(totalAmount);
       const voucher = await this.voucherService.createAuto(
         tenantId,
         {
           voucherDate: this.today(),
           voucherType: VoucherType.MEMO,
-          sourceType: 'SHIPMENT',
-          sourceId: String(shipmentId),
+          sourceType: 'SALES_ORDER',
+          sourceId: String(soId),
         },
         [
-          {
-            accountId: acc5101,
-            debitAmount: cost,
-            summary: `销售出库-${shipmentNo}`,
-          },
-          {
-            accountId: acc1405,
-            creditAmount: cost,
-            summary: `销售出库-${shipmentNo}`,
-          },
+          { accountId: acc1122, debitAmount: amount, summary: `应收账款-${soNo || soId}` },
+          { accountId: acc6001, creditAmount: amount, summary: `主营业务收入-${soNo || soId}` },
         ],
       );
 
-      this.logger.log(
-        `销售出库凭证已生成：${voucher.voucherNo}（shipmentId=${shipmentId}, soId=${soId}）`,
-      );
+      this.logger.log(`销售确认凭证已生成：${voucher.voucherNo}（soId=${soId}, 金额=${amount}）`);
     } catch (err) {
-      this.logger.error(
-        `销售出库凭证生成失败（shipmentId=${shipmentId}）：${(err as Error).message}`,
-      );
+      this.logger.error(`销售确认凭证生成失败（soId=${soId}）：${(err as Error).message}`);
     }
   }
 

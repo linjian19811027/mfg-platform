@@ -1,4 +1,6 @@
-import { request } from '@/utils/request'
+import { request, MOCK_ENABLED } from '@/utils/request'
+
+function rethrowIfNoMock(e: unknown) { if (!MOCK_ENABLED) throw e }
 
 export interface Supplier {
   id: string
@@ -134,165 +136,165 @@ export const scmApi = {
   // 采购订单
   getPurchaseOrders: async (params: object) => {
     try { return await request.get<{ list: PurchaseOrder[]; total: number }>('/v1/scm/purchase-orders', params) }
-    catch { return { list: [], total: 0 } }
+    catch (e) { rethrowIfNoMock(e); return { list: [], total: 0 } }
   },
   getPurchaseOrder: async (id: string) => {
     try { return await request.get<PurchaseOrder>(`/v1/scm/purchase-orders/${id}`) }
-    catch { return null as unknown as PurchaseOrder }
+    catch (e) { rethrowIfNoMock(e); return null as unknown as PurchaseOrder }
   },
   createPurchaseOrder: async (data: object) => {
     try { return await request.post<{ id: string }>('/v1/scm/purchase-orders', data) }
-    catch { return null as unknown as { id: string } }
+    catch (e) { rethrowIfNoMock(e); return null as unknown as { id: string } }
   },
   confirmPurchaseOrder: async (id: string) => {
     try { return await request.patch<void>(`/v1/scm/purchase-orders/${id}/confirm`, {}) }
-    catch { return }
+    catch (e) { rethrowIfNoMock(e); return }
   },
 
   // 采购申请
   getPurchaseRequests: async (params: object) => {
     try { return await request.get<{ list: PurchaseRequest[]; total: number }>('/v1/scm/purchase-requests', params) }
-    catch { return { list: [], total: 0 } }
+    catch (e) { rethrowIfNoMock(e); return { list: [], total: 0 } }
   },
   createPurchaseRequest: async (data: object) => {
     try { return await request.post<PurchaseRequest>('/v1/scm/purchase-requests', data) }
-    catch { return null as unknown as PurchaseRequest }
+    catch (e) { rethrowIfNoMock(e); return null as unknown as PurchaseRequest }
   },
   submitPurchaseRequest: async (id: string) => {
     try { return await request.patch<void>(`/v1/scm/purchase-requests/${id}/submit`, {}) }
-    catch { return }
+    catch (e) { rethrowIfNoMock(e); return }
   },
   approvePurchaseRequest: async (id: string, data?: object) => {
     try { return await request.patch<void>(`/v1/scm/purchase-requests/${id}/approve`, data ?? {}) }
-    catch { return }
+    catch (e) { rethrowIfNoMock(e); return }
   },
   rejectPurchaseRequest: async (id: string, reason?: string) => {
     try { return await request.patch<void>(`/v1/scm/purchase-requests/${id}/reject`, reason ? { approverId: 'current', remarks: reason } : {}) }
-    catch { return }
+    catch (e) { rethrowIfNoMock(e); return }
   },
 
   // ASN
   getAsns: async (params: object) => {
     try { return await request.get<{ list: Asn[]; total: number }>('/v1/scm/asns', params) }
-    catch { return { list: [], total: 0 } }
+    catch (e) { rethrowIfNoMock(e); return { list: [], total: 0 } }
   },
   createAsn: async (data: object) => {
     try { return await request.post<Asn>('/v1/scm/asns', data) }
-    catch { return null as unknown as Asn }
+    catch (e) { rethrowIfNoMock(e); return null as unknown as Asn }
   },
   receiveAsn: async (id: string) => {
     try { return await request.patch<void>(`/v1/scm/asns/${id}/receive`, {}) }
-    catch { return }
+    catch (e) { rethrowIfNoMock(e); return }
   },
   cancelAsn: async (id: string) => {
     try { return await request.patch<void>(`/v1/scm/asns/${id}/cancel`, {}) }
-    catch { return }
+    catch (e) { rethrowIfNoMock(e); return }
   },
 
   // 询价
   getRfqs: async (params: object) => {
     try { return await request.get<{ list: Rfq[]; total: number }>('/v1/scm/inquiries', params) }
-    catch { return { list: [], total: 0 } }
+    catch (e) { rethrowIfNoMock(e); return { list: [], total: 0 } }
   },
   createRfq: async (data: object) => {
     try { return await request.post<Rfq>('/v1/scm/inquiries', data) }
-    catch { return null as unknown as Rfq }
+    catch (e) { rethrowIfNoMock(e); return null as unknown as Rfq }
   },
   sendRfq: async (id: string, supplierIds?: string[]) => {
     try { return await request.patch<void>(`/v1/scm/inquiries/${id}/send`, { supplierIds: supplierIds ?? [] }) }
-    catch { return }
+    catch (e) { rethrowIfNoMock(e); return }
   },
   getRfqComparison: async (id: string) => {
     try { return await request.get<{ lines: RfqLine[] }>(`/v1/scm/inquiries/${id}/comparison`) }
-    catch { return { lines: [] } }
+    catch (e) { rethrowIfNoMock(e); return { lines: [] } }
   },
   selectSupplier: async (id: string, lineId: string) => {
     try { return await request.patch<void>(`/v1/scm/inquiries/${id}/select`, { lineId }) }
-    catch { return }
+    catch (e) { rethrowIfNoMock(e); return }
   },
 
   // 价格协议
   getPriceAgreements: async (params: object) => {
     try { return await request.get<{ list: PriceAgreement[]; total: number }>('/v1/scm/price-agreements', params) }
-    catch { return { list: [], total: 0 } }
+    catch (e) { rethrowIfNoMock(e); return { list: [], total: 0 } }
   },
   createPriceAgreement: async (data: object) => {
     try { return await request.post<PriceAgreement>('/v1/scm/price-agreements', data) }
-    catch { return null as unknown as PriceAgreement }
+    catch (e) { rethrowIfNoMock(e); return null as unknown as PriceAgreement }
   },
   expirePriceAgreement: async (id: string) => {
     try { return await request.patch<void>(`/v1/scm/price-agreements/${id}/expire`, {}) }
-    catch { return }
+    catch (e) { rethrowIfNoMock(e); return }
   },
 
   // 供应商资质
   getQualifications: async (params: object) => {
     try { return await request.get<{ list: SupplierQualification[]; total: number }>('/v1/scm/supplier-qualifications', params) }
-    catch { return { list: [], total: 0 } }
+    catch (e) { rethrowIfNoMock(e); return { list: [], total: 0 } }
   },
   createQualification: async (data: object) => {
     try { return await request.post<SupplierQualification>('/v1/scm/supplier-qualifications', data) }
-    catch { return null as unknown as SupplierQualification }
+    catch (e) { rethrowIfNoMock(e); return null as unknown as SupplierQualification }
   },
   updateQualification: async (id: string, data: object) => {
     try { return await request.patch<SupplierQualification>(`/v1/scm/supplier-qualifications/${id}`, data) }
-    catch { return null as unknown as SupplierQualification }
+    catch (e) { rethrowIfNoMock(e); return null as unknown as SupplierQualification }
   },
 
   // 到货异常
   getReceiptExceptions: async (params: object) => {
     try { return await request.get<{ list: ReceiptException[]; total: number }>('/v1/scm/receipt-exceptions', params) }
-    catch { return { list: [], total: 0 } }
+    catch (e) { rethrowIfNoMock(e); return { list: [], total: 0 } }
   },
   createReceiptException: async (data: object) => {
     try { return await request.post<ReceiptException>('/v1/scm/receipt-exceptions', data) }
-    catch { return null as unknown as ReceiptException }
+    catch (e) { rethrowIfNoMock(e); return null as unknown as ReceiptException }
   },
   processException: async (id: string, data: object) => {
     try { return await request.patch<void>(`/v1/scm/receipts/exceptions/${id}/process`, data) }
-    catch { return }
+    catch (e) { rethrowIfNoMock(e); return }
   },
   closeException: async (id: string) => {
     try { return await request.patch<void>(`/v1/scm/receipts/exceptions/${id}/close`, {}) }
-    catch { return }
+    catch (e) { rethrowIfNoMock(e); return }
   },
 
   // 供应商对账
   getReconciliations: async (params: object) => {
     try { return await request.get<{ list: ScmReconciliation[]; total: number }>('/v1/scm/reconciliations', params) }
-    catch { return { list: [], total: 0 } }
+    catch (e) { rethrowIfNoMock(e); return { list: [], total: 0 } }
   },
   createReconciliation: async (data: object) => {
     try { return await request.post<ScmReconciliation>('/v1/scm/reconciliations', data) }
-    catch { return null as unknown as ScmReconciliation }
+    catch (e) { rethrowIfNoMock(e); return null as unknown as ScmReconciliation }
   },
   confirmReconciliation: async (id: string) => {
     try { return await request.patch<void>(`/v1/scm/reconciliations/${id}/confirm`, {}) }
-    catch { return }
+    catch (e) { rethrowIfNoMock(e); return }
   },
 
   // 到货记录
   getReceipts: async (params: object) => {
     try { return await request.get<{ list: Receipt[]; total: number }>('/v1/scm/receipts', params) }
-    catch { return { list: [], total: 0 } }
+    catch (e) { rethrowIfNoMock(e); return { list: [], total: 0 } }
   },
 
   // 供应商
   getSuppliers: async (params: object) => {
     try { return await request.get<{ list: Supplier[]; total: number }>('/v1/scm/suppliers', params) }
-    catch { return { list: [], total: 0 } }
+    catch (e) { rethrowIfNoMock(e); return { list: [], total: 0 } }
   },
   createSupplier: async (data: object) => {
     try { return await request.post<{ id: string }>('/v1/scm/suppliers', data) }
-    catch { return null as unknown as { id: string } }
+    catch (e) { rethrowIfNoMock(e); return null as unknown as { id: string } }
   },
   updateSupplier: async (id: string, data: object) => {
     try { return await request.patch<Supplier>(`/v1/scm/suppliers/${id}`, data) }
-    catch { return null as unknown as Supplier }
+    catch (e) { rethrowIfNoMock(e); return null as unknown as Supplier }
   },
   getSupplierPerformance: async () => {
     try { return await request.get<{ ranking: { supplierId: string; supplierName: string; score: number; qualityRate: number; deliveryRate: number }[] }>('/v1/scm/suppliers/performance-ranking') }
-    catch { return { ranking: [] } }
+    catch (e) { rethrowIfNoMock(e); return { ranking: [] } }
   },
 
   // 采购分析

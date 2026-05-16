@@ -10,7 +10,7 @@ import { MesWorkOrderOperation } from '../entities/mes-work-order-operation.enti
 import { MesWorkOrderSplit } from '../entities/mes-work-order-split.entity.js';
 import { MesWorkOrderMerge } from '../entities/mes-work-order-merge.entity.js';
 import { TenantContext } from '../../../shared/tenant/tenant.context.js';
-import { sanitizeUpdateData } from '../../../shared/utils/sanitize.js';
+import { sanitizeUpdateData, escapeLikePattern } from '../../../shared/utils/sanitize.js';
 
 // 状态流转规则
 const WO_TRANSITIONS: Record<string, string[]> = {
@@ -65,6 +65,9 @@ export class WorkOrderService {
 
     const qb = this.woRepo
       .createQueryBuilder('wo')
+      .leftJoin('plm_material', 'mat', 'mat.id = wo.material_id')
+      .addSelect('mat.code', 'materialCode')
+      .addSelect('mat.name', 'materialName')
       .where('wo.tenant_id = :tenantId', { tenantId });
 
     if (status) qb.andWhere('wo.status = :status', { status });
@@ -75,34 +78,21 @@ export class WorkOrderService {
       qb.andWhere('wo.planned_start >= :from', { from: plannedStartFrom });
     if (plannedStartTo)
       qb.andWhere('wo.planned_start <= :to', { to: plannedStartTo });
-    if (keyword) qb.andWhere('wo.wo_no LIKE :kw', { kw: `%${keyword}%` });
+    if (keyword) qb.andWhere('wo.wo_no LIKE :kw', { kw: `%${escapeLikePattern(keyword)}%` });
 
-    const [wos, total] = await qb
+    const { entities, raw } = await qb
       .orderBy('wo.priority', 'ASC')
       .addOrderBy('wo.planned_start', 'ASC')
       .skip((page - 1) * pageSize)
       .take(pageSize)
-      .getManyAndCount();
+      .getRawAndEntities();
 
-    // 批量查物料名称（QueryBuilder 替代原生 SQL，不硬编码表名）
-    const matIds = [...new Set(wos.map((w) => w.materialId).filter(Boolean))];
-    const matMap = new Map<string, { code: string; name: string }>();
-    if (matIds.length > 0) {
-      const mats = await this.woRepo.manager
-        .createQueryBuilder()
-        .select(['m.id AS id', 'm.code AS code', 'm.name AS name'])
-        .from('plm_material', 'm')
-        .where('m.id IN (:...ids)', { ids: matIds })
-        .getRawMany<{ id: string; code: string; name: string }>();
-      mats.forEach((m) =>
-        matMap.set(String(m.id), { code: m.code, name: m.name }),
-      );
-    }
+    const total = await qb.getCount();
 
-    const items = wos.map((w) => ({
-      ...w,
-      materialCode: matMap.get(w.materialId)?.code,
-      materialName: matMap.get(w.materialId)?.name,
+    const items = entities.map((wo, i) => ({
+      ...wo,
+      materialCode: raw[i]?.materialCode,
+      materialName: raw[i]?.materialName,
     })) as (MesWorkOrder & { materialName?: string; materialCode?: string })[];
 
     return { items, total };

@@ -1,5 +1,5 @@
 // ERP 扩展 API（补全缺失功能）
-import { request } from '@/utils/request'
+import { request, MOCK_ENABLED } from '@/utils/request'
 
 export interface ErpCustomer {
   id: string
@@ -100,6 +100,35 @@ export interface ErpCostCenter {
   children?: ErpCostCenter[]
 }
 
+export interface ErpSalesOrder {
+  id: string
+  code: string
+  customerId: string
+  customerName?: string
+  status: string
+  totalAmount: number
+  currency: string
+  orderDate: string
+  deliveryDate?: string
+}
+
+export interface ErpVoucher {
+  id: string
+  voucherNo: string
+  voucherType: string
+  status: string
+  totalDebit: number
+  totalCredit: number
+  voucherDate: string
+  description?: string
+  createdAt: string
+}
+
+// 向后兼容别名
+export type Customer = ErpCustomer
+export type SalesOrder = ErpSalesOrder
+export type Voucher = ErpVoucher
+
 export interface ErpCostElement {
   id: string
   code: string
@@ -122,7 +151,10 @@ export interface ErpStandardCost {
 }
 
 const d = async <T>(fn: () => Promise<T>, _fallback: T): Promise<T> => {
-  return await fn()
+  try { return await fn() } catch (e) {
+    if (!MOCK_ENABLED) throw e
+    return _fallback
+  }
 }
 
 export const erpExtApi = {
@@ -151,6 +183,26 @@ export const erpExtApi = {
     d(() => request.patch<void>(`/v1/erp/quotations/${id}/reject`, { reason }), undefined),
   convertQuotation: (id: string) =>
     d(() => request.post<{ salesOrderId: string }>(`/v1/erp/quotations/${id}/convert`, {}), null as unknown as { salesOrderId: string }),
+
+  // 销售订单
+  getSalesOrders: (params: object) =>
+    d(() => request.get<{ list: ErpSalesOrder[]; total: number }>('/v1/erp/sales-orders', params), { list: [], total: 0 }),
+  getSalesOrder: (id: string) =>
+    d(() => request.get<ErpSalesOrder>(`/v1/erp/sales-orders/${id}`), null as unknown as ErpSalesOrder),
+  createSalesOrder: (data: object) =>
+    d(() => request.post<{ id: string }>('/v1/erp/sales-orders', data), null as unknown as { id: string }),
+  confirmSalesOrder: (id: string) =>
+    d(() => request.patch<void>(`/v1/erp/sales-orders/${id}/confirm`, {}), undefined),
+
+  // 凭证
+  getVouchers: (params: object) =>
+    d(() => request.get<{ list: ErpVoucher[]; total: number }>('/v1/erp/vouchers', params), { list: [], total: 0 }),
+  createVoucher: (data: object) =>
+    d(() => request.post<{ id: string }>('/v1/erp/vouchers', data), null as unknown as { id: string }),
+  approveVoucher: (id: string) =>
+    d(() => request.patch<void>(`/v1/erp/vouchers/${id}/approve`, {}), undefined),
+  postVoucher: (id: string) =>
+    d(() => request.patch<void>(`/v1/erp/vouchers/${id}/post`, {}), undefined),
 
   // 发货
   getShipments: (params: object) =>

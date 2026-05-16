@@ -14,5 +14,5 @@ export function getMetricsTrend() {
 }
 
 export function getLogs(params: any) {
-  return request.get('/logs', { params })
+  return request.get('/logs', params)
 }

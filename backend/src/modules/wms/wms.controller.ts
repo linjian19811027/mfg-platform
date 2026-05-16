@@ -13,6 +13,7 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { InjectRepository } from '@nestjs/typeorm';
+import { SafetyStockAlertService } from './services/safety-stock-alert.service.js';
 import { Repository } from 'typeorm';
 import { InventoryService } from './services/inventory.service.js';
 import { ReceiptService, ReceiptRequest } from './services/receipt.service.js';
@@ -50,6 +51,7 @@ export class WmsController {
     private readonly stockTakeSvc: StockTakeService,
     private readonly reportSvc: WmsReportService,
     private readonly strategySvc: LocationStrategyService,
+    private readonly alertSvc: SafetyStockAlertService,
     @InjectRepository(WmsWarehouse)
     private readonly warehouseRepo: Repository<WmsWarehouse>,
     @InjectRepository(WmsSafetyStock)
@@ -316,6 +318,12 @@ export class WmsController {
   @ApiOperation({ summary: '删除安全库存' })
   async deleteSafetyStock(@Param('id') id: string) {
     await this.safetyStockRepo.delete(id);
+  }
+
+  @Get('safety-stocks/alerts')
+  @ApiOperation({ summary: '库存预警（低于安全库存的物料列表）' })
+  getSafetyStockAlerts() {
+    return this.alertSvc.getAlerts();
   }
 
   // ── 条码规则 ──────────────────────────────────────────────────────────────

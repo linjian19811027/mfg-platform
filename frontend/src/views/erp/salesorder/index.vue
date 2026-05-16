@@ -80,7 +80,7 @@ import { ref, reactive, computed } from 'vue'
 import { Message } from '@arco-design/web-vue'
 import MTable from '@/components/MTable/index.vue'
 import type { MTableColumn } from '@/components/MTable/index.vue'
-import { erpApi, type SalesOrder, type Customer } from '@/api/erp'
+import { erpExtApi as erpApi, type SalesOrder, type Customer } from '@/api/erp-ext'
 
 const statusOptions = [
   { label: t('erp.salesorder.draft'), value: 'DRAFT' }, { label: t('erp.salesorder.lbl1225'), value: 'CONFIRMED' },

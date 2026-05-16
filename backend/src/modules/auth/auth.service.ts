@@ -167,6 +167,7 @@ export class AuthService {
       tenantId: tenant.code,
       roles,
       permissions,
+      tokenVersion: user.tokenVersion ?? 0,
     };
 
     return {
@@ -222,11 +223,45 @@ export class AuthService {
       password: hashed,
       passwordChangedAt: new Date(),
     });
+    // 递增 tokenVersion 使旧 token 失效
+    await this.userRepo.increment({ id: userId }, 'tokenVersion', 1);
     return { message: 'Password changed successfully' };
   }
 
   async hashPassword(plain: string): Promise<string> {
     return bcrypt.hash(plain, SALT_ROUNDS);
+  }
+
+  async switchTenant(userId: string, tenantCode: string) {
+    // 验证目标租户存在且活跃
+    const tenant = await this.tenantRepo.findOne({
+      where: { code: tenantCode, status: 'ACTIVE' },
+    });
+    if (!tenant) {
+      throw new UnauthorizedException('AUTH_TENANT_NOT_FOUND');
+    }
+
+    // 验证用户存在
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new UnauthorizedException('AUTH_USER_NOT_FOUND');
+    }
+
+    // 获取用户在目标租户的角色和权限
+    const { roles, permissions } = await this.getUserRolesAndPermissions(userId, tenantCode);
+
+    const payload: JwtPayload = {
+      sub: user.id,
+      username: user.username,
+      tenantId: tenantCode,
+      roles,
+      permissions,
+    };
+
+    return {
+      accessToken: this.jwtService.sign(payload),
+      tenantId: tenantCode,
+    };
   }
 
   private async getUserRolesAndPermissions(userId: string, tenantId: string) {

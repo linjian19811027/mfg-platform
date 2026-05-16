@@ -5,6 +5,7 @@ import {
   ConflictException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { escapeLikePattern } from '../../../shared/utils/sanitize.js';
 import { Repository, DataSource } from 'typeorm';
 import * as ExcelJS from 'exceljs';
 import { HrEmployee, EmployeeStatus } from '../entities/hr-employee.entity.js';
@@ -154,10 +155,10 @@ export class EmployeeService {
       .where('e.tenant_id = :tenantId', { tenantId });
 
     if (query.empNo) {
-      qb.andWhere('e.emp_no LIKE :empNo', { empNo: `%${query.empNo}%` });
+      qb.andWhere('e.emp_no LIKE :empNo', { empNo: `%${escapeLikePattern(query.empNo)}%` });
     }
     if (query.name) {
-      qb.andWhere('e.name LIKE :name', { name: `%${query.name}%` });
+      qb.andWhere('e.name LIKE :name', { name: `%${escapeLikePattern(query.name)}%` });
     }
     if (query.jobType) {
       qb.andWhere('e.job_type = :jobType', { jobType: query.jobType });
@@ -385,10 +386,10 @@ export class EmployeeService {
       .where('e.tenant_id = :tenantId', { tenantId });
 
     if (query.empNo) {
-      qb.andWhere('e.emp_no LIKE :empNo', { empNo: `%${query.empNo}%` });
+      qb.andWhere('e.emp_no LIKE :empNo', { empNo: `%${escapeLikePattern(query.empNo)}%` });
     }
     if (query.name) {
-      qb.andWhere('e.name LIKE :name', { name: `%${query.name}%` });
+      qb.andWhere('e.name LIKE :name', { name: `%${escapeLikePattern(query.name)}%` });
     }
     if (query.jobType) {
       qb.andWhere('e.job_type = :jobType', { jobType: query.jobType });

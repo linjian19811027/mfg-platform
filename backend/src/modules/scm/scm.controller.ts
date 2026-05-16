@@ -254,9 +254,12 @@ export class ScmController {
   @ApiOperation({ summary: '创建采购订单' })
   createPurchaseOrder(
     @CurrentTenant() tenantId: string,
-    @Body() body: { data: Parameters<PurchaseOrderService['create']>[1]; lines: Parameters<PurchaseOrderService['create']>[2] },
+    @Body() body: Record<string, unknown>,
   ) {
-    return this.poSvc.create(tenantId, body.data, body.lines);
+    // 兼容 { data, lines } 和扁平对象两种格式
+    const data = (body.data as Record<string, unknown>) ?? body;
+    const lines = (body.lines as Record<string, unknown>[]) ?? [];
+    return this.poSvc.create(tenantId, data as any, lines as any);
   }
 
   @Get('purchase-orders/:id')

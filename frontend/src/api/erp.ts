@@ -1,4 +1,4 @@
-import { request } from '@/utils/request'
+import { request, MOCK_ENABLED } from '@/utils/request'
 
 export interface Customer {
   id: string
@@ -139,7 +139,10 @@ export interface ProductCost {
 }
 
 const d = async <T>(fn: () => Promise<T>, fallback: T): Promise<T> => {
-  try { return await fn() } catch { return fallback }
+  try { return await fn() } catch (e) {
+    if (!MOCK_ENABLED) throw e
+    return fallback
+  }
 }
 
 export const erpApi = {

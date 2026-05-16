@@ -25,6 +25,7 @@ import { MfgWorkCenter } from './entities/mfg-work-center.entity.js';
 import { ShiftService } from './services/shift.service.js';
 import { CertificationTypeService } from './services/certification-type.service.js';
 import { TenantContext } from '../../shared/tenant/tenant.context.js';
+import { escapeLikePattern } from '../../shared/utils/sanitize.js';
 
 @ApiTags('基础主数据')
 @ApiBearerAuth()
@@ -163,7 +164,7 @@ export class BaseController {
     const qb = this.ruleRepo.createQueryBuilder('r')
       .where('r.tenant_id = :tenantId', { tenantId });
     if (businessKey) qb.andWhere('r.business_key = :businessKey', { businessKey });
-    if (keyword) qb.andWhere('(r.name LIKE :kw OR r.code LIKE :kw)', { kw: `%${keyword}%` });
+    if (keyword) qb.andWhere('(r.name LIKE :kw OR r.code LIKE :kw)', { kw: `%${escapeLikePattern(keyword)}%` });
     const list = await qb.getMany();
     return { list, total: list.length };
   }

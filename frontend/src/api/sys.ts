@@ -1,4 +1,4 @@
-import { request } from '@/utils/request'
+import { request, MOCK_ENABLED } from '@/utils/request'
 
 export interface SysUser {
   id: string
@@ -49,6 +49,8 @@ let mockUsers = [...MOCK_USERS]
 // let nextId = 8 // mock auto-increment
 
 function mockDelay<T>(data: T, ms = 300): Promise<T> {
+  if (!MOCK_ENABLED) return Promise.reject(new Error('[Mock 关闭] sys API — Mock 降级已禁用'))
+  console.warn('[Mock 降级] sys API — 后端未就绪，使用前端 Mock 数据')
   return new Promise(resolve => setTimeout(() => resolve(data), ms))
 }
 

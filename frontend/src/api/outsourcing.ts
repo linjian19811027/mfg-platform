@@ -4,7 +4,7 @@ export function getOutsourcingDashboard() {
   return request.get('/v1/outsourcing/dashboard')
 }
 export function getOutsourcingOrders(params: any) {
-  return request.get('/v1/outsourcing/orders', { params })
+  return request.get('/v1/outsourcing/orders', params)
 }
 export function getOutsourcingOrder(id: string) {
   return request.get(`/v1/outsourcing/orders/${id}`)
@@ -25,7 +25,7 @@ export function getOutsourcingLogs(id: string) {
   return request.get(`/v1/outsourcing/orders/${id}/logs`)
 }
 export function exportOutsourcingOrders(params: any) {
-  return request.get('/v1/outsourcing/orders/export', { params, responseType: 'blob' })
+  return request.getBlob('/v1/outsourcing/orders/export', params)
 }
 
 // 发料

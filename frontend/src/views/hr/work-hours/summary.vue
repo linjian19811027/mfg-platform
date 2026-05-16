@@ -157,8 +157,7 @@ async function handleExport() {
     const params = buildParams()
     delete params.page
     delete params.pageSize
-    const res = await exportWorkHours(params)
-    const blob = new Blob([res.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+    const blob = await exportWorkHours(params)
     const url = window.URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url

@@ -41,7 +41,7 @@ import MTable from '@/components/MTable/index.vue'
 import MForm from '@/components/MForm/index.vue'
 import type { MTableColumn } from '@/components/MTable/index.vue'
 import type { MFormField } from '@/components/MForm/index.vue'
-import { erpApi, type Voucher } from '@/api/erp'
+import { erpExtApi as erpApi, type Voucher } from '@/api/erp-ext'
 
 const typeOptions = [
   { label: 'PURCHASE', value: 'PURCHASE' }, { label: 'SALES', value: 'SALES' },

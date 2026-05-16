@@ -24,7 +24,7 @@ export class SysOrganization {
   @Column({ length: 100 })
   name!: string;
 
-  @Column({ length: 20 })
+  @Column({ length: 20, default: 'WORKSHOP' })
   type!: string; // COMPANY | FACTORY | WORKSHOP | LINE | WORKSTATION
 
   @Column({ name: 'parent_id', type: 'bigint', nullable: true })

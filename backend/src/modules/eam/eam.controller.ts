@@ -44,7 +44,9 @@ export class EamController {
   ) {}
 
   private tenantId(req: Request): string {
-    return (req as any).user?.tenantId ?? 'default';
+    const tid = (req as any).user?.tenantId;
+    if (!tid) throw new Error('EAM: tenantId not found in request context');
+    return tid;
   }
 
   // ═══════════════════════════════════════════════════════════════════════════

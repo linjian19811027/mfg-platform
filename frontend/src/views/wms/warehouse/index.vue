@@ -99,7 +99,7 @@ const whColumns = [
 const whSchema: MFormField[] = [
   { field: 'code', label: t('wms.warehouse.lbl1947'), type: 'input', required: true },
   { field: 'name', label: t('wms.warehouse.lbl1948'), type: 'input', required: true },
-  { field: 'type', label: t('wms.warehouse.type'), type: 'select', options: [{ label: t('wms.warehouse.lbl1949'), value: 'RAW' }, { label: t('wms.warehouse.lbl1950'), value: 'FG' }, { label: t('wms.warehouse.lbl1951'), value: 'WIP' }, { label: t('wms.warehouse.lbl1952'), value: 'OTHER' }] },
+  { field: 'type', label: t('wms.warehouse.type'), type: 'select', options: [{ label: t('wms.warehouse.lbl1949'), value: 'PHYSICAL' }, { label: t('wms.warehouse.lbl1950'), value: 'LOGICAL' }, { label: t('wms.warehouse.lbl1951'), value: 'VIRTUAL' }] },
   { field: 'status', label: t('wms.warehouse.status'), type: 'select', options: [{ label: t('wms.warehouse.enable'), value: 'ACTIVE' }, { label: t('wms.warehouse.disable'), value: 'INACTIVE' }] },
 ]
 

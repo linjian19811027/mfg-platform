@@ -255,6 +255,8 @@ export class SalesOrderService {
         soId: saved.id,
         soNo: saved.soNo,
         customerId: saved.customerId,
+        totalAmount: saved.totalAmount,
+        currency: saved.currency,
         deliveryDate: saved.deliveryDate,
         lines: lines.map((l) => ({
           materialId: l.materialId,

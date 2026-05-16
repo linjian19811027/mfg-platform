@@ -1,0 +1,3116 @@
+[
+  {
+    "file": "aps.ts",
+    "key": "aps.capacity.r22001",
+    "value": "延迟 天",
+    "cnValue": ""
+  },
+  {
+    "file": "aps.ts",
+    "key": "aps.schedule.lbl1020",
+    "value": "已开始",
+    "cnValue": ""
+  },
+  {
+    "file": "aps.ts",
+    "key": "aps.schedule.lbl1018",
+    "value": "已计划",
+    "cnValue": ""
+  },
+  {
+    "file": "aps.ts",
+    "key": "aps.schedule.lbl1017",
+    "value": "触发排程",
+    "cnValue": ""
+  },
+  {
+    "file": "base.ts",
+    "key": "base.file.lbl1037",
+    "value": "上传中...",
+    "cnValue": ""
+  },
+  {
+    "file": "base.ts",
+    "key": "base.file.lbl1035",
+    "value": "表格",
+    "cnValue": ""
+  },
+  {
+    "file": "base.ts",
+    "key": "base.file.lbl1034",
+    "value": "文档",
+    "cnValue": ""
+  },
+  {
+    "file": "base.ts",
+    "key": "base.file.lbl1033",
+    "value": "图片",
+    "cnValue": ""
+  },
+  {
+    "file": "base.ts",
+    "key": "base.batch.lbl1026",
+    "value": "Confirm变更",
+    "cnValue": ""
+  },
+  {
+    "file": "base.ts",
+    "key": "base.batch.lbl1025",
+    "value": "请填写变更原因",
+    "cnValue": ""
+  },
+  {
+    "file": "base.ts",
+    "key": "base.batch.select",
+    "value": "请选择新Status",
+    "cnValue": ""
+  },
+  {
+    "file": "base.ts",
+    "key": "base.batch.lbl1024",
+    "value": "库存流水",
+    "cnValue": ""
+  },
+  {
+    "file": "base.ts",
+    "key": "base.batch.lbl1023",
+    "value": "质量Inspection记录",
+    "cnValue": ""
+  },
+  {
+    "file": "base.ts",
+    "key": "base.batch.lbl1022",
+    "value": "基本信息",
+    "cnValue": ""
+  },
+  {
+    "file": "common.ts",
+    "key": "common.misc.lbl1854",
+    "value": "质量Status",
+    "cnValue": ""
+  },
+  {
+    "file": "common.ts",
+    "key": "common.misc.lbl1844",
+    "value": "Backward Trace（原料→成品）",
+    "cnValue": ""
+  },
+  {
+    "file": "common.ts",
+    "key": "common.misc.lbl1843",
+    "value": "Forward Trace（成品→原料）",
+    "cnValue": ""
+  },
+  {
+    "file": "common.ts",
+    "key": "common.misc.lbl1264",
+    "value": "返回首页",
+    "cnValue": ""
+  },
+  {
+    "file": "common.ts",
+    "key": "common.misc.lbl1263",
+    "value": "您没有访问该页面的权限",
+    "cnValue": ""
+  },
+  {
+    "file": "common.ts",
+    "key": "common.misc.lbl1262",
+    "value": "无权限访问",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.knowledge.r33014",
+    "value": "如 数控机床/液压系统",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.inspection.r33010",
+    "value": "eam.inspection.index.检测值",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.inspection.r33009",
+    "value": "eam.inspection.index.项目",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.equipment.r33001",
+    "value": "生产设备",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.oee.r22004",
+    "value": "质量率: %",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.oee.r22003",
+    "value": "性能率: %",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.oee.r22002",
+    "value": "可用率: %",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.strategy.lbl1149",
+    "value": "维保内容",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.strategy.lbl1148",
+    "value": "触发值",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.strategy.lbl1147",
+    "value": "按运行小时",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.strategy.lbl1146",
+    "value": "按天数",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.strategy.lbl1145",
+    "value": "触发方式",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.strategy.lbl1144",
+    "value": "纠正性维保",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.strategy.lbl1143",
+    "value": "预测性维保",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.strategy.lbl1142",
+    "value": "定期维保",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.strategy.lbl1141",
+    "value": "策略Type",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.strategy.lbl1140",
+    "value": "策略Name",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.strategy.lbl1138",
+    "value": "Create策略",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.oee.lbl1137",
+    "value": "OEE 数据录入成功",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.oee.lbl1136",
+    "value": "录入 OEE 数据",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.lubrication.lbl1131",
+    "value": "记录润滑",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.lubrication.lbl1130",
+    "value": "已逾期",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.lubrication.lbl1129",
+    "value": "7天内到期",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.lubrication.lbl1128",
+    "value": "逾期润滑",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.lubrication.lbl1127",
+    "value": "已逾期",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.knowledge.lbl1124",
+    "value": "预防措施",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.knowledge.lbl1123",
+    "value": "解决方案",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.knowledge.lbl1122",
+    "value": "原因分析",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.knowledge.lbl1121",
+    "value": "Fault现象",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.knowledge.lbl1119",
+    "value": "Create知识items目",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.inspection.lbl1118",
+    "value": "点检完成，一切Normal",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.inspection.lbl1117",
+    "value": "点检完成，发现异常项！",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.inspection.lbl1116",
+    "value": "添加项目",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.inspection.lbl1114",
+    "value": "Create点检记录",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.fault.lbl1113",
+    "value": "低",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.fault.lbl1112",
+    "value": "中",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.fault.lbl1111",
+    "value": "高",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.fault.lbl1109",
+    "value": "严重程度",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.fault.lbl1106",
+    "value": "维修中",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.fault.lbl1105",
+    "value": "诊断中",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.fault.lbl1104",
+    "value": "响应中",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.fault.lbl1103",
+    "value": "已上报",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.fault.lbl1102",
+    "value": "低",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.fault.lbl1101",
+    "value": "中",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.fault.lbl1100",
+    "value": "高",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.fault.lbl1098",
+    "value": "维修中",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.fault.lbl1097",
+    "value": "诊断中",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.fault.lbl1096",
+    "value": "响应中",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.fault.lbl1095",
+    "value": "已上报",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.fault.lbl1094",
+    "value": "上报Fault",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.equipment.lbl1093",
+    "value": "安装日期",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.equipment.lbl1090",
+    "value": "车间",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.equipment.lbl1089",
+    "value": "购置日期",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.equipment.lbl1088",
+    "value": "残值率 (%)",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.equipment.lbl1087",
+    "value": "累计折旧 (元)",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.equipment.lbl1086",
+    "value": "折旧年限 (年)",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.equipment.lbl1085",
+    "value": "折旧方法",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.equipment.lbl1084",
+    "value": "净值 (元)",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.equipment.lbl1083",
+    "value": "原值 (元)",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.equipment.lbl1082",
+    "value": "资产编号",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.equipment.lbl1079",
+    "value": "防护等级",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.equipment.lbl1078",
+    "value": "工作温度范围 (℃)",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.equipment.lbl1077",
+    "value": "精度等级",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.equipment.lbl1076",
+    "value": "转速 (rpm)",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.equipment.lbl1075",
+    "value": "额定电流 (A)",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.equipment.lbl1074",
+    "value": "额定电压 (V)",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.equipment.lbl1073",
+    "value": "额定功率 (kW)",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.equipment.lbl1072",
+    "value": "安装日期",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.equipment.lbl1069",
+    "value": "C类（一般）",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.equipment.lbl1068",
+    "value": "B类（重要）",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.equipment.lbl1067",
+    "value": "A类（关键）",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.equipment.lbl1066",
+    "value": "设备类别",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.equipment.lbl1055",
+    "value": "变更记录接口待后端开发，数据暂不可用",
+    "cnValue": ""
+  },
+  {
+    "file": "eam.ts",
+    "key": "eam.analytics.lbl1048",
+    "value": "次数",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.payable.r44001",
+    "value": "支票",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.shipment.r33025",
+    "value": "发货",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.shipment.r33024",
+    "value": "已签收",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.sales-return.r33020",
+    "value": "接受",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.quotation.r33018",
+    "value": "接受",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.quotation.r33017",
+    "value": "发送",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.payable.r33016",
+    "value": "$t(\\'erp.payable.index.付款方式\\')",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.voucher.lbl1261",
+    "value": "凭证Type",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.voucher.lbl1260",
+    "value": "凭证日期",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.voucher.lbl1259",
+    "value": "已冲销",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.voucher.lbl1258",
+    "value": "已过账",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.voucher.lbl1255",
+    "value": "Create凭证",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.standard-cost.lbl1248",
+    "value": "成本版本",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.standard-cost.lbl1247",
+    "value": "editing ? \\'Edit标准成本\\' : \\'Create标准成本\\'",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.standard-cost.lbl1246",
+    "value": "卷积计算",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.standard-cost.lbl1245",
+    "value": "Create标准成本",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.shipment.lbl1244",
+    "value": "运单号",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.shipment.lbl1243",
+    "value": "承运商",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.shipment.lbl1241",
+    "value": "更新物流",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.shipment.lbl1238",
+    "value": "Create发货单",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.shipment.lbl1237",
+    "value": "已签收",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.salesorder.lbl1233",
+    "value": "订单日期",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.salesorder.lbl1232",
+    "value": "总金额",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.salesorder.lbl1229",
+    "value": "订单编号",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.salesorder.lbl1228",
+    "value": "已交付",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.salesorder.lbl1226",
+    "value": "Production中",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.salesorder.lbl1224",
+    "value": "Create订单",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.sales-return.lbl1223",
+    "value": "Return原因",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.sales-return.lbl1221",
+    "value": "原销售订单",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.sales-return.lbl1219",
+    "value": "CreateReturn单",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.receivable.lbl1217",
+    "value": "收款",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.receivable.lbl1215",
+    "value": "已收",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.receivable.lbl1214",
+    "value": "部分收",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.receivable.lbl1213",
+    "value": "未收",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.receivable.lbl1211",
+    "value": "已收",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.receivable.lbl1210",
+    "value": "部分收",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.receivable.lbl1209",
+    "value": "未收",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.receivable.lbl1208",
+    "value": "应收账款List",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.quotation.lbl1207",
+    "value": "Valid期",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.quotation.lbl1205",
+    "value": "报价日期",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.quotation.lbl1201",
+    "value": "转订单",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.quotation.lbl1200",
+    "value": "Create报价单",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.payable.lbl1197",
+    "value": "付款",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.payable.lbl1196",
+    "value": "已付",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.payable.lbl1195",
+    "value": "部分付",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.payable.lbl1194",
+    "value": "未付",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.payable.lbl1193",
+    "value": "已付",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.payable.lbl1192",
+    "value": "部分付",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.payable.lbl1191",
+    "value": "未付",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.payable.lbl1190",
+    "value": "应付账款",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.customer.lbl1189",
+    "value": "税号",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.customer.lbl1188",
+    "value": "邮箱",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.customer.lbl1185",
+    "value": "信用额度",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.customer.lbl1184",
+    "value": "个人",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.customer.lbl1183",
+    "value": "企业",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.cost-element.lbl1173",
+    "value": "editing ? \\'Edit成本要素\\' : \\'Create成本要素\\'",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.cost-element.lbl1172",
+    "value": "Create成本要素",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.cost-center.lbl1169",
+    "value": "editing ? \\'Edit成本中心\\' : \\'Create成本中心\\'",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.cost-center.lbl1168",
+    "value": "Create子中心",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.cost-center.lbl1167",
+    "value": "Create成本中心",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.cost-center.lbl1166",
+    "value": "成本中心管理",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.cost-analysis.lbl1162",
+    "value": "实际成本",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.cost-analysis.lbl1161",
+    "value": "标准成本",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.account.lbl1160",
+    "value": "贷方",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.account.lbl1159",
+    "value": "借方",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.account.lbl1158",
+    "value": "费用",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.account.lbl1157",
+    "value": "收入",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.account.lbl1156",
+    "value": "权益",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.account.lbl1155",
+    "value": "负债",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.account.lbl1154",
+    "value": "资产",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.account.lbl1153",
+    "value": "editing ? \\'Edit科目\\' : \\'Create科目\\'",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.account.lbl1152",
+    "value": "Create子科目",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.account.lbl1151",
+    "value": "Create科目",
+    "cnValue": ""
+  },
+  {
+    "file": "erp.ts",
+    "key": "erp.account.lbl1150",
+    "value": "科目管理",
+    "cnValue": ""
+  },
+  {
+    "file": "hr.ts",
+    "key": "hr.schedules.r33028",
+    "value": "人",
+    "cnValue": ""
+  },
+  {
+    "file": "hr.ts",
+    "key": "hr.certifications.lbl1266",
+    "value": "续期",
+    "cnValue": ""
+  },
+  {
+    "file": "hr.ts",
+    "key": "hr.certifications.lbl1265",
+    "value": "续期",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.workorder.r33030",
+    "value": "个子工单",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.picking.r33029",
+    "value": "缺料",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.workorder.r22011",
+    "value": "将以下 个工单合并（仅draft/released状态可合并）：",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.workorder.r22010",
+    "value": "子工单",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.workorder.r22009",
+    "value": "同时级联取消 个子工单",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.workorder.r22008",
+    "value": "整体完成度：%",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.wip.r22007",
+    "value": "共 条在制工单",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.workorder.lbl1328",
+    "value": "计划结束",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.workorder.lbl1327",
+    "value": "计划开始",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.workorder.lbl1326",
+    "value": "完成Quantity",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.workorder.lbl1325",
+    "value": "计划Quantity",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.workorder.lbl1322",
+    "value": "待开始",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.workorder.lbl1321",
+    "value": "Material尚未完全齐套",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.workorder.lbl1320",
+    "value": "所有Material已齐套",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.workorder.lbl1319",
+    "value": "关键",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.workorder.lbl1318",
+    "value": "关键",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.receipt-logs.lbl1314",
+    "value": "重试中",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.receipt-logs.lbl1311",
+    "value": "重试中",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.quality-board.lbl1308",
+    "value": "护套",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.quality-board.lbl1307",
+    "value": "绝缘",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.quality-board.lbl1306",
+    "value": "绞线",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.quality-board.lbl1305",
+    "value": "拉丝",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.quality-board.lbl1304",
+    "value": "综合Qualified率",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.quality-board.lbl1303",
+    "value": "首检通过率",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.quality-board.lbl1302",
+    "value": "今日Unqualified品",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.quality-board.lbl1301",
+    "value": "质量看板",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.picking.lbl1299",
+    "value": "扫码Picking",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.picking.lbl1298",
+    "value": "Picking记录",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.picking.lbl1297",
+    "value": "齐套",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.picking.lbl1296",
+    "value": "计划Quantity",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.operation.lbl1294",
+    "value": "待开始",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.operation.lbl1292",
+    "value": "Material短缺",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.operation.lbl1291",
+    "value": "质量问题",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.operation.lbl1288",
+    "value": "完工",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.operation.lbl1287",
+    "value": "开工",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.labor.lbl1286",
+    "value": "记录数：",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.labor.lbl1285",
+    "value": "合计间接工时：",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.labor.lbl1284",
+    "value": "合计直接工时：",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.labor.lbl1283",
+    "value": "工时/报工记录",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.dashboard.lbl1282",
+    "value": "产量：",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.dashboard.lbl1281",
+    "value": "延迟",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.dashboard.lbl1280",
+    "value": "预警",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.dashboard.lbl1279",
+    "value": "停机",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.dashboard.lbl1278",
+    "value": "超期",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.dashboard.lbl1277",
+    "value": "Output Trend（近 7 天）",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.dashboard.lbl1276",
+    "value": "实时Production监控",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.dashboard.lbl1275",
+    "value": "Production看板",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.auto-receipt-config.input",
+    "value": "请输入匹配值",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.auto-receipt-config.select",
+    "value": "请选择匹配Type",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.auto-receipt-config.lbl1270",
+    "value": "直接Inbound",
+    "cnValue": ""
+  },
+  {
+    "file": "mes.ts",
+    "key": "mes.auto-receipt-config.lbl1269",
+    "value": "需要FQC",
+    "cnValue": ""
+  },
+  {
+    "file": "outsourcing.ts",
+    "key": "outsourcing.orders.lbl1335",
+    "value": "Confirm收货",
+    "cnValue": ""
+  },
+  {
+    "file": "outsourcing.ts",
+    "key": "outsourcing.orders.lbl1333",
+    "value": "Confirm发料",
+    "cnValue": ""
+  },
+  {
+    "file": "plm.ts",
+    "key": "plm.ecr.r33040",
+    "value": "物料编码，逗号分隔",
+    "cnValue": ""
+  },
+  {
+    "file": "plm.ts",
+    "key": "plm.ecr.r33039",
+    "value": "请描述变更原因",
+    "cnValue": ""
+  },
+  {
+    "file": "plm.ts",
+    "key": "plm.ecr.r33038",
+    "value": "请输入变更标题",
+    "cnValue": ""
+  },
+  {
+    "file": "plm.ts",
+    "key": "plm.document.r33037",
+    "value": "$t(\\'plm.document.选择文件\\')",
+    "cnValue": ""
+  },
+  {
+    "file": "plm.ts",
+    "key": "plm.routing.lbl1427",
+    "value": "以下工单正在使用该路线，请先处理完成后再废止：",
+    "cnValue": ""
+  },
+  {
+    "file": "plm.ts",
+    "key": "plm.routing.lbl1422",
+    "value": "Create路线",
+    "cnValue": ""
+  },
+  {
+    "file": "plm.ts",
+    "key": "plm.ecr.lbl1419",
+    "value": "影响Material",
+    "cnValue": ""
+  },
+  {
+    "file": "plm.ts",
+    "key": "plm.ecr.lbl1418",
+    "value": "变更原因",
+    "cnValue": ""
+  },
+  {
+    "file": "plm.ts",
+    "key": "plm.ecr.lbl1417",
+    "value": "文件变更",
+    "cnValue": ""
+  },
+  {
+    "file": "plm.ts",
+    "key": "plm.ecr.lbl1416",
+    "value": "工艺变更",
+    "cnValue": ""
+  },
+  {
+    "file": "plm.ts",
+    "key": "plm.ecr.lbl1415",
+    "value": "BOM变更",
+    "cnValue": ""
+  },
+  {
+    "file": "plm.ts",
+    "key": "plm.ecr.lbl1414",
+    "value": "Material变更",
+    "cnValue": ""
+  },
+  {
+    "file": "plm.ts",
+    "key": "plm.ecr.lbl1413",
+    "value": "变更Type",
+    "cnValue": ""
+  },
+  {
+    "file": "plm.ts",
+    "key": "plm.ecr.lbl1411",
+    "value": "审批历史",
+    "cnValue": ""
+  },
+  {
+    "file": "plm.ts",
+    "key": "plm.ecn-execution-plans.lbl1403",
+    "value": "重试",
+    "cnValue": ""
+  },
+  {
+    "file": "plm.ts",
+    "key": "plm.ecn-execution-plans.lbl1394",
+    "value": "切换到新版BOM/工艺",
+    "cnValue": ""
+  },
+  {
+    "file": "plm.ts",
+    "key": "plm.ecn-execution-plans.lbl1393",
+    "value": "继续使用旧版BOM/工艺",
+    "cnValue": ""
+  },
+  {
+    "file": "plm.ts",
+    "key": "plm.ecn-execution-plans.lbl1392",
+    "value": "人工覆盖",
+    "cnValue": ""
+  },
+  {
+    "file": "plm.ts",
+    "key": "plm.ecn-execution-plans.lbl1391",
+    "value": "待Confirm",
+    "cnValue": ""
+  },
+  {
+    "file": "plm.ts",
+    "key": "plm.ecn-execution-plans.lbl1390",
+    "value": "切换新版",
+    "cnValue": ""
+  },
+  {
+    "file": "plm.ts",
+    "key": "plm.ecn-execution-plans.lbl1389",
+    "value": "继续旧版",
+    "cnValue": ""
+  },
+  {
+    "file": "plm.ts",
+    "key": "plm.ecn-execution-plans.lbl1385",
+    "value": "工艺路线变更",
+    "cnValue": ""
+  },
+  {
+    "file": "plm.ts",
+    "key": "plm.ecn-execution-plans.lbl1384",
+    "value": "BOM变更",
+    "cnValue": ""
+  },
+  {
+    "file": "plm.ts",
+    "key": "plm.ecn-execution-plans.lbl1383",
+    "value": "修改",
+    "cnValue": ""
+  },
+  {
+    "file": "plm.ts",
+    "key": "plm.ecn-execution-plans.lbl1382",
+    "value": "重试失败项",
+    "cnValue": ""
+  },
+  {
+    "file": "plm.ts",
+    "key": "plm.ecn-execution-plans.lbl1381",
+    "value": "手动触发",
+    "cnValue": ""
+  },
+  {
+    "file": "plm.ts",
+    "key": "plm.ecn.lbl1379",
+    "value": "已签发",
+    "cnValue": ""
+  },
+  {
+    "file": "plm.ts",
+    "key": "plm.ecn.lbl1378",
+    "value": "签发",
+    "cnValue": ""
+  },
+  {
+    "file": "plm.ts",
+    "key": "plm.ecn.lbl1377",
+    "value": "完成",
+    "cnValue": ""
+  },
+  {
+    "file": "plm.ts",
+    "key": "plm.ecn.lbl1376",
+    "value": "签发 ECN",
+    "cnValue": ""
+  },
+  {
+    "file": "plm.ts",
+    "key": "plm.ecn.lbl1375",
+    "value": "已签发",
+    "cnValue": ""
+  },
+  {
+    "file": "plm.ts",
+    "key": "plm.document.lbl1373",
+    "value": "关联ID不能为空",
+    "cnValue": ""
+  },
+  {
+    "file": "plm.ts",
+    "key": "plm.code-rule.lbl1370",
+    "value": "Index位数",
+    "cnValue": ""
+  },
+  {
+    "file": "plm.ts",
+    "key": "plm.code-rule.lbl1369",
+    "value": "前缀",
+    "cnValue": ""
+  },
+  {
+    "file": "plm.ts",
+    "key": "plm.code-rule.lbl1368",
+    "value": "规则模板",
+    "cnValue": ""
+  },
+  {
+    "file": "plm.ts",
+    "key": "plm.bom.lbl1367",
+    "value": "以下工单正在使用该 BOM，请先处理完成后再Action：",
+    "cnValue": ""
+  },
+  {
+    "file": "plm.ts",
+    "key": "plm.bom.lbl1366",
+    "value": "变更",
+    "cnValue": ""
+  },
+  {
+    "file": "plm.ts",
+    "key": "plm.bom.lbl1364",
+    "value": "对比",
+    "cnValue": ""
+  },
+  {
+    "file": "plm.ts",
+    "key": "plm.bom.lbl1360",
+    "value": "重新激活",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.spc.r33054",
+    "value": "个失控点，请检查生产过程",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.spc.r33053",
+    "value": "发现",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.nonconformance.r33049",
+    "value": "包装问题",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.nonconformance.r33048",
+    "value": "材料异常",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.nonconformance.r33047",
+    "value": "功能故障",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.nonconformance.r33046",
+    "value": "尺寸偏差",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.nonconformance.r33045",
+    "value": "外观缺陷",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.capa.r33043",
+    "value": "$t(\\'qms.capa.index.根本原因\\')",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.supplier-quality.lbl1552",
+    "value": "Supplier质量记录（IQC）",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.standard.lbl1549",
+    "value": "适用Material",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.standard.lbl1546",
+    "value": "过程Inspection(IPQC)",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.standard.lbl1545",
+    "value": "来料Inspection(IQC)",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.standard.lbl1543",
+    "value": "标准Name",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.standard.lbl1542",
+    "value": "标准Code",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.standard.lbl1541",
+    "value": "发布新版本",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.standard.lbl1540",
+    "value": "Inspection项目",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.standard.lbl1539",
+    "value": "`${currentStd?.name ?? \\'\\'} - 版本历史`",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.standard.lbl1538",
+    "value": "editing ? \\'EditInspection标准\\' : \\'Create检验标准\\'",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.standard.lbl1536",
+    "value": "CreateInspection标准",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.standard.lbl1535",
+    "value": "出货Inspection",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.standard.lbl1534",
+    "value": "成品Inspection",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.standard.lbl1533",
+    "value": "过程Inspection",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.standard.lbl1532",
+    "value": "来料Inspection",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.spc.inputDataPoint",
+    "value": "录入数据点",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.recall.lbl1531",
+    "value": "召回原因",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.recall.lbl1530",
+    "value": "Batch号（逗号分隔）",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.recall.lbl1526",
+    "value": "已发起",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.recall.lbl1521",
+    "value": "已发起",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.nonconformance.lbl1520",
+    "value": "处置说明",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.nonconformance.lbl1517",
+    "value": "处置结论",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.nonconformance.lbl1514",
+    "value": "包装问题",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.nonconformance.lbl1513",
+    "value": "材料异常",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.nonconformance.lbl1512",
+    "value": "功能Fault",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.nonconformance.lbl1511",
+    "value": "尺寸偏差",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.nonconformance.lbl1510",
+    "value": "外观缺陷",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.nonconformance.lbl1506",
+    "value": "处置",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.nonconformance.lbl1505",
+    "value": "CreateUnqualified品",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.inspection.lbl1502",
+    "value": "Inspection结果",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.inspection.lbl1501",
+    "value": "Inspection标准",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.inspection.lbl1496",
+    "value": "录入结果",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.final-inspection.lbl1494",
+    "value": "Inspection标准",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.final-inspection.lbl1489",
+    "value": ")\">录入结果",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.final-inspection.lbl1488",
+    "value": "CreateInspection任务",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.complaint.lbl1485",
+    "value": "处理结果",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.complaint.lbl1478",
+    "value": "严重程度",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.complaint.lbl1477",
+    "value": "投诉Description",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.complaint.lbl1472",
+    "value": "editing ? \\'处理投诉\\' : \\'Create投诉\\'",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.complaint.lbl1471",
+    "value": "处理",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.complaint.lbl1468",
+    "value": "Create投诉",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.capa.lbl1461",
+    "value": "目标完成日",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.capa.lbl1460",
+    "value": "责任人",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.capa.lbl1459",
+    "value": "纠正措施",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.capa.lbl1458",
+    "value": "鱼骨图分析",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.capa.lbl1457",
+    "value": "5Why根因分析",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.capa.lbl1454",
+    "value": "待验证",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.capa.lbl1449",
+    "value": "验证",
+    "cnValue": ""
+  },
+  {
+    "file": "qms.ts",
+    "key": "qms.capa.lbl1446",
+    "value": "待验证",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.supplier-performance.r33065",
+    "value": "已过期",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.qualification.r33060",
+    "value": "有效",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.price-agreement.r33059",
+    "value": "天后到期",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.price-agreement.r33058",
+    "value": "有效",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.asn.r33056",
+    "value": "已接收",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.supplier-performance.lbl1644",
+    "value": "{value}分",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.supplier.lbl1643",
+    "value": "邮箱",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.supplier.lbl1640",
+    "value": "等级",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.supplier.lbl1639",
+    "value": "邮箱",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.supplier.lbl1636",
+    "value": "等级",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.supplier.lbl1635",
+    "value": "待审",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.supplier.lbl1632",
+    "value": "待审",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.rfq.lbl1631",
+    "value": "询价Quantity",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.rfq.lbl1630",
+    "value": "已报价",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.rfq.lbl1627",
+    "value": "比价",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.rfq.lbl1626",
+    "value": "发送",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.rfq.lbl1625",
+    "value": "Create询价单",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.rfq.lbl1624",
+    "value": "已报价",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.reconciliation.lbl1619",
+    "value": "对账金额",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.reconciliation.lbl1618",
+    "value": "对账期间",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.reconciliation.lbl1616",
+    "value": "editing ? \\'Edit对账单\\' : \\'Create对账单\\'",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.reconciliation.lbl1615",
+    "value": "有争议",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.reconciliation.lbl1614",
+    "value": "Create对账单",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.reconciliation.lbl1613",
+    "value": "有争议",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.receipt-exception.lbl1611",
+    "value": "处理方案",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.receipt-exception.lbl1608",
+    "value": "包装损坏",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.receipt-exception.lbl1607",
+    "value": "质量问题",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.receipt-exception.lbl1606",
+    "value": "Quantity不符",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.receipt-exception.lbl1604",
+    "value": "editing ? \\'处理异常\\' : \\'Create异常\\'",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.receipt-exception.close",
+    "value": "关闭",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.receipt-exception.lbl1603",
+    "value": "处理",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.receipt-exception.lbl1601",
+    "value": "处理中",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.receipt-exception.lbl1599",
+    "value": "处理中",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.qualification.lbl1597",
+    "value": "到期日期",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.qualification.lbl1596",
+    "value": "颁发日期",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.qualification.lbl1595",
+    "value": "证书编号",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.qualification.lbl1594",
+    "value": "资质Type",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.qualification.lbl1592",
+    "value": "editing ? \\'Edit资质\\' : \\'Create资质\\'",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.qualification.lbl1591",
+    "value": "Create资质",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.purchase-request.lbl1590",
+    "value": "转Purchase订单",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.purchase-request.lbl1588",
+    "value": "批准",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.purchase-request.lbl1587",
+    "value": "CreatePurchase申请",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.purchase.lbl1585",
+    "value": "预计到货",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.purchase.lbl1584",
+    "value": "订单日期",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.purchase.lbl1582",
+    "value": "总金额",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.purchase.lbl1580",
+    "value": "订单编号",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.purchase.lbl1579",
+    "value": "`Purchase订单：${currentOrder?.code}`",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.purchase.lbl1578",
+    "value": "CreatePurchase订单",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.price-agreement.lbl1569",
+    "value": "协议价格",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.price-agreement.lbl1566",
+    "value": "editing ? \\'Edit价格协议\\' : \\'Create价格协议\\'",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.price-agreement.lbl1565",
+    "value": "过期",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.price-agreement.lbl1563",
+    "value": "Create价格协议",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.asn.lbl1561",
+    "value": "预计到货日期",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.asn.lbl1560",
+    "value": "Purchase订单（可选）",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.asn.lbl1558",
+    "value": "接收",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.asn.lbl1557",
+    "value": "待到货",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.asn.lbl1556",
+    "value": "逾期未到",
+    "cnValue": ""
+  },
+  {
+    "file": "scm.ts",
+    "key": "scm.asn.lbl1553",
+    "value": "待到货",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.organization.r44002",
+    "value": "只能包含字母、数字、横线和下划线",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.tenant.r33083",
+    "value": "即将到期",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.tenant.r33082",
+    "value": "已过期",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.permission.r33080",
+    "value": "模块的所有权限集合",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.permission.r33079",
+    "value": "个角色",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.organization.r33078",
+    "value": "组织",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.organization.r33076",
+    "value": "$t(\\'sys.organization.index.组织编码\\')",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.organization.r33075",
+    "value": "$t(\\'sys.organization.index.组织名称\\')",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.numbering.r33073",
+    "value": "规则编码",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.monitor.r33068",
+    "value": "负载",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.monitor.r33067",
+    "value": "核",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.audit-log.r33066",
+    "value": "审计日志",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.organization.r22017",
+    "value": "子组织（）",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.organization.r22016",
+    "value": "第 层",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.numbering.r22015",
+    "value": "确认删除此规则？",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.monitor.r22014",
+    "value": "活跃 ·慢查询{{metrics.database?.slowQueries??0}}",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.uom.lbl1806",
+    "value": "基准单位",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.uom.lbl1805",
+    "value": "面积",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.uom.lbl1804",
+    "value": "体积",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.uom.lbl1803",
+    "value": "重量",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.uom.lbl1802",
+    "value": "长度",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.uom.lbl1801",
+    "value": "面积",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.uom.lbl1800",
+    "value": "体积",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.uom.lbl1799",
+    "value": "重量",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.uom.lbl1798",
+    "value": "长度",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.uom.input2",
+    "value": "请输入单位符号",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.uom.lbl1797",
+    "value": "editingUom ? \\'Edit计量单位\\' : \\'Create计量单位\\'",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.uom.lbl1796",
+    "value": "未设置",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.uom.lbl1795",
+    "value": "非基准",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.uom.lbl1794",
+    "value": "基准",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.tenant.input2",
+    "value": "请输入租户Code",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.tenant.input",
+    "value": "请输入租户Name",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.tenant.lbl1786",
+    "value": "editingTenant ? \\'Edit租户\\' : \\'Create租户\\'",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.role.lbl1780",
+    "value": "已禁用",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.role.lbl1778",
+    "value": "创建失败",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.role.lbl1776",
+    "value": "折叠全部",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.role.lbl1775",
+    "value": "展开全部",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.role.lbl1774",
+    "value": "Cancel全选",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.role.selectAll",
+    "value": "全选",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.role.lbl1770",
+    "value": "ConfirmEnable该角色？",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.role.lbl1769",
+    "value": "Confirm禁用该角色？",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.permission.lbl1766",
+    "value": "仓库管理员",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.permission.lbl1765",
+    "value": "审批员",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.permission.lbl1764",
+    "value": "View员",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.permission.lbl1763",
+    "value": "Action员",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.permission.lbl1762",
+    "value": "管理员",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.permission.lbl1761",
+    "value": "允许管理该模块的配置和用户",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.permission.lbl1760",
+    "value": "允许对该模块中的记录进行审批Action",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.permission.lbl1759",
+    "value": "允许Delete该模块中的记录",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.permission.lbl1758",
+    "value": "允许修改该模块中的已有记录",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.permission.lbl1757",
+    "value": "允许在该模块中Create记录",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.permission.lbl1756",
+    "value": "允许View该模块的数据List和Detail",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.permission.lbl1755",
+    "value": "关联角色",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.permission.lbl1754",
+    "value": "模块权限",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.permission.lbl1752",
+    "value": "折叠全部",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.permission.lbl1751",
+    "value": "展开全部",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.organization.lbl1746",
+    "value": "顶级",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.organization.lbl1745",
+    "value": "子",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.organization.lbl1744",
+    "value": "Edit组织",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.organization.lbl1742",
+    "value": "创建",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.organization.lbl1741",
+    "value": "selectedOrg ? \\'组织Detail\\' : \\'请选择组织\\'",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.organization.lbl1740",
+    "value": "折叠",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.organization.expand",
+    "value": "展开",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.numbering.lbl1739",
+    "value": "当前序列",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.numbering.lbl1738",
+    "value": "模式",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.numbering.lbl1737",
+    "value": "规则Name",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.numbering.lbl1736",
+    "value": "规则Code",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.numbering.lbl1734",
+    "value": "业务字段名 (如 categoryCode)",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.numbering.lbl1733",
+    "value": "位数",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.numbering.lbl1729",
+    "value": "日期格式",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.numbering.lbl1728",
+    "value": "常量内容",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.numbering.lbl1727",
+    "value": "业务字段 (FIELD)",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.numbering.lbl1726",
+    "value": "流水号 (SERIAL)",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.numbering.lbl1724",
+    "value": "常量 (CONST)",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.numbering.lbl1723",
+    "value": "规则定义",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.numbering.lbl1722",
+    "value": "如 ECR自动编号规则",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.numbering.lbl1720",
+    "value": "WMS-Inbound单",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.numbering.lbl1719",
+    "value": "SCM-Purchase订单",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.numbering.lbl1718",
+    "value": "PLM-变更通知(ECN)",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.numbering.lbl1717",
+    "value": "PLM-变更申请(ECR)",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.numbering.lbl1715",
+    "value": "formData.id ? \\'Edit规则\\' : \\'Create规则\\'",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.numbering.lbl1714",
+    "value": "规则Name/Code",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.numbering.lbl1713",
+    "value": "WMS-Inbound单",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.numbering.lbl1712",
+    "value": "SCM-Purchase订单",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.numbering.lbl1711",
+    "value": "PLM-变更通知(ECN)",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.numbering.lbl1710",
+    "value": "PLM-变更申请(ECR)",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.monitor.lbl1700",
+    "value": "进程RSS",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.monitor.lbl1699",
+    "value": "进程堆",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.monitor.lbl1694",
+    "value": "数据库连接",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.monitor.lbl1693",
+    "value": "内存使用率",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.monitor.lbl1692",
+    "value": "CPU 使用率",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.monitor.lbl1690",
+    "value": "● 运行Normal",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.logs.lbl1688",
+    "value": "业务错误",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.logs.lbl1685",
+    "value": "错误堆栈：",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.logs.lbl1683",
+    "value": "请求体：",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.logs.lbl1682",
+    "value": "锁定",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.logs.lbl1679",
+    "value": "业务错误",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.audit-log.lbl1673",
+    "value": "Action结果",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.audit-log.lbl1672",
+    "value": "IP地址",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.audit-log.lbl1671",
+    "value": "Action对象",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.audit-log.lbl1669",
+    "value": "Action模块",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.audit-log.lbl1668",
+    "value": "Action人",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.audit-log.lbl1665",
+    "value": "登出",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.audit-log.lbl1662",
+    "value": "销售管理",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.audit-log.lbl1661",
+    "value": "Purchase管理",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.audit-log.lbl1660",
+    "value": "仓储管理",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.audit-log.lbl1659",
+    "value": "质量Inspection",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.audit-log.lbl1658",
+    "value": "Production计划",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.audit-log.lbl1657",
+    "value": "设备管理",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.audit-log.lbl1656",
+    "value": "权限管理",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.audit-log.lbl1655",
+    "value": "角色管理",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.audit-log.lbl1654",
+    "value": "用户管理",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.audit-log.lbl1653",
+    "value": "系统认证",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.audit-log.lbl1652",
+    "value": "响应结果",
+    "cnValue": ""
+  },
+  {
+    "file": "sys.ts",
+    "key": "sys.audit-log.lbl1651",
+    "value": "请求参数",
+    "cnValue": ""
+  },
+  {
+    "file": "traceability.ts",
+    "key": "traceability.recall.r44004",
+    "value": "件",
+    "cnValue": ""
+  },
+  {
+    "file": "traceability.ts",
+    "key": "traceability.recall.r44003",
+    "value": "件",
+    "cnValue": ""
+  },
+  {
+    "file": "traceability.ts",
+    "key": "traceability.recall.r33097",
+    "value": "traceability.recall.index.在库数量",
+    "cnValue": ""
+  },
+  {
+    "file": "traceability.ts",
+    "key": "traceability.recall.r33096",
+    "value": "traceability.recall.detail.在库待发数量",
+    "cnValue": ""
+  },
+  {
+    "file": "traceability.ts",
+    "key": "traceability.forward.r33095",
+    "value": "正向追溯",
+    "cnValue": ""
+  },
+  {
+    "file": "traceability.ts",
+    "key": "traceability.backward.r33087",
+    "value": "反向追溯",
+    "cnValue": ""
+  },
+  {
+    "file": "traceability.ts",
+    "key": "traceability.forward.r22019",
+    "value": "总节点数:",
+    "cnValue": ""
+  },
+  {
+    "file": "traceability.ts",
+    "key": "traceability.backward.r22018",
+    "value": "总节点数:",
+    "cnValue": ""
+  },
+  {
+    "file": "traceability.ts",
+    "key": "traceability.recall.lbl1868",
+    "value": "View详细报告",
+    "cnValue": ""
+  },
+  {
+    "file": "traceability.ts",
+    "key": "traceability.recall.lbl1860",
+    "value": "在库",
+    "cnValue": ""
+  },
+  {
+    "file": "traceability.ts",
+    "key": "traceability.recall.lbl1859",
+    "value": "监控Production进度",
+    "cnValue": ""
+  },
+  {
+    "file": "traceability.ts",
+    "key": "traceability.forward.lbl1842",
+    "value": "完整",
+    "cnValue": ""
+  },
+  {
+    "file": "traceability.ts",
+    "key": "traceability.forward.lbl1838",
+    "value": "在库",
+    "cnValue": ""
+  },
+  {
+    "file": "traceability.ts",
+    "key": "traceability.forward.lbl1833",
+    "value": "在库",
+    "cnValue": ""
+  },
+  {
+    "file": "traceability.ts",
+    "key": "traceability.batches.lbl1821",
+    "value": "在库",
+    "cnValue": ""
+  },
+  {
+    "file": "traceability.ts",
+    "key": "traceability.batches.lbl1818",
+    "value": "Frozen原因：",
+    "cnValue": ""
+  },
+  {
+    "file": "traceability.ts",
+    "key": "traceability.batches.lbl1814",
+    "value": "在库",
+    "cnValue": ""
+  },
+  {
+    "file": "traceability.ts",
+    "key": "traceability.backward.lbl1809",
+    "value": "完整",
+    "cnValue": ""
+  },
+  {
+    "file": "traceability.ts",
+    "key": "traceability.backward.lbl1807",
+    "value": "含Data Missing节点",
+    "cnValue": ""
+  },
+  {
+    "file": "wms.ts",
+    "key": "wms.picking-task.lbl1933",
+    "value": "来源单据",
+    "cnValue": ""
+  },
+  {
+    "file": "wms.ts",
+    "key": "wms.picking-task.lbl1925",
+    "value": "`拣货任务 - ${currentTask?.code ?? \\'\\'}`",
+    "cnValue": ""
+  },
+  {
+    "file": "wms.ts",
+    "key": "wms.inventory-count.lbl1913",
+    "value": "`盘点明细 - ${currentTake?.code ?? \\'\\'}`",
+    "cnValue": ""
+  },
+  {
+    "file": "wms.ts",
+    "key": "wms.dashboard.lbl1892",
+    "value": "净变化",
+    "cnValue": ""
+  },
+  {
+    "file": "wms.ts",
+    "key": "wms.dashboard.lbl1889",
+    "value": "净变化",
+    "cnValue": ""
+  },
+  {
+    "file": "wms.ts",
+    "key": "wms.barcode-rule.lbl1872",
+    "value": "规则Name",
+    "cnValue": ""
+  },
+  {
+    "file": "wms.ts",
+    "key": "wms.barcode-rule.lbl1871",
+    "value": "规则Code",
+    "cnValue": ""
+  }
+]

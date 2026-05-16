@@ -229,8 +229,7 @@ async function handleRenewSubmit() {
 async function handleExport() {
   exportLoading.value = true
   try {
-    const res = await exportCertifications(activeTab.value === 'expiring' ? { expiringSoon: 1 } : { expired: 1 })
-    const blob = new Blob([res.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+    const blob = await exportCertifications(activeTab.value === 'expiring' ? { expiringSoon: 1 } : { expired: 1 })
     const url = window.URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url

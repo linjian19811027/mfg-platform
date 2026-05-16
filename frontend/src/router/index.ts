@@ -16,6 +16,12 @@ const routes: RouteRecordRaw[] = [
     meta: { public: true },
   },
   {
+    path: '/404',
+    name: 'NotFound',
+    component: () => import('@/views/error/404.vue'),
+    meta: { public: true },
+  },
+  {
     path: '/',
     component: () => import('@/layouts/BasicLayout.vue'),
     children: [
@@ -156,7 +162,7 @@ const routes: RouteRecordRaw[] = [
       { path: 'plm/ecn-execution-plans/:id', name: 'EcnExecutionPlanDetail', component: () => import('@/views/plm/ecn-execution-plans/detail.vue') },
     ],
   },
-  { path: '/:pathMatch(.*)*', redirect: '/dashboard' },
+  { path: '/:pathMatch(.*)*', redirect: '/404' },
 ]
 
 const router = createRouter({

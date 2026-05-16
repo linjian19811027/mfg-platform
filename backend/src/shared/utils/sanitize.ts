@@ -27,3 +27,8 @@ export function sanitizeUpdateData<T extends Record<string, unknown>>(
   }
   return result;
 }
+
+/** 转义 LIKE 模式中的特殊字符（% _ \），防止用户输入通配符扩大匹配范围 */
+export function escapeLikePattern(input: string): string {
+  return input.replace(/[%_\\]/g, '\\$&');
+}

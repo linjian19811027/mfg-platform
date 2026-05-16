@@ -1,4 +1,6 @@
-import { request } from '@/utils/request'
+import { request, MOCK_ENABLED } from '@/utils/request'
+
+function rethrowIfNoMock(e: unknown) { if (!MOCK_ENABLED) throw e }
 
 export interface Material {
   id: string
@@ -150,12 +152,12 @@ export const plmApi = {
   getMaterials: async (params: object) => {
     try {
       return await request.get<{ list: Material[]; total: number }>('/v1/plm/materials', params)
-    } catch { return { list: [], total: 0 } }
+    } catch (e) { rethrowIfNoMock(e); return { list: [], total: 0 } }
   },
   getMaterial: async (id: string) => {
     try {
       return await request.get<Material>(`/v1/plm/materials/${id}`)
-    } catch { return null as unknown as Material }
+    } catch (e) { rethrowIfNoMock(e); return null as unknown as Material }
   },
   createMaterial: async (data: object) => {
     return await request.post<Material>('/v1/plm/materials', data)
@@ -171,12 +173,12 @@ export const plmApi = {
   getBomList: async (params: object) => {
     try {
       return await request.get<{ list: Bom[]; total: number }>('/v1/plm/boms', params)
-    } catch { return { list: [], total: 0 } }
+    } catch (e) { rethrowIfNoMock(e); return { list: [], total: 0 } }
   },
   getBom: async (id: string) => {
     try {
       return await request.get<Bom>(`/v1/plm/boms/${id}`)
-    } catch { return null as unknown as Bom }
+    } catch (e) { rethrowIfNoMock(e); return null as unknown as Bom }
   },
   createBom: async (data: { bom: object; lines?: object[]; copyFromBomId?: string }) => {
     return await request.post<Bom>('/v1/plm/boms', data)
@@ -196,7 +198,7 @@ export const plmApi = {
   expandBomTree: async (id: string) => {
     try {
       return await request.get<BomNode>(`/v1/plm/boms/${id}/expand`)
-    } catch { return null as unknown as BomNode }
+    } catch (e) { rethrowIfNoMock(e); return null as unknown as BomNode }
   },
   addBomLine: async (bomId: string, data: object) => {
     return await request.post<BomLine>(`/v1/plm/boms/${bomId}/lines`, data)
@@ -210,31 +212,31 @@ export const plmApi = {
   compareBoms: async (v1: string, v2: string) => {
     try {
       return await request.get<BomCompareResult>('/v1/plm/boms/compare', { v1, v2 })
-    } catch { return { added: [], removed: [], modified: [] } as BomCompareResult }
+    } catch (e) { rethrowIfNoMock(e); return { added: [], removed: [], modified: [] } as BomCompareResult }
   },
 
   // Legacy (kept for backward compat)
   getBoms: async (materialId?: string) => {
     try {
       return await request.get<{ list: BomNode[] }>('/v1/plm/boms', { materialId })
-    } catch { return { list: [] } }
+    } catch (e) { rethrowIfNoMock(e); return { list: [] } }
   },
   expandBom: async (id: string) => {
     try {
       return await request.get<BomNode>(`/v1/plm/boms/${id}/expand`)
-    } catch { return null as unknown as BomNode }
+    } catch (e) { rethrowIfNoMock(e); return null as unknown as BomNode }
   },
 
   // Routing
   getRoutingList: async (params: object) => {
     try {
       return await request.get<{ list: Routing[]; total: number }>('/v1/plm/routings', params)
-    } catch { return { list: [], total: 0 } }
+    } catch (e) { rethrowIfNoMock(e); return { list: [], total: 0 } }
   },
   getRouting: async (id: string) => {
     try {
       return await request.get<Routing>(`/v1/plm/routings/${id}`)
-    } catch { return null as unknown as Routing }
+    } catch (e) { rethrowIfNoMock(e); return null as unknown as Routing }
   },
   createRouting: async (data: object) => {
     return await request.post<Routing>('/v1/plm/routings', data)
@@ -268,19 +270,19 @@ export const plmApi = {
   getRoutings: async (params: object) => {
     try {
       return await request.get<{ list: Routing[]; total: number }>('/v1/plm/routings', params)
-    } catch { return { list: [], total: 0 } }
+    } catch (e) { rethrowIfNoMock(e); return { list: [], total: 0 } }
   },
 
   // ECR
   getEcrs: async (params: object) => {
     try {
       return await request.get<{ list: Ecr[]; total: number }>('/v1/plm/ecrs', params)
-    } catch { return { list: [], total: 0 } }
+    } catch (e) { rethrowIfNoMock(e); return { list: [], total: 0 } }
   },
   getEcr: async (id: string) => {
     try {
       return await request.get<Ecr>(`/v1/plm/ecrs/${id}`)
-    } catch { return null as unknown as Ecr }
+    } catch (e) { rethrowIfNoMock(e); return null as unknown as Ecr }
   },
   createEcr: async (data: object) => {
     return await request.post<Ecr>('/v1/plm/ecrs', data)
@@ -302,12 +304,12 @@ export const plmApi = {
   getEcns: async (params: object) => {
     try {
       return await request.get<{ list: Ecn[]; total: number }>('/v1/plm/ecns', params)
-    } catch { return { list: [], total: 0 } }
+    } catch (e) { rethrowIfNoMock(e); return { list: [], total: 0 } }
   },
   getEcn: async (id: string) => {
     try {
       return await request.get<Ecn>(`/v1/plm/ecns/${id}`)
-    } catch { return null as unknown as Ecn }
+    } catch (e) { rethrowIfNoMock(e); return null as unknown as Ecn }
   },
   issueEcn: async (data: object) => {
     return await request.post<Ecn>('/v1/plm/ecns', data)
@@ -320,7 +322,7 @@ export const plmApi = {
   getCategories: async () => {
     try {
       return await request.get<MaterialCategory[]>('/v1/plm/materials/categories')
-    } catch { return [] as MaterialCategory[] }
+    } catch (e) { rethrowIfNoMock(e); return [] as MaterialCategory[] }
   },
   createCategory: async (data: object) => {
     return await request.post<MaterialCategory>('/v1/plm/materials/categories', data)
@@ -336,7 +338,7 @@ export const plmApi = {
   getCodeRules: async (params?: object) => {
     try {
       return await request.get<{ list: MaterialCodeRule[]; total: number }>('/v1/plm/materials/code-rules', params)
-    } catch { return { list: [], total: 0 } }
+    } catch (e) { rethrowIfNoMock(e); return { list: [], total: 0 } }
   },
   createCodeRule: async (data: object) => {
     return await request.post<MaterialCodeRule>('/v1/plm/materials/code-rules', data)
@@ -349,7 +351,7 @@ export const plmApi = {
   getDocuments: async (params: object) => {
     try {
       return await request.get<{ list: PlmDocument[]; total: number }>('/v1/plm/documents', params)
-    } catch { return { list: [], total: 0 } }
+    } catch (e) { rethrowIfNoMock(e); return { list: [], total: 0 } }
   },
   uploadDocument: async (formData: FormData) => {
     return await request.post<PlmDocument>('/v1/plm/documents', formData)
@@ -362,12 +364,12 @@ export const plmApi = {
   getStandardOperations: async (params?: object) => {
     try {
       return await request.get<{ items: StandardOperation[]; total: number }>('/v1/plm/standard-operations', params)
-    } catch { return { items: [], total: 0 } }
+    } catch (e) { rethrowIfNoMock(e); return { items: [], total: 0 } }
   },
   getStandardOperation: async (id: string) => {
     try {
       return await request.get<StandardOperation>(`/v1/plm/standard-operations/${id}`)
-    } catch { return null as unknown as StandardOperation }
+    } catch (e) { rethrowIfNoMock(e); return null as unknown as StandardOperation }
   },
   createStandardOperation: async (data: object) => {
     return await request.post<StandardOperation>('/v1/plm/standard-operations', data)
@@ -383,7 +385,7 @@ export const plmApi = {
 // ── ECN 执行计划 ──────────────────────────────────────────────────────────
 
 export function getEcnExecutionPlans(params: any) {
-  return request.get('/v1/plm/ecn-execution-plans', { params })
+  return request.get('/v1/plm/ecn-execution-plans', params)
 }
 export function getEcnExecutionPlan(id: string) {
   return request.get(`/v1/plm/ecn-execution-plans/${id}`)

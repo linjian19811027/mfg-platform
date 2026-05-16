@@ -27,9 +27,9 @@ export function setupRouterGuard(router: Router) {
       return next({ path: '/login', query: { redirect: to.fullPath } })
     }
 
-    // 3. 检查权限（ADMIN 角色跳过权限检查）
+    // 3. 检查权限（SUPER_ADMIN / TENANT_ADMIN 角色跳过权限检查）
     if (to.meta.permission) {
-      const isAdmin = authStore.roles.some(r => r === 'ADMIN' || r === 'admin' || r === 'SUPER_ADMIN')
+      const isAdmin = authStore.roles.some(r => r === 'SUPER_ADMIN' || r === 'TENANT_ADMIN')
       if (!isAdmin && !authStore.permissions.includes(to.meta.permission)) {
         return next('/403')
       }

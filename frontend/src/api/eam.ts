@@ -1,4 +1,6 @@
-import { request } from '@/utils/request'
+import { request, MOCK_ENABLED } from '@/utils/request'
+
+function rethrowIfNoMock(e: unknown) { if (!MOCK_ENABLED) throw e }
 
 export interface Equipment {
   id: string
@@ -139,7 +141,7 @@ export const eamApi = {
         type: e.type ?? e.equipmentType,
       })) as Equipment[]
       return { list, total: res.total }
-    } catch { return { list: [], total: 0 } }
+    } catch (e) { rethrowIfNoMock(e); return { list: [], total: 0 } }
   },
   getEquipment: async (id: string) => {
     try { return await request.get<Equipment>(`/v1/eam/equipment/${id}`) }
@@ -291,6 +293,6 @@ export const eamApi = {
   getEquipmentHistory: async (id: string) => {
     try {
       return await request.get<ChangeRecord[]>(`/v1/eam/equipment/${id}/history`)
-    } catch { return [] as ChangeRecord[] }
+    } catch (e) { rethrowIfNoMock(e); return [] as ChangeRecord[] }
   },
 }

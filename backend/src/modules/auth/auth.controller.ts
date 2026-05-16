@@ -1,5 +1,6 @@
 import {
   Controller,
+  Get,
   Post,
   Body,
   UseGuards,
@@ -15,6 +16,8 @@ import {
   ApiBody,
 } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { AuthService } from './auth.service.js';
 import {
   LoginDto,
@@ -25,12 +28,17 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
 import { Public } from './decorators/public.decorator.js';
 import { CurrentUser } from './decorators/current-user.decorator.js';
 import { JwtPayload } from './strategies/jwt.strategy.js';
+import { SysTenant } from './entities/sys-tenant.entity.js';
 
 @ApiTags('认证')
 @Controller('api/v1/auth')
 @UseGuards(JwtAuthGuard)
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    @InjectRepository(SysTenant)
+    private readonly tenantRepo: Repository<SysTenant>,
+  ) {}
 
   @Post('login')
   @Public()
@@ -97,5 +105,29 @@ export class AuthController {
       dto.oldPassword,
       dto.newPassword,
     );
+  }
+
+  @Get('tenants')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '获取租户列表（当前用户可见）' })
+  async getTenants() {
+    const tenants = await this.tenantRepo.find({
+      where: { status: 'ACTIVE' },
+      select: ['id', 'code', 'name'],
+      order: { createdAt: 'ASC' },
+    });
+    return tenants.map((t) => ({ id: t.code, name: t.name }));
+  }
+
+  @Post('switch-tenant')
+  @ApiBearerAuth()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: '切换租户' })
+  @ApiBody({ schema: { properties: { tenantId: { type: 'string' } }, required: ['tenantId'] } })
+  async switchTenant(
+    @CurrentUser() user: JwtPayload,
+    @Body() body: { tenantId: string },
+  ) {
+    return this.authService.switchTenant(user.sub, body.tenantId);
   }
 }

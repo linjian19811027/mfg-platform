@@ -9,20 +9,15 @@ interface ApiResponse<T = unknown> {
   data: T
 }
 
-// 递归处理响应数据：格式化日期字段，清理空对象
+// 递归处理响应数据：格式化日期字段
 function processResponseData(data: unknown): unknown {
   if (data === null || data === undefined) return data
   if (Array.isArray(data)) return data.map(processResponseData)
   if (typeof data === 'object') {
     const obj = data as Record<string, unknown>
-    // 空对象 {} 可能是 TypeORM 对 NULL Date 的处理结果
-    if (Object.keys(obj).length === 0) return null
     const result: Record<string, unknown> = {}
     for (const [key, val] of Object.entries(obj)) {
-      if (val !== null && typeof val === 'object' && !Array.isArray(val) && Object.keys(val as object).length === 0) {
-        // 空对象字段 → null
-        result[key] = null
-      } else if (typeof val === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(val)) {
+      if (typeof val === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(val)) {
         // ISO 日期字符串 → YYYY-MM-DD HH:mm
         result[key] = val.replace('T', ' ').substring(0, 16)
       } else if (Array.isArray(val) || (val !== null && typeof val === 'object')) {
@@ -67,7 +62,7 @@ instance.interceptors.response.use(
       const processed = processResponseData(res.data) as Record<string, unknown>
       // 后端部分接口返回 items 或 data 字段，统一映射为 list
       if (processed && typeof processed === 'object') {
-        if ('items' in processed && !('list' in processed)) processed.list = processed.items
+        if ('items' in processed && !('list' in processed) && Array.isArray((processed as Record<string, unknown>).items)) processed.list = (processed as Record<string, unknown>).items
         if ('data' in processed && Array.isArray(processed.data) && !('list' in processed)) processed.list = processed.data
       }
       return processed as never
@@ -112,6 +107,11 @@ export const request = {
   async get<T = any>(url: string, params?: object): Promise<T> {
     return (await instance.get(url, { params } as AxiosRequestConfig)) as T
   },
+  /** GET 请求返回 Blob（用于文件导出） */
+  async getBlob(url: string, params?: object): Promise<Blob> {
+    const res = await instance.get(url, { params, responseType: 'blob' } as AxiosRequestConfig)
+    return res as unknown as Blob
+  },
   async post<T = any>(url: string, data?: object): Promise<T> {
     return (await instance.post(url, data)) as T
   },
@@ -124,6 +124,23 @@ export const request = {
   async delete<T = any>(url: string, params?: object): Promise<T> {
     return (await instance.delete(url, { params } as AxiosRequestConfig)) as T
   },
+}
+
+/**
+ * Mock 降级开关：所有环境默认关闭
+ * - 后端报错直接暴露，便于排查
+ * - 上生产时改为 true 开启降级
+ */
+export const MOCK_ENABLED = import.meta.env.VITE_MOCK_ENABLED === 'true'
+
+/** Mock 降级工具：开关关闭时直接抛错，开关开启时返回兜底数据 */
+export function mockFallback<T>(url: string, fallback: T, ms = 300): Promise<T> {
+  if (!MOCK_ENABLED) {
+    // 测试阶段不降级，让错误暴露出来
+    return Promise.reject(new Error(`[Mock 关闭] ${url} — 后端未返回，Mock 降级已禁用`))
+  }
+  console.warn(`[Mock 降级] ${url} — 后端未就绪，使用前端 Mock 数据`)
+  return new Promise(resolve => setTimeout(() => resolve(fallback), ms))
 }
 
 export { instance }

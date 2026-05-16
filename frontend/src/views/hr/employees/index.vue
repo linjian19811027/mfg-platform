@@ -355,8 +355,7 @@ function handleDelete(record: any) {
 async function handleExport() {
   exportLoading.value = true
   try {
-    const res = await exportEmployees(searchForm)
-    const blob = new Blob([res.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+    const blob = await exportEmployees(searchForm)
     const url = window.URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url

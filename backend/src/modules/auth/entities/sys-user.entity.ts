@@ -46,6 +46,9 @@ export class SysUser {
   @Column({ name: 'login_fail_count', default: 0 })
   loginFailCount!: number;
 
+  @Column({ name: 'token_version', default: 0 })
+  tokenVersion!: number;
+
   @Column({ name: 'locked_until', type: 'timestamp', nullable: true })
   lockedUntil?: Date;
 

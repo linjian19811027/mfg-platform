@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "type-check": "vue-tsc --noEmit",
     "lint": "eslint src --fix",
+    "lint:i18n": "node scripts/check-i18n-en.mjs",
     "format": "prettier --write src"
   },
   "dependencies": {

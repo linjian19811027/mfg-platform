@@ -1,4 +1,4 @@
-import { request } from '@/utils/request'
+import { request, MOCK_ENABLED } from '@/utils/request'
 
 // ==================== 物料批次管理 ====================
 
@@ -66,6 +66,8 @@ export interface ChangeStatusParams {
 // ---- Mock 数据 ----
 
 function mockDelay<T>(data: T, ms = 300): Promise<T> {
+  if (!MOCK_ENABLED) return Promise.reject(new Error('[Mock 关闭] base API — Mock 降级已禁用'))
+  console.warn('[Mock 降级] base API — 后端未就绪，使用前端 Mock 数据')
   return new Promise(resolve => setTimeout(() => resolve(data), ms))
 }
 
@@ -417,7 +419,7 @@ export const fileApi = {
       form.append('file', file)
       if (bizType) form.append('bizType', bizType)
       if (bizNo) form.append('bizNo', bizNo)
-      return await request.post<FileRecord>('/v1/base/files/upload', form)
+      return await request.post<FileRecord>('/v1/files/upload', form)
     } catch {
       const ext = file.name.split('.').pop()?.toLowerCase() ?? ''
       const typeMap: Record<string, FileType> = {

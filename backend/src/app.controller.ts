@@ -16,6 +16,7 @@ import { SysAuditLog } from './modules/auth/entities/sys-audit-log.entity.js';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between, MoreThanOrEqual } from 'typeorm';
 import { TenantContext } from './shared/tenant/tenant.context.js';
+import { escapeLikePattern } from './shared/utils/sanitize.js';
 
 @ApiTags('系统')
 @Controller()
@@ -67,15 +68,18 @@ export class AppController {
   @Get('api/metrics')
   @ApiOperation({ summary: '系统监控指标（CPU/内存/磁盘/进程/数据库）' })
   async metrics() {
-    // CPU
+    // CPU（Windows 下 os.loadavg() 返回 [0,0,0]，用 os.cpus() 计算实际使用率）
     const cpus = os.cpus();
     const cpuCount = cpus.length;
     const cpuModel = cpus[0]?.model ?? 'Unknown';
-    const loadAvg = os.loadavg(); // [1min, 5min, 15min]
-    const cpuUsagePercent = Math.min(
-      100,
-      Math.round((loadAvg[0] / cpuCount) * 100),
-    );
+    const loadAvg = os.loadavg(); // [1min, 5min, 15min] — Windows 始终返回 [0,0,0]
+    let cpuUsagePercent = Math.min(100, Math.round((loadAvg[0] / cpuCount) * 100));
+    if (cpuUsagePercent === 0 && cpuCount > 0) {
+      // Windows fallback：通过 os.cpus() 的 idle/total 时间差计算
+      const totalIdle = cpus.reduce((s, c) => s + c.times.idle, 0);
+      const totalAll = cpus.reduce((s, c) => s + c.times.user + c.times.nice + c.times.sys + c.times.irq + c.times.idle, 0);
+      cpuUsagePercent = totalAll > 0 ? Math.round(((totalAll - totalIdle) / totalAll) * 100) : 0;
+    }
 
     // 内存
     const totalMem = os.totalmem();
@@ -255,13 +259,13 @@ export class AppController {
 
     if (logType) qb.andWhere('l.logType = :logType', { logType });
     if (username)
-      qb.andWhere('l.username LIKE :username', { username: `%${username}%` });
+      qb.andWhere('l.username LIKE :username', { username: `%${escapeLikePattern(username)}%` });
     if (startTime) qb.andWhere('l.createdAt >= :startTime', { startTime });
     if (endTime) qb.andWhere('l.createdAt <= :endTime', { endTime });
     if (keyword)
       qb.andWhere(
         '(l.requestUrl LIKE :kw OR l.errorMessage LIKE :kw OR l.action LIKE :kw)',
-        { kw: `%${keyword}%` },
+        { kw: `%${escapeLikePattern(keyword)}%` },
       );
 
     const [items, total] = await qb.getManyAndCount();

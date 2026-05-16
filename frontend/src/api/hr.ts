@@ -70,7 +70,7 @@ export interface EmployeeOverview {
 
 // 员工管理 API
 export function getEmployees(params: HrEmployeeQuery) {
-  return request.get<EmployeePageResult>('/v1/hr/employees', { params })
+  return request.get<EmployeePageResult>('/v1/hr/employees', params)
 }
 
 export function getEmployee(id: string) {
@@ -98,7 +98,7 @@ export function getEmployeeOverview() {
 }
 
 export function exportEmployees(params: HrEmployeeQuery) {
-  return request.get('/v1/hr/employees/export', { params, responseType: 'blob' })
+  return request.getBlob('/v1/hr/employees/export', params)
 }
 
 // ── 员工履历 ──────────────────────────────────────────────────────────
@@ -278,11 +278,11 @@ export function getEmployeeCertifications(employeeId: string) {
 }
 
 export function getExpiringCertifications(params: CertificationQuery) {
-  return request.get<{ list: HrEmployeeCertification[]; total: number }>('/v1/hr/certifications/expiring', { params })
+  return request.get<{ list: HrEmployeeCertification[]; total: number }>('/v1/hr/certifications/expiring', params)
 }
 
 export function exportCertifications(params: CertificationQuery) {
-  return request.get('/v1/hr/certifications/export', { params, responseType: 'blob' })
+  return request.getBlob('/v1/hr/certifications/export', params)
 }
 
 // ── 排班管理 ──────────────────────────────────────────────────────────
@@ -368,11 +368,11 @@ export function deleteSchedule(id: string) {
 }
 
 export function getSchedules(params: ScheduleQuery) {
-  return request.get<{ list: HrShiftSchedule[]; total: number }>('/v1/hr/schedules', { params })
+  return request.get<{ list: HrShiftSchedule[]; total: number }>('/v1/hr/schedules', params)
 }
 
 export function getScheduleStats(params: { startDate?: string; endDate?: string }) {
-  return request.get<ScheduleStats>('/v1/hr/schedules/stats', { params })
+  return request.get<ScheduleStats>('/v1/hr/schedules/stats', params)
 }
 
 // ── 工时统计 ──────────────────────────────────────────────────────────
@@ -435,19 +435,19 @@ export interface WorkHourSummaryResult {
 
 // 工时统计 API
 export function getWorkHourDashboard(params: { startDate?: string; endDate?: string }) {
-  return request.get<WorkHourDashboard>('/v1/hr/work-hours/dashboard', { params })
+  return request.get<WorkHourDashboard>('/v1/hr/work-hours/dashboard', params)
 }
 
 export function getWorkHourSummary(params: WorkHourSummaryQuery) {
-  return request.get<WorkHourSummaryResult>('/v1/hr/work-hours/summary', { params })
+  return request.get<WorkHourSummaryResult>('/v1/hr/work-hours/summary', params)
 }
 
 export function getWorkHourRecords(params: WorkHourRecordQuery) {
-  return request.get<{ list: HrWorkHourRecord[]; total: number }>('/v1/hr/work-hours/records', { params })
+  return request.get<{ list: HrWorkHourRecord[]; total: number }>('/v1/hr/work-hours/records', params)
 }
 
 export function exportWorkHours(params: WorkHourRecordQuery) {
-  return request.get('/v1/hr/work-hours/export', { params, responseType: 'blob' })
+  return request.getBlob('/v1/hr/work-hours/export', params)
 }
 
 // 工种与工作中心 API

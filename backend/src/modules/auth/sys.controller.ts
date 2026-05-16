@@ -35,6 +35,7 @@ import { SysTenant } from './entities/sys-tenant.entity.js';
 import { SysOrganization } from '../base/entities/sys-organization.entity.js';
 import { SysUom } from '../base/entities/sys-uom.entity.js';
 import { TenantContext } from '../../shared/tenant/tenant.context.js';
+import { escapeLikePattern } from '../../shared/utils/sanitize.js';
 import { Permissions } from './decorators/permissions.decorator.js';
 import { CurrentUser } from './decorators/current-user.decorator.js';
 import { JwtPayload } from './strategies/jwt.strategy.js';
@@ -95,8 +96,8 @@ export class SysController {
     const tenantId = TenantContext.requireCurrentTenant();
     const where = keyword
       ? [
-          { tenantId, username: Like(`%${keyword}%`) },
-          { tenantId, realName: Like(`%${keyword}%`) },
+          { tenantId, username: Like(`%${escapeLikePattern(keyword)}%`) },
+          { tenantId, realName: Like(`%${escapeLikePattern(keyword)}%`) },
         ]
       : { tenantId };
     const [items, total] = await this.userRepo.findAndCount({
@@ -410,12 +411,20 @@ export class SysController {
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'pageSize', required: false })
   @ApiQuery({ name: 'userId', required: false })
+  @ApiQuery({ name: 'operator', required: false })
+  @ApiQuery({ name: 'module', required: false })
+  @ApiQuery({ name: 'actionType', required: false })
+  @ApiQuery({ name: 'result', required: false })
   @ApiQuery({ name: 'startTime', required: false })
   @ApiQuery({ name: 'endTime', required: false })
   async listAuditLogs(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('pageSize', new DefaultValuePipe(20), ParseIntPipe) pageSize: number,
     @Query('userId') userId?: string,
+    @Query('operator') operator?: string,
+    @Query('module') module?: string,
+    @Query('actionType') actionType?: string,
+    @Query('result') result?: string,
     @Query('startTime') startTime?: string,
     @Query('endTime') endTime?: string,
   ) {
@@ -428,6 +437,10 @@ export class SysController {
       .take(pageSize);
 
     if (userId) qb.andWhere('log.userId = :userId', { userId });
+    if (operator) qb.andWhere('log.username LIKE :operator', { operator: `%${escapeLikePattern(operator)}%` });
+    if (module) qb.andWhere('log.module = :module', { module });
+    if (actionType) qb.andWhere('log.action = :actionType', { actionType });
+    if (result) qb.andWhere('(log.loginResult = :result OR (log.responseCode IS NOT NULL AND :result = CASE WHEN log.responseCode < 400 THEN \'success\' ELSE \'fail\' END))', { result });
     if (startTime) qb.andWhere('log.createdAt >= :startTime', { startTime });
     if (endTime) qb.andWhere('log.createdAt <= :endTime', { endTime });
 
@@ -451,7 +464,7 @@ export class SysController {
       .skip((page - 1) * pageSize)
       .take(pageSize)
       .orderBy('r.createdAt', 'ASC');
-    if (name) qb.andWhere('r.name LIKE :name', { name: `%${name}%` });
+    if (name) qb.andWhere('r.name LIKE :name', { name: `%${escapeLikePattern(name)}%` });
     const [list, total] = await qb.getManyAndCount();
     return { list, total, page, pageSize };
   }
@@ -511,7 +524,8 @@ export class SysController {
     @Body() body: { status: string },
   ) {
     const tenantId = TenantContext.requireCurrentTenant();
-    await this.roleRepo.update({ id, tenantId }, { status: body.status });
+    const mappedStatus = this.mapStatus(body.status);
+    await this.roleRepo.update({ id, tenantId }, { status: mappedStatus });
     return { id };
   }
 
@@ -524,7 +538,12 @@ export class SysController {
     @Body() body: { status: string },
   ) {
     const tenantId = TenantContext.requireCurrentTenant();
-    await this.userRepo.update({ id, tenantId }, { status: body.status });
+    const mappedStatus = this.mapStatus(body.status);
+    await this.userRepo.update({ id, tenantId }, { status: mappedStatus });
+    // 禁用用户时递增 tokenVersion，使旧 token 立即失效
+    if (mappedStatus === 'INACTIVE' || mappedStatus === 'DELETED') {
+      await this.userRepo.increment({ id, tenantId }, 'tokenVersion', 1);
+    }
     return { id };
   }
 
@@ -541,6 +560,8 @@ export class SysController {
       { id, tenantId },
       { password: await bcrypt.hash(tempPassword, SALT_ROUNDS) },
     );
+    // 递增 tokenVersion 使旧 token 失效
+    await this.userRepo.increment({ id, tenantId }, 'tokenVersion', 1);
     return { tempPassword };
   }
 
@@ -663,8 +684,16 @@ export class SysController {
   @ApiOperation({ summary: '创建计量单位' })
   async createUom(@Body() body: Record<string, unknown>) {
     const tenantId = TenantContext.requireCurrentTenant();
+    // 字段映射：前端 type → 后端 category；自动生成 code
+    const { type, description, code, ...rest } = body;
+    const mappedCode = (code as string) ?? (rest.symbol as string) ?? (rest.name as string) ?? 'UOM';
     const uom = await this.uomRepo.save(
-      this.uomRepo.create({ ...body, tenantId } as Partial<SysUom>),
+      this.uomRepo.create({
+        ...rest,
+        code: mappedCode,
+        category: type ?? rest.category,
+        tenantId,
+      } as Partial<SysUom>),
     );
     return { id: uom.id };
   }
@@ -676,7 +705,11 @@ export class SysController {
     @Body() body: Record<string, unknown>,
   ) {
     const tenantId = TenantContext.requireCurrentTenant();
-    await this.uomRepo.update({ id, tenantId }, body as Partial<SysUom>);
+    const { type, description, ...rest } = body;
+    await this.uomRepo.update({ id, tenantId }, {
+      ...rest,
+      ...(type !== undefined ? { category: type } : {}),
+    } as Partial<SysUom>);
     return { id };
   }
 
@@ -728,9 +761,17 @@ export class SysController {
   @Post('tenants')
   @ApiOperation({ summary: '创建租户' })
   async createTenant(@Body() body: Record<string, unknown>) {
-    const { enabledModules, ...rest } = body;
+    const { enabledModules, contact, phone, email, remark, status, ...rest } = body;
+    // 字段映射：前端 contact/phone/email → 后端 contactName/contactPhone/contactEmail
+    const mappedStatus = this.mapTenantStatus(status as string);
     const tenant = await this.tenantRepo.save(
-      this.tenantRepo.create(rest as Partial<SysTenant>),
+      this.tenantRepo.create({
+        ...rest,
+        contactName: contact ?? rest.contactName,
+        contactPhone: phone ?? rest.contactPhone,
+        contactEmail: email ?? rest.contactEmail,
+        status: mappedStatus,
+      } as Partial<SysTenant>),
     );
 
     // 为租户创建默认的 TENANT_ADMIN 角色并分配模块权限
@@ -779,10 +820,17 @@ export class SysController {
     @Param('id') id: string,
     @Body() body: Record<string, unknown>,
   ) {
-    const { enabledModules, ...rest } = body;
+    const { enabledModules, contact, phone, email, remark, status, ...rest } = body;
+    const mappedStatus = this.mapTenantStatus(status as string);
     const oldTenant = await this.tenantRepo.findOne({ where: { id } });
 
-    await this.tenantRepo.update({ id }, rest as any);
+    await this.tenantRepo.update({ id }, {
+      ...rest,
+      ...(contact !== undefined ? { contactName: contact } : {}),
+      ...(phone !== undefined ? { contactPhone: phone } : {}),
+      ...(email !== undefined ? { contactEmail: email } : {}),
+      ...(mappedStatus ? { status: mappedStatus } : {}),
+    } as any);
 
     // 如果 enabledModules 变更，同步更新租户的 TENANT_ADMIN 角色权限
     if (enabledModules !== undefined && oldTenant) {
@@ -825,7 +873,25 @@ export class SysController {
     @Param('id') id: string,
     @Body() body: { status: string },
   ) {
-    await this.tenantRepo.update({ id }, { status: body.status });
+    const mappedStatus = this.mapTenantStatus(body.status) ?? body.status;
+    await this.tenantRepo.update({ id }, { status: mappedStatus });
     return { id };
+  }
+
+  /** 前端小写 status → 后端大写（租户专用） */
+  private mapTenantStatus(status?: string): string | undefined {
+    if (!status) return undefined;
+    const map: Record<string, string> = {
+      trial: 'TRIAL', formal: 'ACTIVE', expired: 'EXPIRED', disabled: 'INACTIVE',
+    };
+    return map[status] ?? status.toUpperCase();
+  }
+
+  /** 前端小写 status → 后端大写（通用：用户/角色） */
+  private mapStatus(status: string): string {
+    const map: Record<string, string> = {
+      active: 'ACTIVE', disabled: 'INACTIVE', deleted: 'DELETED',
+    };
+    return map[status] ?? status.toUpperCase();
   }
 }

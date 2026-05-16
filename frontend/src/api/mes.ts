@@ -1,4 +1,6 @@
-import { request } from '@/utils/request'
+import { request, MOCK_ENABLED } from '@/utils/request'
+
+function rethrowIfNoMock(e: unknown) { if (!MOCK_ENABLED) throw e }
 
 export interface WorkOrder {
   id: string
@@ -97,22 +99,22 @@ export const mesApi = {
   getMesWorkOrders: async (params: object) => {
     try {
       return await request.get<{ list: WorkOrder[]; total: number }>('/v1/mes/work-orders', params)
-    } catch { return { list: [], total: 0 } }
+    } catch (e) { rethrowIfNoMock(e); return { list: [], total: 0 } }
   },
   getMesWorkOrder: async (id: string) => {
     try {
       return await request.get<WorkOrder>(`/v1/mes/work-orders/${id}`)
-    } catch { return null as unknown as WorkOrder }
+    } catch (e) { rethrowIfNoMock(e); return null as unknown as WorkOrder }
   },
   createMesWorkOrder: async (data: object) => {
     // 字段映射：前端用 code/plannedStartDate/plannedEndDate，后端用 woNo/plannedStart/plannedEnd
     const d = data as Record<string, unknown>
+    const { code, plannedStartDate, plannedEndDate, ...rest } = d
     const mapped = {
-      ...d,
-      woNo: d.woNo ?? d.code,
-      plannedStart: d.plannedStart ?? d.plannedStartDate,
-      plannedEnd: d.plannedEnd ?? d.plannedEndDate,
-      uomId: d.uomId ?? '1',  // 默认单位
+      ...rest,
+      woNo: d.woNo ?? code,
+      plannedStart: d.plannedStart ?? plannedStartDate,
+      plannedEnd: d.plannedEnd ?? plannedEndDate,
     }
     return await request.post<WorkOrder>('/v1/mes/work-orders', mapped)
   },
@@ -130,21 +132,21 @@ export const mesApi = {
   getProductionReports: async (params: object) => {
     try {
       return await request.get<{ list: ProductionReport[]; total: number }>('/v1/mes/production-reports', params)
-    } catch { return { list: [], total: 0 } }
+    } catch (e) { rethrowIfNoMock(e); return { list: [], total: 0 } }
   },
 
   // 工时记录
   getLaborRecords: async (params: object) => {
     try {
       return await request.get<{ list: any[]; total: number }>('/v1/mes/labor-records', params)
-    } catch { return { list: [], total: 0 } }
+    } catch (e) { rethrowIfNoMock(e); return { list: [], total: 0 } }
   },
 
   // 领料
   getMaterialIssues: async (woId: string, params?: object) => {
     try {
       return await request.get<{ list: MaterialIssue[]; total: number }>(`/v1/mes/work-orders/${woId}/material-issues`, params)
-    } catch { return { list: [], total: 0 } }
+    } catch (e) { rethrowIfNoMock(e); return { list: [], total: 0 } }
   },
   issueMaterials: async (woId: string, data: object) => {
     return await request.post<void>(`/v1/mes/work-orders/${woId}/material-issues`, data)
@@ -155,7 +157,7 @@ export const mesApi = {
   kitCheck: async (woId: string) => {
     try {
       return await request.get<{ items: { materialId: string; materialCode?: string; materialName?: string; required: number; available: number; sufficient: boolean }[] }>(`/v1/mes/work-orders/${woId}/kit-check`)
-    } catch { return { items: [] } }
+    } catch (e) { rethrowIfNoMock(e); return { items: [] } }
   },
 
   // 工序操作
@@ -173,14 +175,14 @@ export const mesApi = {
   getQualityDashboard: async () => {
     try {
       return await request.get<QualityDashboard>('/v1/mes/dashboards/quality')
-    } catch { return null as unknown as QualityDashboard }
+    } catch (e) { rethrowIfNoMock(e); return null as unknown as QualityDashboard }
   },
 }
 
 // ── 自动入库配置 ──────────────────────────────────────────────────────────
 
 export function getAutoReceiptConfigs(params: any) {
-  return request.get('/v1/mes/auto-receipt-config', { params })
+  return request.get('/v1/mes/auto-receipt-config', params)
 }
 export function createAutoReceiptConfig(data: any) {
   return request.post('/v1/mes/auto-receipt-config', data)
@@ -198,7 +200,7 @@ export function toggleAutoReceiptConfig(id: string) {
 // ── 入库日志 ──────────────────────────────────────────────────────────────
 
 export function getReceiptLogs(params: any) {
-  return request.get('/v1/mes/receipt-logs', { params })
+  return request.get('/v1/mes/receipt-logs', params)
 }
 export function retryReceiptLog(id: string) {
   return request.post(`/v1/mes/receipt-logs/${id}/retry`)

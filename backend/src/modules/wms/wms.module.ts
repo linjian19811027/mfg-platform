@@ -25,6 +25,7 @@ import { IssueService } from './services/issue.service.js';
 import { StockTakeService } from './services/stock-take.service.js';
 import { WmsReportService } from './services/wms-report.service.js';
 import { WmsEventService } from './services/wms-event.service.js';
+import { SafetyStockAlertService } from './services/safety-stock-alert.service.js';
 
 import { WmsController } from './wms.controller.js';
 import { MessageModule } from '../../shared/message/message.module.js';
@@ -56,6 +57,7 @@ import { MessageModule } from '../../shared/message/message.module.js';
     StockTakeService,
     WmsReportService,
     WmsEventService,
+    SafetyStockAlertService,
   ],
   exports: [InventoryService, ReceiptService, IssueService],
 })

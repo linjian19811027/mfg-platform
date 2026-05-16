@@ -216,9 +216,12 @@ export class ErpController {
   @ApiOperation({ summary: '创建销售订单' })
   createSalesOrder(
     @CurrentTenant() tenantId: string,
-    @Body() body: { data: Parameters<SalesOrderService['create']>[1]; lines: Parameters<SalesOrderService['create']>[2] },
+    @Body() body: Record<string, unknown>,
   ) {
-    return this.soSvc.create(tenantId, body.data, body.lines);
+    // 兼容 { data, lines } 和扁平对象两种格式
+    const data = (body.data as Record<string, unknown>) ?? body;
+    const lines = (body.lines as Record<string, unknown>[]) ?? [];
+    return this.soSvc.create(tenantId, data as any, lines as any);
   }
 
   @Get('sales-orders/:id')

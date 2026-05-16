@@ -53,12 +53,11 @@ const columns: MTableColumn[] = [
 const formSchema: MFormField[] = [
   { field: 'name', label: t('erp.customer.lbl1180'), type: 'input', required: true },
   { field: 'code', label: t('erp.customer.lbl1181'), type: 'input' },
-  { field: 'type', label: t('erp.customer.lbl1182'), type: 'select', options: [{ label: t('erp.customer.lbl1183'), value: 'ENTERPRISE' }, { label: t('erp.customer.lbl1184'), value: 'INDIVIDUAL' }] },
+  { field: 'type', label: t('erp.customer.lbl1182'), type: 'select', options: [{ label: t('erp.customer.lbl1183'), value: 'STRATEGIC' }, { label: t('erp.customer.lbl1184'), value: 'KEY' }, { label: t('erp.customer.lbl1185a'), value: 'GENERAL' }, { label: t('erp.customer.lbl1185b'), value: 'POTENTIAL' }] },
   { field: 'creditLimit', label: t('erp.customer.lbl1185'), type: 'number', props: { min: 0, precision: 2 } },
   { field: 'contactName', label: t('erp.customer.lbl1186'), type: 'input' },
   { field: 'contactPhone', label: t('erp.customer.lbl1187'), type: 'input' },
-  { field: 'email', label: t('erp.customer.lbl1188'), type: 'input' },
-  { field: 'taxNo', label: t('erp.customer.lbl1189'), type: 'input' },
+  { field: 'contactEmail', label: t('erp.customer.lbl1188'), type: 'input' },
   { field: 'status', label: t('erp.customer.status'), type: 'select', options: [{ label: t('erp.customer.enable'), value: 'ACTIVE' }, { label: t('erp.customer.disable'), value: 'INACTIVE' }] },
 ]
 async function loadData() {

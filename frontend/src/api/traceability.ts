@@ -2,7 +2,7 @@ import { request } from '@/utils/request'
 
 // 追溯批次管理
 export function getTraceBatches(params: any) {
-  return request.get('/v1/traceability/batches', { params })
+  return request.get('/v1/traceability/batches', params)
 }
 
 export function getTraceBatch(id: string) {
@@ -14,7 +14,7 @@ export function manualCreateBatch(data: any) {
 }
 
 export function exportBatches(params: any) {
-  return request.get('/v1/traceability/batches/export/excel', { params })
+  return request.get('/v1/traceability/batches/export/excel', params)
 }
 
 export function archiveBatches(data: any) {
@@ -45,7 +45,7 @@ export function assessRecall(data: any) {
 }
 
 export function getRecallAssessments(params: any) {
-  return request.get('/v1/traceability/recall/assessments', { params })
+  return request.get('/v1/traceability/recall/assessments', params)
 }
 
 export function getRecallAssessment(id: string) {
@@ -58,7 +58,7 @@ export function confirmRecall(id: string) {
 
 // 追溯报告
 export function getReports(params: any) {
-  return request.get('/v1/traceability/reports', { params })
+  return request.get('/v1/traceability/reports', params)
 }
 
 export function generateReport(data: any) {
@@ -71,9 +71,9 @@ export function getAnalyticsDashboard() {
 }
 
 export function getCoverageStats(params: any) {
-  return request.get('/v1/traceability/analytics/coverage', { params })
+  return request.get('/v1/traceability/analytics/coverage', params)
 }
 
 export function getQueryFrequency(params: any) {
-  return request.get('/v1/traceability/analytics/query-frequency', { params })
+  return request.get('/v1/traceability/analytics/query-frequency', params)
 }
