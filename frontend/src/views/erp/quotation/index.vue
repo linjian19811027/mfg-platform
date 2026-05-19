@@ -47,7 +47,7 @@ const STATUS_MAP: Record<string, { label: string; color: string }> = {
   ACCEPTED: { label: t('erp.quotation.lbl1203'), color: 'green' }, REJECTED: { label: t('erp.quotation.rejected'), color: 'red' }, EXPIRED: { label: t('erp.quotation.expired'), color: 'gray' },
 }
 const columns: MTableColumn[] = [
-  { key: 'code', title: t('erp.quotation.index.报价单号'), dataIndex: 'code', width: 130 },
+  { key: 'code', title: t('erp.quotation.index.报价单号'), dataIndex: 'quotationNo', width: 130 },
   { key: 'customerName', title: t('erp.quotation.index.客户'), dataIndex: 'customerName', width: 150 },
   { key: 'totalAmount', title: t('erp.quotation.index.总金额'), dataIndex: 'totalAmount', width: 120 },
   { key: 'currency', title: t('erp.quotation.index.币种'), dataIndex: 'currency', width: 80 },

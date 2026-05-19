@@ -32,6 +32,10 @@
             <span class="username">{{ authStore.username || $t('navbar.admin') }}</span>
           </div>
           <template #content>
+            <a-doption v-if="authStore.roles.includes('SUPER_ADMIN') && authStore.tenantId !== '__SYSTEM__'" @click="handleReturnPlatform">
+              <template #icon><icon-left /></template>
+              返回平台管理
+            </a-doption>
             <a-doption @click="handleLogout">
               <template #icon><icon-export /></template>
               {{ $t('navbar.logout') }}
@@ -201,8 +205,7 @@ function getTheme(key: string) {
 
 function hasPermission(item: MenuItem): boolean {
   if (!item.permission) return true
-  if (authStore.roles.some(r => r === 'ADMIN' || r === 'admin' || r === 'SUPER_ADMIN')) return true
-  if (authStore.permissions.length === 0) return true
+  if (authStore.roles.some(r => r === 'SUPER_ADMIN' || r === 'TENANT_ADMIN')) return true
   return authStore.permissions.includes(item.permission)
 }
 
@@ -210,8 +213,22 @@ function getVisibleChildren(item: MenuItem): MenuItem[] {
   return (item.children || []).filter(hasPermission)
 }
 
+// 模块级过滤：SYS/BASE 始终显示，其他模块按 enabledModules 过滤
+// platformOnly 菜单仅 SUPER_ADMIN 可见
+function isModuleEnabled(item: MenuItem): boolean {
+  // 平台专属菜单：只有超管可见
+  if (item.platformOnly && !authStore.roles.includes('SUPER_ADMIN')) return false
+  const moduleKey = item.key.toUpperCase()
+  if (moduleKey === 'SYS' || moduleKey === 'BASE' || moduleKey === 'DASHBOARD' || moduleKey === 'PLATFORM') return true
+  // 超管看所有模块
+  if (authStore.roles.some(r => r === 'SUPER_ADMIN')) return true
+  if (authStore.enabledModules.length === 0) return true
+  return authStore.enabledModules.some(m => m.toUpperCase() === moduleKey)
+}
+
 const visibleMenus = computed(() =>
   menuConfig.filter((item) => {
+    if (!isModuleEnabled(item)) return false
     if (!item.children || item.children.length === 0) return true
     return getVisibleChildren(item).length > 0
   }),
@@ -251,6 +268,11 @@ function handleLogout() {
   playClickSound()
   authStore.logout()
   router.push('/login')
+}
+
+async function handleReturnPlatform() {
+  playClickSound()
+  await authStore.switchTenant('__SYSTEM__')
 }
 
 const { t, locale } = useI18n()

@@ -13,6 +13,8 @@ export class DatabaseMessageService implements MessageService {
     string,
     Array<(event: DomainEvent) => Promise<void>>
   >();
+  /** 已处理的 eventId 集合（进程内幂等，防止同一次启动重复处理） */
+  private readonly processedIds = new Set<string>();
 
   constructor(
     @InjectRepository(EventStore)
@@ -20,23 +22,37 @@ export class DatabaseMessageService implements MessageService {
   ) {}
 
   async publish(event: DomainEvent): Promise<void> {
-    // 先尝试同步执行已注册的 handler
+    // 幂等检查：同一 eventId 不重复处理
+    if (event.eventId && this.processedIds.has(event.eventId)) {
+      this.logger.debug(`跳过重复事件 ${event.eventId} (${event.eventType})`);
+      return;
+    }
+
+    // 所有事件都持久化到 event_store（审计 + 重试保障）
     const handlers = this.handlers.get(event.eventType) ?? [];
+    let handlerError: string | undefined;
+
     if (handlers.length > 0) {
       for (const handler of handlers) {
         try {
           await handler(event);
         } catch (err) {
-          // 同步失败，写入数据库异步重试
-          await this.saveToStore(
-            event,
-            err instanceof Error ? err.message : String(err),
-          );
+          handlerError = err instanceof Error ? err.message : String(err);
+          this.logger.error(`事件处理失败 ${event.eventType}: ${handlerError}`);
         }
       }
-    } else {
-      // 无 handler，写入数据库等待订阅者注册后处理
-      await this.saveToStore(event);
+    }
+
+    // 持久化：成功标记 COMPLETED，失败标记 FAILED（供重试）
+    await this.saveToStore(event, handlerError);
+
+    // 标记为已处理（进程内幂等）
+    if (event.eventId) {
+      this.processedIds.add(event.eventId);
+      if (this.processedIds.size > 10000) {
+        const first = this.processedIds.values().next().value;
+        if (first) this.processedIds.delete(first);
+      }
     }
   }
 
@@ -49,8 +65,9 @@ export class DatabaseMessageService implements MessageService {
         sourceModule: event.sourceModule,
         targetModule: event.targetModule,
         payload: event.payload,
-        status: 'PENDING',
+        status: error ? 'FAILED' : 'COMPLETED',
         lastError: error,
+        processedAt: error ? undefined : new Date(),
       });
       await this.eventRepo.save(entity);
     } catch (err) {

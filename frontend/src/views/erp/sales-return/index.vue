@@ -44,7 +44,7 @@ import { erpExtApi } from '@/api/erp-ext'
 const loading = ref(false); const tableData = ref<any[]>([]); const total = ref(0)
 const query = reactive({ status: '', page: 1, pageSize: 20 })
 const columns: MTableColumn[] = [
-  { key: 'code', title: t('erp.sales-return.index.退货单号'), dataIndex: 'code', width: 130 },
+  { key: 'code', title: t('erp.sales-return.index.退货单号'), dataIndex: 'returnNo', width: 130 },
   { key: 'customerName', title: t('erp.sales-return.index.客户'), dataIndex: 'customerName', width: 150 },
   { key: 'reason', title: t('erp.sales-return.index.退货原因'), dataIndex: 'reason', width: 200, ellipsis: true },
   { key: 'status', title: t('erp.sales-return.index.状态'), slotName: 'status', width: 100 },

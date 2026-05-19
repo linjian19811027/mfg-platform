@@ -6,6 +6,7 @@ import {
   Logger,
   Inject,
 } from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
@@ -184,6 +185,7 @@ export class AuthService {
         tenantId: tenant.code,
         roles,
         permissions,
+        enabledModules: tenant.enabledModules ?? [],
       },
     };
   }
@@ -250,6 +252,15 @@ export class AuthService {
     // 获取用户在目标租户的角色和权限
     const { roles, permissions } = await this.getUserRolesAndPermissions(userId, tenantCode);
 
+    // 记录审计日志
+    void this.logSvc.login({
+      username: user.username,
+      tenantId: tenantCode,
+      userId: user.id,
+      result: 'SUCCESS',
+      errorMessage: `切换租户: ${tenantCode} (${tenant.name})`,
+    });
+
     const payload: JwtPayload = {
       sub: user.id,
       username: user.username,
@@ -260,6 +271,7 @@ export class AuthService {
 
     return {
       accessToken: this.jwtService.sign(payload),
+      refreshToken: this.jwtService.sign(payload, { expiresIn: this.config.get('JWT_REFRESH_EXPIRES_IN', '7d') }),
       tenantId: tenantCode,
     };
   }
@@ -325,5 +337,47 @@ export class AuthService {
     const result = { roles: roleCodes, permissions: permCodes };
     await this.cache.set(cacheKey, result, 1800);
     return result;
+  }
+
+  // ── 租户到期自动禁用 ──────────────────────────────────────────────────
+
+  @Cron(CronExpression.EVERY_HOUR)
+  async checkTenantExpiry() {
+    try {
+      const now = new Date();
+      const expired = await this.tenantRepo
+        .createQueryBuilder('t')
+        .where('t.expire_at IS NOT NULL')
+        .andWhere('t.expire_at < :now', { now })
+        .andWhere('t.status = :status', { status: 'ACTIVE' })
+        .getMany();
+
+      if (expired.length === 0) return;
+
+      for (const tenant of expired) {
+        await this.tenantRepo.update(tenant.id, { status: 'EXPIRED' });
+        this.logger.warn(`租户 ${tenant.name}(${tenant.code}) 已过期，自动禁用`);
+      }
+    } catch (err) {
+      this.logger.error('租户到期检查失败', (err as Error).stack);
+    }
+  }
+
+  // ── 异常租户检查（每小时） ──────────────────────────────────────────────
+
+  @Cron(CronExpression.EVERY_HOUR)
+  async checkTenantAnomalies() {
+    try {
+      const maxUsers = 1000; // 阈值：单租户超过 1000 用户告警
+      const tenants = await this.tenantRepo.find({ where: { status: 'ACTIVE' } });
+      for (const tenant of tenants) {
+        const userCount = await this.userRepo.count({ where: { tenantId: tenant.code, status: 'ACTIVE' } });
+        if (userCount > (tenant.maxUsers ?? maxUsers)) {
+          this.logger.warn(`租户 ${tenant.name}(${tenant.code}) 用户数 ${userCount} 超过限额 ${tenant.maxUsers}`);
+        }
+      }
+    } catch (err) {
+      this.logger.error('异常租户检查失败', (err as Error).stack);
+    }
   }
 }

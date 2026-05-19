@@ -6,10 +6,11 @@ import {
   Optional,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { PlmEcr } from '../entities/plm-ecr.entity.js';
 import { PlmEcn } from '../entities/plm-ecn.entity.js';
+import { SysUser } from '../../auth/entities/sys-user.entity.js';
 import { TenantContext } from '../../../shared/tenant/tenant.context.js';
 import {
   MESSAGE_SERVICE,
@@ -66,10 +67,27 @@ export class ChangeService {
     return { list, total };
   }
 
-  async findOneEcr(id: string): Promise<PlmEcr> {
+  async findOneEcr(id: string): Promise<PlmEcr & { submittedByName?: string; approvedByName?: string }> {
     const tenantId = TenantContext.requireCurrentTenant();
     const ecr = await this.ecrRepo.findOne({ where: { id, tenantId } });
     if (!ecr) throw new NotFoundException('PLM_ECR_NOT_FOUND');
+
+    // 补充提交人和审批人姓名
+    const userIds: string[] = [];
+    if (ecr.submittedBy) userIds.push(ecr.submittedBy);
+    if (ecr.approvedBy) userIds.push(ecr.approvedBy);
+    if (userIds.length > 0) {
+      const users = await this.ecrRepo.manager.getRepository(SysUser).find({
+        where: { id: In(userIds) },
+      });
+      const userMap = new Map(users.map((u) => [u.id, u.realName || u.username]));
+      return {
+        ...ecr,
+        submittedByName: ecr.submittedBy ? userMap.get(ecr.submittedBy) : undefined,
+        approvedByName: ecr.approvedBy ? userMap.get(ecr.approvedBy) : undefined,
+      } as any;
+    }
+
     return ecr;
   }
 

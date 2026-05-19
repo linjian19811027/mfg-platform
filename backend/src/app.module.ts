@@ -58,11 +58,16 @@ import { InitSeedService } from './modules/shared/seed/init-seed.service.js';
       useFactory: getDatabaseConfig,
     }),
     ScheduleModule.forRoot(),
-    // 限流：普通接口 100次/分钟，登录接口单独用 @Throttle 覆盖为 5次/分钟
-    // 测试环境可通过 THROTTLE_DISABLE=1 禁用限流
+    // 限流：默认关闭（THROTTLE_DISABLE=1），上线时去掉并配置限流值
+    // THROTTLE_GLOBAL_LIMIT=1000 每分钟全局请求上限
+    // THROTTLE_TTL=60000 限流窗口（毫秒）
     ...(process.env.THROTTLE_DISABLE === '1'
       ? []
-      : [ThrottlerModule.forRoot([{ name: 'default', ttl: 60000, limit: 100 }])]),
+      : [ThrottlerModule.forRoot([{
+          name: 'default',
+          ttl: Number(process.env.THROTTLE_TTL ?? 60000),
+          limit: Number(process.env.THROTTLE_GLOBAL_LIMIT ?? 100),
+        }])]),
     CacheModule,
     MessageModule,
     TenantModule,

@@ -85,10 +85,13 @@
           <a-descriptions-item :label="$t('plm.ecr.标题')" :span="2">{{ currentEcr.title }}</a-descriptions-item>
           <a-descriptions-item :label="$t('plm.ecr.变更原因')" :span="2">{{ currentEcr.changeReason }}</a-descriptions-item>
           <a-descriptions-item :label="$t('plm.ecr.影响物料')" :span="2">
-            {{ currentEcr.affectedMaterials || '-' }}
+            {{ (currentEcr.affectedItems?.map(i => i.description || i.name || JSON.stringify(i)).join('、') || '-') }}
           </a-descriptions-item>
-          <a-descriptions-item :label="$t('plm.ecr.创建时间')">{{ currentEcr.createdAt }}</a-descriptions-item>
-          <a-descriptions-item :label="$t('plm.ecr.提交时间')">{{ currentEcr.submittedAt || '-' }}</a-descriptions-item>
+          <a-descriptions-item :label="$t('plm.ecr.创建时间')">{{ dayjs(currentEcr.createdAt).format('YYYY-MM-DD HH:mm') }}</a-descriptions-item>
+          <a-descriptions-item :label="$t('plm.ecr.提交时间')">{{ currentEcr.submittedAt ? dayjs(currentEcr.submittedAt).format('YYYY-MM-DD HH:mm') : '-' }}</a-descriptions-item>
+          <a-descriptions-item :label="$t('plm.ecr.提交人')">{{ currentEcr.submittedByName || '-' }}</a-descriptions-item>
+          <a-descriptions-item :label="$t('plm.ecr.审批时间')">{{ currentEcr.approvedAt ? dayjs(currentEcr.approvedAt).format('YYYY-MM-DD HH:mm') : '-' }}</a-descriptions-item>
+          <a-descriptions-item :label="$t('plm.ecr.审批人')">{{ currentEcr.approvedByName || '-' }}</a-descriptions-item>
         </a-descriptions>
 
         <!-- 审批操作区（仅 SUBMITTED 显示） -->
@@ -111,17 +114,17 @@
         <a-divider />
         <div style="margin-bottom: 12px; font-weight: 500; color: #1d2129">{{ $t('plm.ecr.lbl1411') }}</div>
         <a-steps direction="vertical" :current="approvalStepCurrent" size="small">
-          <a-step :title="$t('plm.ecr.创建')" :description="currentEcr.createdAt" />
+          <a-step :title="$t('plm.ecr.创建')" :description="dayjs(currentEcr.createdAt).format('YYYY-MM-DD HH:mm')" />
           <a-step
             v-if="currentEcr.submittedAt || currentEcr.status !== 'DRAFT'"
             :title="$t('plm.ecr.提交审批')"
-            :description="currentEcr.submittedAt || $t('common.draft')"
+            :description="currentEcr.submittedAt ? dayjs(currentEcr.submittedAt).format('YYYY-MM-DD HH:mm') : $t('common.draft')"
             :status="currentEcr.submittedAt ? 'finish' : 'wait'"
           />
           <a-step
             v-if="currentEcr.approvedAt || currentEcr.status === 'APPROVED' || currentEcr.status === 'REJECTED'"
             :title="currentEcr.status === 'REJECTED' ? $t('common.reject') : $t('common.approve')"
-            :description="currentEcr.approvedAt || '-'"
+            :description="currentEcr.approvedAt ? dayjs(currentEcr.approvedAt).format('YYYY-MM-DD HH:mm') : '-'"
             :status="currentEcr.status === 'REJECTED' ? 'error' : 'finish'"
           />
         </a-steps>
@@ -148,8 +151,9 @@
 </template>
 
 <script setup lang="ts">
-const { t } = useI18n()
+import dayjs from 'dayjs'
 import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 import { ref, reactive, computed, onMounted } from 'vue'
 import { Message } from '@arco-design/web-vue'
 import MTable from '@/components/MTable/index.vue'
@@ -265,8 +269,13 @@ const approvalStepCurrent = computed(() => {
   return 1
 })
 
-function openDetailDrawer(ecr: Ecr) {
-  currentEcr.value = ecr
+async function openDetailDrawer(ecr: Ecr) {
+  try {
+    const full = await plmApi.getEcr(ecr.id)
+    currentEcr.value = full
+  } catch {
+    currentEcr.value = ecr
+  }
   detailDrawerVisible.value = true
 }
 
@@ -314,7 +323,7 @@ const createFormSchema: MFormField[] = [
     { label: t('plm.ecr.lbl1417'), value: 'DOCUMENT' },
   ]},
   { field: 'changeReason', label: t('plm.ecr.lbl1418'), type: 'textarea', required: true, placeholder: t('plm.ecr.r33039'), props: { autoSize: { minRows: 3, maxRows: 6 } } },
-  { field: 'affectedMaterials', label: t('plm.ecr.lbl1419'), type: 'textarea', placeholder: t('plm.ecr.r33040'), props: { autoSize: { minRows: 2, maxRows: 4 } } },
+  { field: 'affectedItems', label: t('plm.ecr.lbl1419'), type: 'textarea', placeholder: t('plm.ecr.r33040'), props: { autoSize: { minRows: 2, maxRows: 4 } } },
 ]
 
 function openCreateDrawer() {
@@ -325,6 +334,14 @@ function openCreateDrawer() {
 async function handleCreate(data: Record<string, unknown>) {
   creating.value = true
   try {
+    // affectedItems 来自 textarea，需要转为 JSON 数组
+    if (typeof data.affectedItems === 'string' && data.affectedItems) {
+      try {
+        data.affectedItems = JSON.parse(data.affectedItems as string)
+      } catch {
+        data.affectedItems = [{ description: data.affectedItems }]
+      }
+    }
     await plmApi.createEcr(data)
     Message.success(t('plm.新建成功'))
     createDrawerVisible.value = false

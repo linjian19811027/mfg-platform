@@ -6,6 +6,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ScmAsn, AsnStatus } from '../entities/scm-asn.entity.js';
+import { ScmAsnLine } from '../entities/scm-asn-line.entity.js';
 import { ScmPurchaseOrder } from '../entities/scm-purchase-order.entity.js';
 
 // ── DTOs ──────────────────────────────────────────────────────────────────────
@@ -38,6 +39,8 @@ export class AsnService {
   constructor(
     @InjectRepository(ScmAsn)
     private readonly asnRepo: Repository<ScmAsn>,
+    @InjectRepository(ScmAsnLine)
+    private readonly lineRepo: Repository<ScmAsnLine>,
     @InjectRepository(ScmPurchaseOrder)
     private readonly poRepo: Repository<ScmPurchaseOrder>,
   ) {}
@@ -80,17 +83,48 @@ export class AsnService {
 
     const asnNo = await this.generateAsnNo(tenantId);
 
+    // 查找供应商名称（同模块）
+    let supplierName: string | undefined;
+    if (data.supplierId) {
+      const sup = await this.asnRepo.manager
+        .createQueryBuilder()
+        .select('name')
+        .from('scm_supplier', 's')
+        .where('id = :id AND tenant_id = :tid', { id: data.supplierId, tid: tenantId })
+        .getRawOne<{ name: string }>();
+      supplierName = sup?.name;
+    }
+
     const asn = this.asnRepo.create({
       tenantId,
       asnNo,
       poId: data.poId,
       supplierId: data.supplierId,
+      supplierName,
       expectedDate: data.expectedDate,
       status: AsnStatus.PENDING,
       items: data.items ?? [],
     });
+    const savedAsn = await this.asnRepo.save(asn);
 
-    return this.asnRepo.save(asn);
+    // 保存明细行
+    if (data.items && data.items.length > 0) {
+      const lines = data.items.map((item, idx) =>
+        this.lineRepo.create({
+          tenantId,
+          asnId: savedAsn.id,
+          lineNo: idx + 1,
+          materialId: item.materialId,
+          materialCode: (item as any).materialCode,
+          materialName: (item as any).materialName,
+          quantity: item.quantity,
+          uomId: item.uomId,
+        }),
+      );
+      await this.lineRepo.save(lines);
+    }
+
+    return savedAsn;
   }
 
   // ── 2. findAll ──────────────────────────────────────────────────────────────
@@ -103,6 +137,8 @@ export class AsnService {
 
     const qb = this.asnRepo
       .createQueryBuilder('asn')
+      .leftJoin('scm_supplier', 'sup', 'sup.id = asn.supplier_id AND sup.tenant_id = asn.tenant_id')
+      .addSelect('sup.name', 'supplierName')
       .where('asn.tenantId = :tenantId', { tenantId });
 
     if (status) qb.andWhere('asn.status = :status', { status });
@@ -113,7 +149,9 @@ export class AsnService {
       .skip((page - 1) * pageSize)
       .take(pageSize);
 
-    const [items, total] = await qb.getManyAndCount();
+    const { entities, raw } = await qb.getRawAndEntities();
+    const total = await qb.getCount();
+    const items = entities.map((e, i) => ({ ...e, supplierName: raw[i]?.supplierName }));
     return { items, total };
   }
 
@@ -151,7 +189,16 @@ export class AsnService {
     return this.asnRepo.save(asn);
   }
 
-  // ── 6. findByPo ─────────────────────────────────────────────────────────────
+  // ── 6. findLines ────────────────────────────────────────────────────────────
+
+  async findLines(tenantId: string, asnId: string): Promise<ScmAsnLine[]> {
+    return this.lineRepo.find({
+      where: { tenantId, asnId },
+      order: { lineNo: 'ASC' },
+    });
+  }
+
+  // ── 7. findByPo ─────────────────────────────────────────────────────────────
 
   async findByPo(tenantId: string, poId: string): Promise<ScmAsn[]> {
     return this.asnRepo.find({

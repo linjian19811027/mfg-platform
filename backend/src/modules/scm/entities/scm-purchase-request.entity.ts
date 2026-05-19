@@ -52,6 +52,30 @@ export class ScmPurchaseRequest {
   @Column({ type: 'enum', enum: PrStatus, default: PrStatus.DRAFT })
   status!: PrStatus;
 
+  /** 物料 ID */
+  @Column({ name: 'material_id', type: 'bigint', nullable: true })
+  materialId?: string;
+
+  /** 冗余：物料编码 */
+  @Column({ name: 'material_code', length: 50, nullable: true })
+  materialCode?: string;
+
+  /** 冗余：物料名称 */
+  @Column({ name: 'material_name', length: 200, nullable: true })
+  materialName?: string;
+
+  /** 申请数量 */
+  @Column({ type: 'decimal', precision: 18, scale: 6, nullable: true })
+  qty?: number;
+
+  /** 期望到货日期 */
+  @Column({ name: 'expected_date', type: 'date', nullable: true })
+  expectedDate?: Date;
+
+  /** 申请原因 */
+  @Column({ type: 'text', nullable: true })
+  reason?: string;
+
   @Column({ type: 'json', nullable: true })
   items?: Record<string, any>[];
 

@@ -227,6 +227,8 @@ export class WorkHourService {
 
     const qb = this.summaryRepo
       .createQueryBuilder('s')
+      .leftJoin('hr_employee', 'e', 'e.id = s.emp_id AND e.tenant_id = s.tenant_id')
+      .addSelect('e.name', 'empName')
       .where('s.tenant_id = :tenantId', { tenantId });
 
     if (query.empId !== undefined) {
@@ -244,12 +246,14 @@ export class WorkHourService {
       qb.andWhere('s.summary_date <= :endDate', { endDate: query.endDate });
     }
 
-    const [data, total] = await qb
+    const { entities, raw } = await qb
       .orderBy('s.summary_date', 'DESC')
       .addOrderBy('s.emp_id', 'ASC')
       .skip((page - 1) * pageSize)
       .take(pageSize)
-      .getManyAndCount();
+      .getRawAndEntities();
+    const total = await qb.getCount();
+    const data = entities.map((e, i) => ({ ...e, empName: raw[i]?.empName }));
 
     return { data, total };
   }
@@ -265,6 +269,8 @@ export class WorkHourService {
 
     const qb = this.recordRepo
       .createQueryBuilder('r')
+      .leftJoin('hr_employee', 'e', 'e.id = r.emp_id AND e.tenant_id = r.tenant_id')
+      .addSelect('e.name', 'empName')
       .where('r.tenant_id = :tenantId', { tenantId });
 
     if (query.empId !== undefined) {
@@ -289,12 +295,14 @@ export class WorkHourService {
       });
     }
 
-    const [data, total] = await qb
+    const { entities, raw } = await qb
       .orderBy('r.report_date', 'DESC')
       .addOrderBy('r.created_at', 'DESC')
       .skip((page - 1) * pageSize)
       .take(pageSize)
-      .getManyAndCount();
+      .getRawAndEntities();
+    const total = await qb.getCount();
+    const data = entities.map((e, i) => ({ ...e, empName: raw[i]?.empName }));
 
     return { data, total };
   }

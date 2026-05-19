@@ -32,14 +32,13 @@ export class WmsReportService {
     );
 
     let sql = `
-      SELECT inv.material_id, mat.code as material_code, mat.name as material_name,
+      SELECT inv.material_id, inv.material_code, inv.material_name,
              inv.batch_id, inv.location_id,
              inv.quantity, inv.available_qty, inv.locked_qty,
              inv.uom_id, inv.status, inv.quality_status, inv.updated_at,
              loc.code as location_code, loc.warehouse_id
       FROM wms_inventory inv
       JOIN wms_location loc ON loc.id = inv.location_id
-      LEFT JOIN plm_material mat ON mat.id = inv.material_id
       WHERE inv.tenant_id = ?
     `;
     const params: unknown[] = [tenantId];
@@ -72,15 +71,14 @@ export class WmsReportService {
     let sql = `
       SELECT
         tx.material_id,
-        mat.code as material_code,
-        mat.name as material_name,
+        tx.material_code,
+        tx.material_name,
         SUM(CASE WHEN tx.tx_type = 'RECEIPT' THEN tx.quantity ELSE 0 END) as receipt_qty,
         SUM(CASE WHEN tx.tx_type = 'ISSUE'   THEN tx.quantity ELSE 0 END) as issue_qty,
         SUM(CASE WHEN tx.tx_type = 'ADJUST' AND tx.quantity > 0 THEN tx.quantity ELSE 0 END) as adjust_in,
         SUM(CASE WHEN tx.tx_type = 'ADJUST' AND tx.quantity < 0 THEN ABS(tx.quantity) ELSE 0 END) as adjust_out,
         tx.uom_id
       FROM wms_stock_transaction tx
-      LEFT JOIN plm_material mat ON mat.id = tx.material_id
       WHERE tx.tenant_id = ? AND tx.tx_time BETWEEN ? AND ?
     `;
     const params: unknown[] = [tenantId, startDate, endDate];

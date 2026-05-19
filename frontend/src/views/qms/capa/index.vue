@@ -108,7 +108,7 @@ const columns: MTableColumn[] = [
   { key: 'title', title: t('qms.capa.index.标题'), dataIndex: 'title', width: 200, ellipsis: true },
   { key: 'status', title: t('qms.capa.index.状态'), slotName: 'status', width: 100 },
   { key: 'responsibleId', title: t('qms.capa.index.责任人'), dataIndex: 'responsibleId', width: 110 },
-  { key: 'targetDate', title: t('qms.capa.index.目标完成日'), dataIndex: 'targetDate', width: 120 },
+  { key: 'targetDate', title: t('qms.capa.index.目标完成日'), dataIndex: 'dueDate', width: 120 },
   { key: 'overdue', title: t('qms.capa.index.逾期'), slotName: 'overdue', width: 120 },
   { key: 'createdAt', title: t('qms.capa.index.创建时间'), dataIndex: 'createdAt', width: 160 },
   { key: 'action', title: t('qms.capa.index.操作'), slotName: 'action', width: 160 },

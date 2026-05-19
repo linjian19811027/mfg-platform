@@ -11,6 +11,7 @@ import { MesWorkOrderSplit } from '../entities/mes-work-order-split.entity.js';
 import { MesWorkOrderMerge } from '../entities/mes-work-order-merge.entity.js';
 import { TenantContext } from '../../../shared/tenant/tenant.context.js';
 import { sanitizeUpdateData, escapeLikePattern } from '../../../shared/utils/sanitize.js';
+import { NumberingService } from '../../base/services/numbering.service.js';
 
 // 状态流转规则
 const WO_TRANSITIONS: Record<string, string[]> = {
@@ -43,6 +44,7 @@ export class WorkOrderService {
     @InjectRepository(MesWorkOrderMerge)
     private readonly mergeRepo: Repository<MesWorkOrderMerge>,
     private readonly dataSource: DataSource,
+    private readonly numberingSvc: NumberingService,
   ) {}
 
   // ── CRUD ─────────────────────────────────────────────────────────────────
@@ -65,9 +67,6 @@ export class WorkOrderService {
 
     const qb = this.woRepo
       .createQueryBuilder('wo')
-      .leftJoin('plm_material', 'mat', 'mat.id = wo.material_id')
-      .addSelect('mat.code', 'materialCode')
-      .addSelect('mat.name', 'materialName')
       .where('wo.tenant_id = :tenantId', { tenantId });
 
     if (status) qb.andWhere('wo.status = :status', { status });
@@ -80,20 +79,12 @@ export class WorkOrderService {
       qb.andWhere('wo.planned_start <= :to', { to: plannedStartTo });
     if (keyword) qb.andWhere('wo.wo_no LIKE :kw', { kw: `%${escapeLikePattern(keyword)}%` });
 
-    const { entities, raw } = await qb
+    const [items, total] = await qb
       .orderBy('wo.priority', 'ASC')
       .addOrderBy('wo.planned_start', 'ASC')
       .skip((page - 1) * pageSize)
       .take(pageSize)
-      .getRawAndEntities();
-
-    const total = await qb.getCount();
-
-    const items = entities.map((wo, i) => ({
-      ...wo,
-      materialCode: raw[i]?.materialCode,
-      materialName: raw[i]?.materialName,
-    })) as (MesWorkOrder & { materialName?: string; materialCode?: string })[];
+      .getManyAndCount();
 
     return { items, total };
   }
@@ -120,11 +111,18 @@ export class WorkOrderService {
     data.status = 'RELEASED';
 
     if (!data.woNo) {
-      const count = await this.woRepo.count({ where: { tenantId } });
-      const now = new Date();
-      data.woNo = `WO-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}-${String(count + 1).padStart(5, '0')}`;
+      try {
+        data.woNo = await this.numberingSvc.generate('MES_WO', tenantId);
+      } catch {
+        // 编码规则不存在时降级到内联生成
+        const count = await this.woRepo.count({ where: { tenantId } });
+        const now = new Date();
+        data.woNo = `WO-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}-${String(count + 1).padStart(5, '0')}`;
+      }
     }
 
+    // 冗余物料信息（避免跨模块查询 plm_material）
+    // 前端应传 materialCode/materialName，如未传则留空
     return this.woRepo.save(this.woRepo.create(data));
   }
 

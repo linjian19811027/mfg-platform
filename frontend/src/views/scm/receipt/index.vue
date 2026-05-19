@@ -37,7 +37,7 @@ const columns: MTableColumn[] = [
   { key: 'poId', title: t('scm.receipt.index.采购订单号'), width: 140 },
   { key: 'supplierName', title: t('scm.receipt.index.供应商名称') },
   { key: 'status', title: t('scm.receipt.index.状态'), width: 100, slotName: 'status' },
-  { key: 'receivedDate', title: t('scm.receipt.index.到货日期'), width: 120 },
+  { key: 'receivedDate', title: t('scm.receipt.index.到货日期'), width: 120, dataIndex: 'receiptDate' },
   { key: 'materialId', title: t('scm.receipt.index.物料ID'), width: 120 },
   { key: 'qty', title: t('scm.receipt.index.数量'), width: 90 },
 ]

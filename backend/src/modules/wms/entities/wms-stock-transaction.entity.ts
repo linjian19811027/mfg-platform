@@ -18,6 +18,8 @@ export class WmsStockTransaction {
   /** RECEIPT | ISSUE | TRANSFER | ADJUST | LOCK | UNLOCK */
   @Column({ name: 'tx_type', length: 20 }) txType!: string;
   @Column({ name: 'material_id', type: 'bigint' }) materialId!: string;
+  @Column({ name: 'material_code', length: 50, nullable: true }) materialCode?: string;
+  @Column({ name: 'material_name', length: 200, nullable: true }) materialName?: string;
   @Column({ name: 'batch_id', type: 'bigint', nullable: true })
   batchId?: string;
   @Column({ name: 'from_location_id', type: 'bigint', nullable: true })

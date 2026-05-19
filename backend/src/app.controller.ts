@@ -17,6 +17,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between, MoreThanOrEqual } from 'typeorm';
 import { TenantContext } from './shared/tenant/tenant.context.js';
 import { escapeLikePattern } from './shared/utils/sanitize.js';
+import { AuditInterceptor } from './modules/auth/interceptors/audit.interceptor.js';
 
 @ApiTags('系统')
 @Controller()
@@ -36,6 +37,9 @@ export class AppController {
   @ApiResponse({ status: 200 })
   async health() {
     const redisUrl = this.config.get<string>('REDIS_URL');
+    const storagePath = this.config.get<string>('STORAGE_LOCAL_PATH', './data/files');
+
+    // MySQL
     let mysqlStatus = 'UP';
     let mysqlLatencyMs = 0;
     try {
@@ -46,19 +50,34 @@ export class AppController {
       mysqlStatus = 'DOWN';
     }
 
+    // 文件存储
+    let storageStatus = 'UP';
+    try {
+      const fs = await import('fs');
+      fs.accessSync(storagePath, fs.constants.W_OK);
+    } catch {
+      storageStatus = 'DOWN';
+    }
+
+    // 内存
+    const totalMem = os.totalmem();
+    const freeMem = os.freemem();
+    const memUsage = Math.round(((totalMem - freeMem) / totalMem) * 100);
+    const memStatus = memUsage > 95 ? 'CRITICAL' : memUsage > 85 ? 'WARNING' : 'UP';
+
+    const overallStatus = mysqlStatus === 'DOWN' ? 'DOWN' : memStatus === 'CRITICAL' ? 'DEGRADED' : 'UP';
+
     return {
-      status: mysqlStatus === 'UP' ? 'UP' : 'DOWN',
+      status: overallStatus,
       mode: redisUrl ? 'FULL' : 'DEGRADED',
+      uptime: Math.round(process.uptime()),
+      nodeVersion: process.version,
       components: {
         mysql: { status: mysqlStatus, latencyMs: mysqlLatencyMs },
         redis: { status: redisUrl ? 'UP' : 'DEGRADED' },
-        storage: {
-          status: 'UP',
-          type: this.config.get<string>('STORAGE_TYPE', 'local'),
-          path: this.config.get<string>('STORAGE_LOCAL_PATH', './data/files'),
-        },
+        storage: { status: storageStatus, type: this.config.get<string>('STORAGE_TYPE', 'local') },
+        memory: { status: memStatus, usagePercent: memUsage },
       },
-      version: '1.0.0',
       timestamp: new Date().toISOString(),
     };
   }
@@ -68,18 +87,25 @@ export class AppController {
   @Get('api/metrics')
   @ApiOperation({ summary: '系统监控指标（CPU/内存/磁盘/进程/数据库）' })
   async metrics() {
-    // CPU（Windows 下 os.loadavg() 返回 [0,0,0]，用 os.cpus() 计算实际使用率）
-    const cpus = os.cpus();
-    const cpuCount = cpus.length;
-    const cpuModel = cpus[0]?.model ?? 'Unknown';
-    const loadAvg = os.loadavg(); // [1min, 5min, 15min] — Windows 始终返回 [0,0,0]
-    let cpuUsagePercent = Math.min(100, Math.round((loadAvg[0] / cpuCount) * 100));
-    if (cpuUsagePercent === 0 && cpuCount > 0) {
-      // Windows fallback：通过 os.cpus() 的 idle/total 时间差计算
-      const totalIdle = cpus.reduce((s, c) => s + c.times.idle, 0);
-      const totalAll = cpus.reduce((s, c) => s + c.times.user + c.times.nice + c.times.sys + c.times.irq + c.times.idle, 0);
-      cpuUsagePercent = totalAll > 0 ? Math.round(((totalAll - totalIdle) / totalAll) * 100) : 0;
-    }
+    // CPU：两采样点计算真实使用率（兼容 Windows）
+    const cpus1 = os.cpus();
+    const cpuCount = cpus1.length;
+    const cpuModel = cpus1[0]?.model ?? 'Unknown';
+    const loadAvg = os.loadavg();
+
+    // 采样点 1
+    const idle1 = cpus1.reduce((s, c) => s + c.times.idle, 0);
+    const total1 = cpus1.reduce((s, c) => s + c.times.user + c.times.nice + c.times.sys + c.times.irq + c.times.idle, 0);
+
+    // 等待 100ms 取采样点 2
+    await new Promise(r => setTimeout(r, 100));
+    const cpus2 = os.cpus();
+    const idle2 = cpus2.reduce((s, c) => s + c.times.idle, 0);
+    const total2 = cpus2.reduce((s, c) => s + c.times.user + c.times.nice + c.times.sys + c.times.irq + c.times.idle, 0);
+
+    const idleDelta = idle2 - idle1;
+    const totalDelta = total2 - total1;
+    const cpuUsagePercent = totalDelta > 0 ? Math.round(((totalDelta - idleDelta) / totalDelta) * 100) : 0;
 
     // 内存
     const totalMem = os.totalmem();
@@ -270,5 +296,102 @@ export class AppController {
 
     const [items, total] = await qb.getManyAndCount();
     return { items, total, page, pageSize };
+  }
+
+  // ── 平台仪表盘 ──────────────────────────────────────────────────────────
+
+  @Get('api/platform/dashboard')
+  @ApiOperation({ summary: '平台仪表盘：租户统计、API 调用量' })
+  async platformDashboard() {
+    // 租户统计
+    const tenantStats = await this.dataSource.query(`
+      SELECT
+        COUNT(*) as total_tenants,
+        SUM(CASE WHEN status = 'ACTIVE' THEN 1 ELSE 0 END) as active_tenants,
+        SUM(CASE WHEN expire_at IS NOT NULL AND expire_at < NOW() THEN 1 ELSE 0 END) as expired_tenants
+      FROM sys_tenant
+    `);
+
+    // 用户统计
+    const userStats = await this.dataSource.query(`
+      SELECT COUNT(*) as total_users
+      FROM sys_user WHERE status = 'ACTIVE'
+    `);
+
+    // API 调用量
+    const apiStats: Record<string, number> = {};
+    for (const [tenantId, count] of AuditInterceptor.apiStats) {
+      apiStats[tenantId] = count;
+    }
+
+    return {
+      tenants: tenantStats[0] ?? { total_tenants: 0, active_tenants: 0, expired_tenants: 0 },
+      users: userStats[0] ?? { total_users: 0 },
+      apiCalls: { byTenant: apiStats, total: Object.values(apiStats).reduce((s, n) => s + n, 0) },
+    };
+  }
+
+  // ── 平台级健康检查（含租户状态） ─────────────────────────────────────────
+
+  @Get('api/platform/health')
+  @ApiOperation({ summary: '平台级健康检查：所有租户状态' })
+  async platformHealth() {
+    const tenants = await this.dataSource.query(`
+      SELECT code, name, status,
+             CASE WHEN expire_at IS NOT NULL AND expire_at < NOW() THEN 1 ELSE 0 END as is_expired
+      FROM sys_tenant
+      ORDER BY status, name
+    `);
+    return {
+      status: 'UP',
+      tenantCount: tenants.length,
+      tenants,
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  // ── 租户活跃用户统计 ──────────────────────────────────────────────────────
+
+  @Get('api/platform/active-users')
+  @ApiOperation({ summary: '各租户活跃用户数（最近 24 小时登录）' })
+  async getActiveUsers() {
+    const stats = await this.dataSource.query(`
+      SELECT tenant_id,
+             COUNT(*) as total_users,
+             SUM(CASE WHEN last_login_at >= DATE_SUB(NOW(), INTERVAL 24 HOUR) THEN 1 ELSE 0 END) as active_24h,
+             SUM(CASE WHEN last_login_at >= DATE_SUB(NOW(), INTERVAL 7 DAY) THEN 1 ELSE 0 END) as active_7d
+      FROM sys_user
+      WHERE status = 'ACTIVE'
+      GROUP BY tenant_id
+    `);
+    return { stats };
+  }
+
+  // ── 租户存储用量统计 ──────────────────────────────────────────────────────
+
+  @Get('api/platform/storage-stats')
+  @ApiOperation({ summary: '各租户文件存储用量' })
+  async getStorageStats() {
+    const stats = await this.dataSource.query(`
+      SELECT tenant_id,
+             COUNT(*) as file_count,
+             ROUND(SUM(size_bytes) / 1024 / 1024, 2) as total_mb
+      FROM sys_file
+      GROUP BY tenant_id
+      ORDER BY total_mb DESC
+    `);
+    return { stats };
+  }
+
+  // ── 租户 API 调用量统计 ──────────────────────────────────────────────────
+
+  @Get('api/platform/tenant-stats')
+  @ApiOperation({ summary: '各租户 API 调用量统计（进程内存）' })
+  getTenantApiStats() {
+    const stats: Record<string, number> = {};
+    for (const [tenantId, count] of AuditInterceptor.apiStats) {
+      stats[tenantId] = count;
+    }
+    return { stats, total: Object.values(stats).reduce((s, n) => s + n, 0) };
   }
 }

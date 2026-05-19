@@ -187,7 +187,7 @@ export class BaseController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: '删除编码规则' })
   deleteNumberingRule(@Param('id') id: string) {
-    return this.ruleRepo.delete(id);
+    return this.ruleRepo.softDelete(id);
   }
 
   // ── 工作中心（工种绑定） ─────────────────────────────────

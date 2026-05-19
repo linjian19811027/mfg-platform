@@ -97,7 +97,7 @@ const statusColor = (s: string) => statusColorMap[s] ?? 'gray'
 const statusLabel = (s: string) => statusLabelMap[s] ?? s
 
 const columns: MTableColumn[] = [
-  { key: 'code', title: t('erp.salesorder.index.订单编号'), width: 140 },
+  { key: 'code', title: t('erp.salesorder.index.订单编号'), width: 140, dataIndex: 'soNo' },
   { key: 'customerName', title: t('erp.salesorder.index.客户名称') },
   { key: 'status', title: t('erp.salesorder.index.状态'), width: 90, slotName: 'status' },
   { key: 'totalAmount', title: t('erp.salesorder.index.总金额'), width: 140, slotName: 'totalAmount' },

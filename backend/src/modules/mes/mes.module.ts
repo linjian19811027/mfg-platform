@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { BaseModule } from '../base/base.module.js';
 
 // Entities
 import { MesWorkOrder } from './entities/mes-work-order.entity.js';
@@ -60,6 +61,7 @@ import { HrModule } from '../hr/hr.module.js';
       CiOutput,
     ]),
     MessageModule,
+    BaseModule,
     HrModule,
   ],
   controllers: [MesController],

@@ -38,6 +38,10 @@ export class ErpAccount {
   @Column({ type: 'enum', enum: AccountType })
   type!: AccountType;
 
+  /** 借贷方向：DEBIT(借) / CREDIT(贷) */
+  @Column({ length: 10, nullable: true })
+  direction?: string;
+
   @Column({ name: 'parent_id', type: 'bigint', nullable: true })
   parentId?: string;
 

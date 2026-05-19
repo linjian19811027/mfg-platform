@@ -57,11 +57,11 @@ export class SkillValidatorService {
       return empty;
     }
 
-    // 2. 查询工序所需认证 codes
+    // 2. 查询工序所需认证 codes（跨模块查询，MES 未启用时降级跳过）
     const opRows = await this.dataSource.query<OperationRow[]>(
       `SELECT required_cert_codes FROM mes_operation WHERE id = ? AND tenant_id = ?`,
       [operationId, tenantId],
-    );
+    ).catch(() => [] as OperationRow[]);
 
     if (!opRows.length) {
       return empty;

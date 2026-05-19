@@ -84,8 +84,12 @@ export interface Ecr {
   ecrNo: string
   title: string
   changeReason: string
-  affectedMaterials?: string
+  affectedItems?: Record<string, unknown>[]
   status: string // DRAFT/SUBMITTED/APPROVED/REJECTED
+  submittedBy?: string
+  submittedByName?: string
+  approvedBy?: string
+  approvedByName?: string
   createdAt: string
   submittedAt?: string
   approvedAt?: string

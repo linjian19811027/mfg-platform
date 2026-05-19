@@ -112,6 +112,8 @@ const NUMBERING_RULE_DATA = [
   { businessKey: 'WMS_ASN', code: 'ASN', name: '入库通知单编码', segments: [{ type: 'CONST', value: 'ASN' }, { type: 'DATE', format: 'YYYYMMDD' }, { type: 'SERIAL', length: 4, padChar: '0' }] },
   { businessKey: 'QMS_QC', code: 'QC', name: '质检单编码', segments: [{ type: 'CONST', value: 'QC' }, { type: 'DATE', format: 'YYYYMMDD' }, { type: 'SERIAL', length: 4, padChar: '0' }] },
   { businessKey: 'EAM_MT', code: 'MT', name: '维修工单编码', segments: [{ type: 'CONST', value: 'MT' }, { type: 'DATE', format: 'YYYYMMDD' }, { type: 'SERIAL', length: 4, padChar: '0' }] },
+  { businessKey: 'PLM_ECR', code: 'ECR', name: 'ECR变更申请编码', segments: [{ type: 'CONST', value: 'ECR' }, { type: 'DATE', format: 'YYYYMMDD' }, { type: 'SERIAL', length: 4, padChar: '0' }] },
+  { businessKey: 'PLM_ECN', code: 'ECN', name: 'ECN变更通知编码', segments: [{ type: 'CONST', value: 'ECN' }, { type: 'DATE', format: 'YYYYMMDD' }, { type: 'SERIAL', length: 4, padChar: '0' }] },
 ];
 
 const WAREHOUSE_DATA = [
@@ -231,18 +233,28 @@ export class InitSeedService implements OnApplicationBootstrap {
   async onApplicationBootstrap() {
     this.logger.log('🚀 开始初始化基础种子数据...');
 
-    await this.seedTenant();
-    await this.seedUsers();
-    await this.seedOrganization();
-    await this.seedUoms();
-    await this.seedShifts();
-    await this.seedJobTypes();
-    await this.seedWorkCenters();
-    await this.seedMaterialCategories();
-    await this.seedNumberingRules();
-    await this.seedWarehouses();
-    await this.seedAccounts();
-    await this.seedCostCenters();
+    const steps = [
+      { name: '租户', fn: () => this.seedTenant() },
+      { name: '用户', fn: () => this.seedUsers() },
+      { name: '组织', fn: () => this.seedOrganization() },
+      { name: '计量单位', fn: () => this.seedUoms() },
+      { name: '班次', fn: () => this.seedShifts() },
+      { name: '工种', fn: () => this.seedJobTypes() },
+      { name: '工作中心', fn: () => this.seedWorkCenters() },
+      { name: '物料分类', fn: () => this.seedMaterialCategories() },
+      { name: '编码规则', fn: () => this.seedNumberingRules() },
+      { name: '仓库', fn: () => this.seedWarehouses() },
+      { name: '会计科目', fn: () => this.seedAccounts() },
+      { name: '成本中心', fn: () => this.seedCostCenters() },
+    ];
+
+    for (const step of steps) {
+      try {
+        await step.fn();
+      } catch (err) {
+        this.logger.error(`❌ 种子数据 [${step.name}] 初始化失败: ${(err as Error).message}`);
+      }
+    }
 
     this.logger.log('✅ 基础种子数据初始化完成');
   }
@@ -424,34 +436,32 @@ export class InitSeedService implements OnApplicationBootstrap {
   // ─── 4. 计量单位 ──────────────────────────────────────────────
 
   private async seedUoms() {
-    const count = await this.uomRepo.count({ where: { tenantId: DEFAULT_TENANT_ID } });
-    if (count > 0) {
-      this.logger.log('⏭️  计量单位已存在，跳过');
-      return;
+    // 幂等：逐条检查，只插入缺失的 UOM
+    const existing = await this.uomRepo.find({ where: { tenantId: DEFAULT_TENANT_ID } });
+    const existingCodes = new Set(existing.map((u) => u.code));
+    const codeIdMap = new Map(existing.map((u) => [u.code, u.id]));
+
+    // 插入缺失的 UOM
+    const newUoms = UOM_DATA.filter((d) => !existingCodes.has(d.code));
+    if (newUoms.length > 0) {
+      const saved = await this.uomRepo.save(
+        newUoms.map((d) =>
+          this.uomRepo.create({ ...d, tenantId: DEFAULT_TENANT_ID, status: 'ACTIVE' }),
+        ),
+      );
+      for (const u of saved) codeIdMap.set(u.code, u.id);
+      this.logger.log(`✅ 新增 ${saved.length} 个计量单位`);
     }
-    // 批量插入 UOM
-    const uomEntities = UOM_DATA.map((d) =>
-      this.uomRepo.create({
-        tenantId: DEFAULT_TENANT_ID,
-        code: d.code,
-        name: d.name,
-        symbol: d.symbol,
-        category: d.category,
-        isBase: d.isBase,
-        status: 'ACTIVE',
-      }),
+
+    // 幂等：只插入缺失的换算关系
+    const existingConvs = await this.uomConvRepo.find({ where: { tenantId: DEFAULT_TENANT_ID } });
+    const existingConvKeys = new Set(
+      existingConvs.map((c) => `${c.fromUomId}-${c.toUomId}`),
     );
-    const saved = await this.uomRepo.save(uomEntities);
 
-    // 建立 code → id 映射
-    const codeIdMap = new Map<string, string>();
-    for (const u of saved) {
-      codeIdMap.set(u.code, u.id);
-    }
-
-    // 插入换算关系
-    const convEntities = UOM_CONVERSION_DATA
+    const newConvs = UOM_CONVERSION_DATA
       .filter((d) => codeIdMap.has(d.fromCode) && codeIdMap.has(d.toCode))
+      .filter((d) => !existingConvKeys.has(`${codeIdMap.get(d.fromCode)}-${codeIdMap.get(d.toCode)}`))
       .map((d) =>
         this.uomConvRepo.create({
           tenantId: DEFAULT_TENANT_ID,
@@ -460,11 +470,14 @@ export class InitSeedService implements OnApplicationBootstrap {
           factor: d.factor,
         }),
       );
-    if (convEntities.length > 0) {
-      await this.uomConvRepo.save(convEntities);
+    if (newConvs.length > 0) {
+      await this.uomConvRepo.save(newConvs);
+      this.logger.log(`✅ 新增 ${newConvs.length} 个换算关系`);
     }
 
-    this.logger.log(`✅ 已创建 ${saved.length} 个计量单位和 ${convEntities.length} 个换算关系`);
+    if (newUoms.length === 0 && newConvs.length === 0) {
+      this.logger.log('⏭️  计量单位和换算关系已完整，跳过');
+    }
   }
 
   // ─── 5. 班次 ──────────────────────────────────────────────────

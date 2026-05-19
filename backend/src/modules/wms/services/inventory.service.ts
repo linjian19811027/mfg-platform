@@ -24,6 +24,8 @@ export interface InventoryQuery {
 
 export interface StockOpParams {
   materialId: string;
+  materialCode?: string;
+  materialName?: string;
   batchId?: string;
   locationId: string;
   quantity: number;
@@ -434,6 +436,8 @@ export class InventoryService {
       mgr.create(WmsInventory, {
         tenantId,
         materialId: params.materialId,
+        materialCode: params.materialCode,
+        materialName: params.materialName,
         batchId: params.batchId,
         locationId: params.locationId,
         quantity: params.quantity,
@@ -477,6 +481,8 @@ export class InventoryService {
         txNo,
         txType,
         materialId: params.materialId,
+        materialCode: params.materialCode,
+        materialName: params.materialName,
         batchId: params.batchId,
         fromLocationId: fromLocationId ?? undefined,
         toLocationId: toLocationId ?? undefined,

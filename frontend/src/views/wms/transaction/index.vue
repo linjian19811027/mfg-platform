@@ -77,8 +77,8 @@ async function searchMaterials(kw: string) {
 const columns: MTableColumn[] = [
   { key: 'createdAt', title: t('wms.transaction.index.时间'), dataIndex: 'createdAt', width: 160 },
   { key: 'materialName', title: t('wms.transaction.index.物料名称'), dataIndex: 'materialName', width: 160 },
-  { key: 'type', title: t('wms.transaction.index.类型'), dataIndex: 'type', width: 120 },
-  { key: 'qty', title: t('wms.transaction.index.数量'), dataIndex: 'qty', width: 100 },
+  { key: 'type', title: t('wms.transaction.index.类型'), dataIndex: 'txType', width: 120 },
+  { key: 'qty', title: t('wms.transaction.index.数量'), dataIndex: 'quantity', width: 100 },
   { key: 'direction', title: t('wms.transaction.index.方向'), slotName: 'direction', width: 90 },
   { key: 'warehouseName', title: t('wms.transaction.index.仓库'), dataIndex: 'warehouseName', width: 120 },
   { key: 'batchId', title: t('wms.transaction.index.批次号'), dataIndex: 'batchId', width: 120 },

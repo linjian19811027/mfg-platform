@@ -72,9 +72,9 @@ const STATUS_MAP: Record<string, { label: string; color: string }> = {
 }
 
 const columns: MTableColumn[] = [
-  { key: 'code', title: t('scm.rfq.index.询价单号'), dataIndex: 'code', width: 130 },
+  { key: 'code', title: t('scm.rfq.index.询价单号'), dataIndex: 'inquiryNo', width: 130 },
   { key: 'materialName', title: t('scm.rfq.index.物料名称'), dataIndex: 'materialName', width: 160 },
-  { key: 'qty', title: t('scm.rfq.index.询价数量'), dataIndex: 'qty', width: 100 },
+  { key: 'qty', title: t('scm.rfq.index.询价数量'), dataIndex: 'quantity', width: 100 },
   { key: 'status', title: t('scm.rfq.index.状态'), slotName: 'status', width: 100 },
   { key: 'createdAt', title: t('scm.rfq.index.创建时间'), dataIndex: 'createdAt', width: 160 },
   { key: 'action', title: t('scm.rfq.index.操作'), slotName: 'action', width: 140 },

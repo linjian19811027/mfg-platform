@@ -355,20 +355,30 @@ export const roleApi = {
 
 // ==================== 审计日志 ====================
 
-export type AuditActionType = 'create' | 'edit' | 'delete' | 'login' | 'logout' | 'approve'
-export type AuditResult = 'success' | 'fail'
+export type AuditActionType = 'create' | 'edit' | 'delete' | 'login' | 'logout' | 'approve' | string
+export type AuditResult = 'success' | 'fail' | string
 
 export interface AuditLog {
   id: string
-  operatedAt: string
-  operator: string
-  module: string
-  actionType: AuditActionType
-  target: string
-  ip: string
-  result: AuditResult
-  requestParams?: Record<string, unknown>
-  responseData?: Record<string, unknown>
+  createdAt?: string
+  username?: string
+  module?: string
+  logType?: string
+  action?: string
+  requestUrl?: string
+  ipAddress?: string
+  responseCode?: number
+  responseBody?: string
+  requestBody?: string
+  errorMessage?: string
+  signature?: string
+  // 向后兼容
+  operatedAt?: string
+  operator?: string
+  actionType?: string
+  target?: string
+  ip?: string
+  result?: string
   errorMsg?: string
 }
 
@@ -439,12 +449,12 @@ const MOCK_AUDIT_LOGS: AuditLog[] = Array.from({ length: 52 }, (_, i) => {
 
 function filterAuditLogs(params: AuditLogParams) {
   let list = [...MOCK_AUDIT_LOGS]
-  if (params.operator) list = list.filter(l => l.operator.includes(params.operator!))
+  if (params.operator) list = list.filter(l => (l.username ?? l.operator ?? '').includes(params.operator!))
   if (params.module) list = list.filter(l => l.module === params.module)
-  if (params.actionType) list = list.filter(l => l.actionType === params.actionType)
+  if (params.actionType) list = list.filter(l => (l.logType ?? l.actionType) === params.actionType)
   if (params.result) list = list.filter(l => l.result === params.result)
-  if (params.startTime) list = list.filter(l => l.operatedAt >= params.startTime!)
-  if (params.endTime) list = list.filter(l => l.operatedAt <= params.endTime! + ' 23:59:59')
+  if (params.startTime) list = list.filter(l => (l.createdAt ?? l.operatedAt ?? '') >= params.startTime!)
+  if (params.endTime) list = list.filter(l => (l.createdAt ?? l.operatedAt ?? '') <= params.endTime! + ' 23:59:59')
   const page = params.page ?? 1
   const pageSize = params.pageSize ?? 20
   const total = list.length

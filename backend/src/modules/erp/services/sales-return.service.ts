@@ -109,6 +109,8 @@ export class SalesReturnService {
 
     const qb = this.returnRepo
       .createQueryBuilder('r')
+      .leftJoin('erp_customer', 'c', 'c.id = r.customer_id AND c.tenant_id = r.tenant_id')
+      .addSelect('c.name', 'customerName')
       .where('r.tenantId = :tenantId', { tenantId });
 
     if (status) qb.andWhere('r.status = :status', { status });
@@ -119,7 +121,9 @@ export class SalesReturnService {
       .skip((page - 1) * pageSize)
       .take(pageSize);
 
-    const [items, total] = await qb.getManyAndCount();
+    const { entities, raw } = await qb.getRawAndEntities();
+    const total = await qb.getCount();
+    const items = entities.map((e, i) => ({ ...e, customerName: raw[i]?.customerName }));
     return { items, total };
   }
 

@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MessageModule } from '../../shared/message/message.module.js';
+import { BaseModule } from '../base/base.module.js';
 
 // Entities
 import { HrEmployee } from './entities/hr-employee.entity.js';
@@ -40,6 +41,7 @@ import { HrController } from './hr.controller.js';
       HrEmployeeHistory,
     ]),
     MessageModule,
+    BaseModule,
   ],
   controllers: [HrController],
   providers: [

@@ -48,7 +48,7 @@ const qualColumns: MTableColumn[] = [
   { key: 'supplierName', title: t('scm.supplier-performance.index.供应商'), dataIndex: 'supplierName', width: 160 },
   { key: 'certType', title: t('scm.supplier-performance.index.资质类型'), dataIndex: 'certType', width: 130 },
   { key: 'certNo', title: t('scm.supplier-performance.index.证书编号'), dataIndex: 'certNo', width: 140 },
-  { key: 'expiryDate', title: t('scm.supplier-performance.index.到期日期'), dataIndex: 'expiryDate', width: 120 },
+  { key: 'expireDate', title: t('scm.supplier-performance.index.到期日期'), dataIndex: 'expireDate', width: 120 },
   { key: 'status', title: t('scm.supplier-performance.index.状态'), slotName: 'status', width: 100 },
 ]
 

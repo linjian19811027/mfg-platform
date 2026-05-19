@@ -134,6 +134,8 @@ export class PriceAgreementService {
 
     const qb = this.paRepo
       .createQueryBuilder('pa')
+      .leftJoin('scm_supplier', 'sup', 'sup.id = pa.supplier_id AND sup.tenant_id = pa.tenant_id')
+      .addSelect('sup.name', 'supplierName')
       .where('pa.tenantId = :tenantId', { tenantId });
 
     if (status) qb.andWhere('pa.status = :status', { status });
@@ -144,7 +146,9 @@ export class PriceAgreementService {
       .skip((page - 1) * pageSize)
       .take(pageSize);
 
-    const [items, total] = await qb.getManyAndCount();
+    const { entities, raw } = await qb.getRawAndEntities();
+    const total = await qb.getCount();
+    const items = entities.map((e, i) => ({ ...e, supplierName: raw[i]?.supplierName }));
     return { items, total };
   }
 

@@ -49,14 +49,14 @@ const total = ref(0)
 const query = reactive({ keyword: '', page: 1, pageSize: 20 })
 
 const columns: MTableColumn[] = [
-  { key: 'code', title: t('mes.wip.index.工单号'), dataIndex: 'code', width: 140 },
+  { key: 'code', title: t('mes.wip.index.工单号'), dataIndex: 'woNo', width: 140 },
   { key: 'materialName', title: t('mes.wip.index.物料名称'), dataIndex: 'materialName', width: 160 },
   { key: 'plannedQty', title: t('mes.wip.index.计划数量'), dataIndex: 'plannedQty', width: 100 },
   { key: 'completedQty', title: t('mes.wip.index.完成数量'), dataIndex: 'completedQty', width: 100 },
   { key: 'wipQty', title: t('mes.wip.index.在制数量'), slotName: 'wipQty', width: 100 },
   { key: 'currentOp', title: t('mes.wip.index.当前工序'), slotName: 'currentOp', width: 140 },
   { key: 'progress', title: t('mes.wip.index.进度'), slotName: 'progress', width: 160 },
-  { key: 'plannedEndDate', title: t('mes.wip.index.计划完成'), dataIndex: 'plannedEndDate', width: 120 },
+  { key: 'plannedEndDate', title: t('mes.wip.index.计划完成'), dataIndex: 'plannedEnd', width: 120 },
 ]
 
 async function loadData() {

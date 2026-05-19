@@ -61,8 +61,8 @@ const statusColor = (s: string) => statusColorMap[s] ?? 'gray'
 const statusLabel = (s: string) => statusLabelMap[s] ?? s
 
 const columns: MTableColumn[] = [
-  { key: 'code', title: t('erp.voucher.index.凭证编号'), width: 140 },
-  { key: 'type', title: t('erp.voucher.index.类型'), width: 110 },
+  { key: 'code', title: t('erp.voucher.index.凭证编号'), width: 140, dataIndex: 'voucherNo' },
+  { key: 'type', title: t('erp.voucher.index.类型'), width: 110, dataIndex: 'voucherType' },
   { key: 'status', title: t('erp.voucher.index.状态'), width: 90, slotName: 'status' },
   { key: 'totalDebit', title: t('erp.voucher.index.借方合计'), width: 110 },
   { key: 'totalCredit', title: t('erp.voucher.index.贷方合计'), width: 110 },

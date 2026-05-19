@@ -163,6 +163,8 @@ export class QuotationService {
 
     const qb = this.quotationRepo
       .createQueryBuilder('q')
+      .leftJoin('erp_customer', 'c', 'c.id = q.customer_id AND c.tenant_id = q.tenant_id')
+      .addSelect('c.name', 'customerName')
       .where('q.tenantId = :tenantId', { tenantId });
 
     if (status) qb.andWhere('q.status = :status', { status });
@@ -172,7 +174,9 @@ export class QuotationService {
       .skip((page - 1) * pageSize)
       .take(pageSize);
 
-    const [items, total] = await qb.getManyAndCount();
+    const { entities, raw } = await qb.getRawAndEntities();
+    const total = await qb.getCount();
+    const items = entities.map((e, i) => ({ ...e, customerName: raw[i]?.customerName }));
     return { items, total };
   }
 

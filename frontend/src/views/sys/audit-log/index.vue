@@ -56,13 +56,8 @@
         @change="onTableChange"
       >
         <template #actionType="{ record }">
-          <a-tag :color="actionTypeColor(record.actionType as string)" size="small">
-            {{ actionTypeLabel(record.actionType as string) }}
-          </a-tag>
-        </template>
-        <template #result="{ record }">
-          <a-tag :color="record.result === 'success' ? 'green' : 'red'" size="small">
-            {{ record.result === 'success' ? $t('sys.audit-log.lbl1647') : $t('sys.audit-log.lbl1648') }}
+          <a-tag :color="actionTypeColor(record.logType as string)" size="small">
+            {{ actionTypeLabel(record.logType as string) }}
           </a-tag>
         </template>
         <template #action="{ record }">
@@ -82,34 +77,35 @@
     >
       <template v-if="detailRecord">
         <a-descriptions :column="2" bordered size="small">
-          <a-descriptions-item :label="$t('sys.audit-log.index.操作时间')">{{ detailRecord.operatedAt }}</a-descriptions-item>
-          <a-descriptions-item :label="$t('sys.audit-log.index.操作人')">{{ detailRecord.operator }}</a-descriptions-item>
+          <a-descriptions-item :label="$t('sys.audit-log.index.操作时间')">{{ detailRecord.createdAt }}</a-descriptions-item>
+          <a-descriptions-item :label="$t('sys.audit-log.index.操作人')">{{ detailRecord.username }}</a-descriptions-item>
           <a-descriptions-item :label="$t('sys.audit-log.index.操作模块')">{{ detailRecord.module }}</a-descriptions-item>
           <a-descriptions-item :label="$t('sys.audit-log.index.操作类型')">
-            <a-tag :color="actionTypeColor(detailRecord.actionType)" size="small">
-              {{ actionTypeLabel(detailRecord.actionType) }}
+            <a-tag :color="actionTypeColor(detailRecord.logType ?? '')" size="small">
+              {{ actionTypeLabel(detailRecord.logType ?? '') }}
             </a-tag>
           </a-descriptions-item>
-          <a-descriptions-item :label="$t('sys.audit-log.index.操作对象')">{{ detailRecord.target }}</a-descriptions-item>
-          <a-descriptions-item :label="$t('sys.audit-log.index.IP地址')">{{ detailRecord.ip }}</a-descriptions-item>
+          <a-descriptions-item :label="$t('sys.audit-log.index.操作')">{{ detailRecord.action }}</a-descriptions-item>
+          <a-descriptions-item :label="$t('sys.audit-log.index.IP地址')">{{ detailRecord.ipAddress }}</a-descriptions-item>
+          <a-descriptions-item label="状态码">{{ detailRecord.responseCode }}</a-descriptions-item>
           <a-descriptions-item :label="$t('sys.audit-log.index.操作结果')" :span="2">
-            <a-tag :color="detailRecord.result === 'success' ? 'green' : 'red'" size="small">
-              {{ detailRecord.result === 'success' ? $t('sys.audit-log.lbl1649') : $t('sys.audit-log.lbl1650') }}
+            <a-tag :color="(detailRecord.responseCode ?? 200) < 400 ? 'green' : 'red'" size="small">
+              {{ (detailRecord.responseCode ?? 200) < 400 ? $t('sys.audit-log.lbl1649') : $t('sys.audit-log.lbl1650') }}
             </a-tag>
-            <span v-if="detailRecord.errorMsg" style="margin-left: 8px; color: var(--color-danger-6)">
-              {{ detailRecord.errorMsg }}
+            <span v-if="detailRecord.errorMessage" style="margin-left: 8px; color: var(--color-danger-6)">
+              {{ detailRecord.errorMessage }}
             </span>
           </a-descriptions-item>
         </a-descriptions>
 
-        <div style="margin-top: 16px">
-          <div class="detail-section-title">{{ $t('sys.audit-log.lbl1651') }}</div>
-          <pre class="json-block">{{ formatJson(detailRecord.requestParams) }}</pre>
+        <div v-if="detailRecord.requestBody" style="margin-top: 16px">
+          <div class="detail-section-title">请求体</div>
+          <pre class="json-block">{{ formatJson(detailRecord.requestBody) }}</pre>
         </div>
 
-        <div v-if="detailRecord.responseData" style="margin-top: 12px">
-          <div class="detail-section-title">{{ $t('sys.audit-log.lbl1652') }}</div>
-          <pre class="json-block">{{ formatJson(detailRecord.responseData) }}</pre>
+        <div v-if="detailRecord.responseBody" style="margin-top: 12px">
+          <div class="detail-section-title">响应体</div>
+          <pre class="json-block">{{ formatJson(detailRecord.responseBody) }}</pre>
         </div>
       </template>
     </a-modal>
@@ -123,7 +119,7 @@ import { ref, reactive } from 'vue'
 import { Message } from '@arco-design/web-vue'
 import MTable from '@/components/MTable/index.vue'
 import type { MTableColumn } from '@/components/MTable/index.vue'
-import { auditLogApi, type AuditLog, type AuditActionType } from '@/api/sys'
+import { auditLogApi, type AuditLog } from '@/api/sys'
 
 // ---- 常量 ----
 const MODULE_OPTIONS = [
@@ -131,22 +127,18 @@ const MODULE_OPTIONS = [
   t('sys.audit-log.lbl1658'), t('sys.audit-log.lbl1659'), t('sys.audit-log.lbl1660'), t('sys.audit-log.lbl1661'), t('sys.audit-log.lbl1662'), t('sys.audit-log.lbl1663'),
 ]
 
-const ACTION_TYPE_OPTIONS: { value: AuditActionType; label: string }[] = [
-  { value: 'create', label: t('sys.audit-log.create') },
-  { value: 'edit', label: t('sys.audit-log.edit') },
-  { value: 'delete', label: t('sys.audit-log.delete') },
-  { value: 'login', label: t('sys.audit-log.lbl1664') },
-  { value: 'logout', label: t('sys.audit-log.lbl1665') },
-  { value: 'approve', label: t('sys.audit-log.lbl1666') },
+const ACTION_TYPE_OPTIONS = [
+  { value: 'LOGIN', label: '登录' },
+  { value: 'OPERATION', label: '操作' },
+  { value: 'SYSTEM_ERROR', label: '系统错误' },
+  { value: 'BIZ_ERROR', label: '业务错误' },
 ]
 
-const ACTION_TYPE_COLOR: Record<AuditActionType, string> = {
-  create: 'green',
-  edit: 'arcoblue',
-  delete: 'red',
-  login: 'purple',
-  logout: 'gray',
-  approve: 'orange',
+const ACTION_TYPE_COLOR: Record<string, string> = {
+  LOGIN: 'purple',
+  OPERATION: 'arcoblue',
+  SYSTEM_ERROR: 'red',
+  BIZ_ERROR: 'orange',
 }
 
 function actionTypeLabel(type: string): string {
@@ -154,7 +146,7 @@ function actionTypeLabel(type: string): string {
 }
 
 function actionTypeColor(type: string): string {
-  return ACTION_TYPE_COLOR[type as AuditActionType] ?? 'gray'
+  return ACTION_TYPE_COLOR[type] ?? 'gray'
 }
 
 function formatJson(obj: unknown): string {
@@ -168,14 +160,14 @@ function formatJson(obj: unknown): string {
 
 // ---- 列定义 ----
 const columns: MTableColumn[] = [
-  { key: 'operatedAt', title: t('sys.audit-log.index.操作时间'), width: 160 },
-  { key: 'operator', title: t('sys.audit-log.index.操作人'), width: 100 },
-  { key: 'module', title: t('sys.audit-log.index.操作模块'), width: 120 },
-  { key: 'actionType', title: t('sys.audit-log.index.操作类型'), width: 90, slotName: 'actionType' },
-  { key: 'target', title: t('sys.audit-log.index.操作对象'), ellipsis: true },
-  { key: 'ip', title: t('sys.audit-log.index.IP地址'), width: 140 },
-  { key: 'result', title: t('sys.audit-log.index.操作结果'), width: 90, slotName: 'result' },
-  { key: 'action', title: t('sys.audit-log.index.操作'), width: 80, slotName: 'action' },
+  { key: 'createdAt', title: t('sys.audit-log.index.操作时间'), width: 180 },
+  { key: 'username', title: t('sys.audit-log.index.操作人'), width: 100 },
+  { key: 'module', title: t('sys.audit-log.index.操作模块'), width: 100 },
+  { key: 'logType', title: t('sys.audit-log.index.操作类型'), width: 100, slotName: 'actionType' },
+  { key: 'action', title: t('sys.audit-log.index.操作'), width: 160 },
+  { key: 'requestUrl', title: t('sys.audit-log.index.操作对象'), ellipsis: true },
+  { key: 'ipAddress', title: t('sys.audit-log.index.IP地址'), width: 140 },
+  { key: 'responseCode', title: '状态码', width: 80 },
 ]
 
 // ---- 查询状态 ----
@@ -218,13 +210,13 @@ async function handleExport() {
     const csvLines = [
       headers.join(','),
       ...rows.map(r => [
-        r.operatedAt,
-        r.operator,
+        r.createdAt,
+        r.username,
         r.module,
-        actionTypeLabel(r.actionType),
-        `"${r.target}"`,
-        r.ip,
-        r.result === 'success' ? t('sys.audit-log.lbl1674') : t('sys.audit-log.lbl1675'),
+        actionTypeLabel(r.logType ?? ''),
+        `"${r.action ?? ''}"`,
+        r.ipAddress,
+        (r.responseCode ?? 200) < 400 ? t('sys.audit-log.lbl1674') : t('sys.audit-log.lbl1675'),
       ].join(',')),
     ]
     const bom = '\uFEFF'

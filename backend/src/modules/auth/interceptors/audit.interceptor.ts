@@ -4,7 +4,7 @@ import {
   ExecutionContext,
   CallHandler,
 } from '@nestjs/common';
-import { Observable, tap } from 'rxjs';
+import { Observable, tap, map } from 'rxjs';
 import { Request } from 'express';
 import { LogService } from '../../../shared/logger/log.service.js';
 import { TenantContext } from '../../../shared/tenant/tenant.context.js';
@@ -36,10 +36,23 @@ function extractModule(url: string): string {
 
 @Injectable()
 export class AuditInterceptor implements NestInterceptor {
+  /** 租户级 API 调用量计数器（进程内存，定期查询即用） */
+  static readonly apiStats = new Map<string, number>();
+
   constructor(private readonly logSvc: LogService) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     const req = context.switchToHttp().getRequest<Request>();
+
+    // 统计所有请求（包括 GET）的调用量
+    const tenantId = TenantContext.getCurrentTenant();
+    if (tenantId) {
+      AuditInterceptor.apiStats.set(
+        tenantId,
+        (AuditInterceptor.apiStats.get(tenantId) ?? 0) + 1,
+      );
+    }
+
     if (!WRITE_METHODS.has(req.method)) return next.handle();
 
     const startTime = Date.now();
@@ -50,26 +63,32 @@ export class AuditInterceptor implements NestInterceptor {
     const module = extractModule(req.originalUrl);
 
     return next.handle().pipe(
+      map((data) => {
+        // 记录操作日志（含请求体和响应体快照）
+        const respStr = data ? JSON.stringify(sanitize(data as unknown)) : undefined;
+        void this.logSvc.operation({
+          tenantId: TenantContext.getCurrentTenant() ?? user?.tenantId,
+          userId: user?.id,
+          username: user?.username,
+          module,
+          action: `${req.method} ${req.originalUrl.split('?')[0]}`,
+          requestMethod: req.method,
+          requestUrl: req.originalUrl,
+          requestTime,
+          requestBody: req.body
+            ? JSON.stringify(sanitize(req.body as unknown))
+            : undefined,
+          responseBody: respStr && respStr.length > 5000
+            ? respStr.substring(0, 5000) + '...(truncated)'
+            : respStr,
+          responseCode: 200,
+          ipAddress: (req.headers['x-forwarded-for'] as string) ?? req.ip,
+          userAgent: req.headers['user-agent'],
+          durationMs: Date.now() - startTime,
+        });
+        return data;
+      }),
       tap({
-        next: () => {
-          void this.logSvc.operation({
-            tenantId: TenantContext.getCurrentTenant() ?? user?.tenantId,
-            userId: user?.id,
-            username: user?.username,
-            module,
-            action: `${req.method} ${req.originalUrl.split('?')[0]}`,
-            requestMethod: req.method,
-            requestUrl: req.originalUrl,
-            requestTime,
-            requestBody: req.body
-              ? JSON.stringify(sanitize(req.body as unknown))
-              : undefined,
-            responseCode: 200,
-            ipAddress: (req.headers['x-forwarded-for'] as string) ?? req.ip,
-            userAgent: req.headers['user-agent'],
-            durationMs: Date.now() - startTime,
-          });
-        },
         error: (err: { status?: number; message?: string }) => {
           const code = err?.status ?? 500;
           const isSystemError = code >= 500;

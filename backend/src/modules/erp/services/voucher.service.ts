@@ -3,6 +3,7 @@ import {
   BadRequestException,
   NotFoundException,
 } from '@nestjs/common';
+import { NumberingService } from '../../base/services/numbering.service.js';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import {
@@ -44,32 +45,32 @@ export class VoucherService {
     @InjectRepository(ErpVoucherLine)
     private readonly lineRepo: Repository<ErpVoucherLine>,
     private readonly dataSource: DataSource,
+    private readonly numberingSvc: NumberingService,
   ) {}
 
   // ── 生成凭证号 ────────────────────────────────────────────────────────────
 
-  private async generateVoucherNo(
-    tenantId: string,
-    date: string,
-  ): Promise<string> {
-    const dateStr = date.replace(/-/g, '').slice(0, 8); // YYYYMMDD
-    const prefix = `VCH-${dateStr}-`;
-
-    const last = await this.voucherRepo
-      .createQueryBuilder('v')
-      .where('v.tenantId = :tenantId', { tenantId })
-      .andWhere('v.voucherNo LIKE :prefix', { prefix: `${prefix}%` })
-      .orderBy('v.voucherNo', 'DESC')
-      .getOne();
-
-    let seq = 1;
-    if (last) {
-      const parts = last.voucherNo.split('-');
-      const lastSeq = parseInt(parts[parts.length - 1], 10);
-      if (!isNaN(lastSeq)) seq = lastSeq + 1;
+  private async generateVoucherNo(tenantId: string): Promise<string> {
+    try {
+      return await this.numberingSvc.generate('ERP_VOUCHER', tenantId);
+    } catch {
+      // 编码规则不存在时降级
+      const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+      const prefix = `VCH-${dateStr}-`;
+      const last = await this.voucherRepo
+        .createQueryBuilder('v')
+        .where('v.tenantId = :tenantId', { tenantId })
+        .andWhere('v.voucherNo LIKE :prefix', { prefix: `${prefix}%` })
+        .orderBy('v.voucherNo', 'DESC')
+        .getOne();
+      let seq = 1;
+      if (last) {
+        const parts = last.voucherNo.split('-');
+        const lastSeq = parseInt(parts[parts.length - 1], 10);
+        if (!isNaN(lastSeq)) seq = lastSeq + 1;
+      }
+      return `${prefix}${String(seq).padStart(4, '0')}`;
     }
-
-    return `${prefix}${String(seq).padStart(4, '0')}`;
   }
 
   // ── 借贷平衡校验 ──────────────────────────────────────────────────────────
@@ -105,10 +106,7 @@ export class VoucherService {
     totalCredit: number,
   ): Promise<ErpVoucher> {
     return this.dataSource.transaction(async (manager) => {
-      const voucherNo = await this.generateVoucherNo(
-        tenantId,
-        data.voucherDate,
-      );
+      const voucherNo = await this.generateVoucherNo(tenantId);
 
       const voucher = manager.create(ErpVoucher, {
         tenantId,
@@ -273,10 +271,7 @@ export class VoucherService {
       );
 
       // 生成红字冲销凭证（借贷互换）
-      const reversalNo = await this.generateVoucherNo(
-        tenantId,
-        voucher.voucherDate,
-      );
+      const reversalNo = await this.generateVoucherNo(tenantId);
       const reversal = manager.create(ErpVoucher, {
         tenantId,
         voucherNo: reversalNo,

@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
@@ -23,6 +24,7 @@ export interface LogEntry {
   requestBody?: string;
   requestTime?: Date;
   responseCode?: number;
+  responseBody?: string;
   errorMessage?: string;
   errorStack?: string;
   ipAddress?: string;
@@ -109,6 +111,7 @@ export class LogService {
     requestBody?: string;
     requestTime?: Date;
     responseCode?: number;
+    responseBody?: string;
     ipAddress?: string;
     userAgent?: string;
     durationMs?: number;
@@ -149,7 +152,11 @@ export class LogService {
   // ── 私有：写数据库 ────────────────────────────────────────────────────────
 
   private async writeToDB(entry: LogEntry): Promise<void> {
-    await this.logRepo.save(this.logRepo.create(entry));
+    // 计算签名（防篡改）：对关键字段做 SHA-256
+    const crypto = await import('crypto');
+    const sigInput = `${entry.tenantId}|${entry.userId}|${entry.module}|${entry.action}|${entry.requestUrl}|${entry.requestBody ?? ''}|${entry.responseCode ?? ''}|${entry.errorMessage ?? ''}|${entry.requestTime?.toISOString() ?? ''}`;
+    const signature = crypto.createHash('sha256').update(sigInput).digest('hex');
+    await this.logRepo.save(this.logRepo.create({ ...entry, signature }));
   }
 
   // ── 私有：写文件 ──────────────────────────────────────────────────────────
@@ -163,5 +170,30 @@ export class LogService {
     const line =
       JSON.stringify({ ...entry, timestamp: new Date().toISOString() }) + '\n';
     fs.appendFileSync(filename, line, 'utf8');
+  }
+
+  // ── 日志保留策略：每天凌晨 3 点清理过期日志 ─────────────────────────────
+
+  @Cron('0 3 * * *')
+  async cleanupOldLogs() {
+    const retentionDays = this.config.get<number>('LOG_RETENTION_DAYS', 90);
+    if (retentionDays <= 0) return; // 0 或负数 = 不清理
+
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - retentionDays);
+
+    try {
+      const result = await this.logRepo
+        .createQueryBuilder()
+        .delete()
+        .where('created_at < :cutoff', { cutoff })
+        .execute();
+
+      if (result.affected && result.affected > 0) {
+        this.logger.log(`日志清理完成：删除 ${result.affected} 条超过 ${retentionDays} 天的日志`);
+      }
+    } catch (err) {
+      this.logger.error(`日志清理失败: ${(err as Error).message}`);
+    }
   }
 }

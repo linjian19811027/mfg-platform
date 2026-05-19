@@ -12,14 +12,15 @@ interface ApiResponse<T = unknown> {
 // 递归处理响应数据：格式化日期字段
 function processResponseData(data: unknown): unknown {
   if (data === null || data === undefined) return data
+  if (data instanceof Date) return data
   if (Array.isArray(data)) return data.map(processResponseData)
   if (typeof data === 'object') {
     const obj = data as Record<string, unknown>
     const result: Record<string, unknown> = {}
     for (const [key, val] of Object.entries(obj)) {
       if (typeof val === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(val)) {
-        // ISO 日期字符串 → YYYY-MM-DD HH:mm
-        result[key] = val.replace('T', ' ').substring(0, 16)
+        // ISO 日期字符串 → YYYY-MM-DD HH:mm:ss
+        result[key] = val.replace('T', ' ').substring(0, 19)
       } else if (Array.isArray(val) || (val !== null && typeof val === 'object')) {
         result[key] = processResponseData(val)
       } else {

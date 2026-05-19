@@ -31,6 +31,7 @@ import { SysPermission } from './entities/sys-permission.entity.js';
 import { SysUserRole } from './entities/sys-user-role.entity.js';
 import { SysRolePermission } from './entities/sys-role-permission.entity.js';
 import { SysAuditLog } from './entities/sys-audit-log.entity.js';
+import { SysConfig } from './entities/sys-config.entity.js';
 import { SysTenant } from './entities/sys-tenant.entity.js';
 import { SysOrganization } from '../base/entities/sys-organization.entity.js';
 import { SysUom } from '../base/entities/sys-uom.entity.js';
@@ -40,6 +41,7 @@ import { Permissions } from './decorators/permissions.decorator.js';
 import { CurrentUser } from './decorators/current-user.decorator.js';
 import { JwtPayload } from './strategies/jwt.strategy.js';
 import { CreateUserDto } from './dto/login.dto.js';
+import { TenantProvisionService } from './tenant-provision.service.js';
 
 const SALT_ROUNDS = 12;
 const PASSWORD_REGEX =
@@ -78,6 +80,8 @@ export class SysController {
     @InjectRepository(SysOrganization)
     private readonly orgRepo: Repository<SysOrganization>,
     @InjectRepository(SysUom) private readonly uomRepo: Repository<SysUom>,
+    @InjectRepository(SysConfig) private readonly configRepo: Repository<SysConfig>,
+    private readonly provisionSvc: TenantProvisionService,
   ) {}
 
   // ─── 用户管理 ────────────────────────────────────────────────
@@ -448,6 +452,24 @@ export class SysController {
     return { items, total, page, pageSize };
   }
 
+  @Get('audit-logs/export')
+  @Permissions('sys:audit:list')
+  @ApiOperation({ summary: '导出审计日志（JSON 格式）' })
+  async exportAuditLogs(
+    @Query('startTime') startTime?: string,
+    @Query('endTime') endTime?: string,
+  ) {
+    const tenantId = TenantContext.requireCurrentTenant();
+    const qb = this.auditRepo
+      .createQueryBuilder('log')
+      .where('log.tenantId = :tenantId', { tenantId })
+      .orderBy('log.createdAt', 'DESC');
+    if (startTime) qb.andWhere('log.createdAt >= :startTime', { startTime });
+    if (endTime) qb.andWhere('log.createdAt <= :endTime', { endTime });
+    const items = await qb.getMany();
+    return { items, total: items.length, exportedAt: new Date().toISOString() };
+  }
+
   // ─── 角色分页列表 ─────────────────────────────────────────────
 
   @Get('roles/list')
@@ -639,7 +661,7 @@ export class SysController {
   @ApiOperation({ summary: '删除组织' })
   async deleteOrg(@Param('id') id: string) {
     const tenantId = TenantContext.requireCurrentTenant();
-    await this.orgRepo.delete({ id, tenantId });
+    await this.orgRepo.softDelete({ id, tenantId });
   }
 
   private buildOrgTree(
@@ -758,10 +780,35 @@ export class SysController {
     return { list, total, page, pageSize };
   }
 
+  @Get('tenants/:id')
+  @ApiOperation({ summary: '租户详情（用户数、角色数、模块）' })
+  async getTenantDetail(@Param('id') id: string) {
+    const tenant = await this.tenantRepo.findOne({ where: { id } });
+    if (!tenant) throw new Error('TENANT_NOT_FOUND');
+
+    const userCount = await this.userRepo.count({ where: { tenantId: tenant.code } });
+    const roleCount = await this.roleRepo.count({ where: { tenantId: tenant.code } });
+
+    return {
+      ...tenant,
+      userCount,
+      roleCount,
+      enabledModules: tenant.enabledModules ?? [],
+    };
+  }
+
+  /** 套餐预设：plan → 自动解析 enabledModules */
+  private static readonly PLAN_MODULES: Record<string, string[]> = {
+    BASIC: ['MES', 'WMS'],
+    STANDARD: ['MES', 'WMS', 'PLM', 'QMS', 'HR'],
+    PROFESSIONAL: ['MES', 'WMS', 'PLM', 'QMS', 'HR', 'SCM', 'ERP', 'APS'],
+    ENTERPRISE: ['PLM', 'MES', 'WMS', 'QMS', 'SCM', 'ERP', 'APS', 'EAM', 'HR', 'TRACEABILITY', 'OUTSOURCING'],
+  };
+
   @Post('tenants')
   @ApiOperation({ summary: '创建租户' })
   async createTenant(@Body() body: Record<string, unknown>) {
-    const { enabledModules, contact, phone, email, remark, status, ...rest } = body;
+    const { enabledModules, contact, phone, email, remark, status, plan, ...rest } = body;
     // 字段映射：前端 contact/phone/email → 后端 contactName/contactPhone/contactEmail
     const mappedStatus = this.mapTenantStatus(status as string);
     const tenant = await this.tenantRepo.save(
@@ -771,6 +818,7 @@ export class SysController {
         contactPhone: phone ?? rest.contactPhone,
         contactEmail: email ?? rest.contactEmail,
         status: mappedStatus,
+        plan: (plan as string)?.toUpperCase() ?? 'STANDARD',
       } as Partial<SysTenant>),
     );
 
@@ -787,29 +835,31 @@ export class SysController {
       }),
     );
 
-    // 根据 enabledModules 分配权限（所有 enabledModules 内的权限）
-    const modules: string[] = (enabledModules as string[]) ?? [];
-    if (modules.length > 0) {
-      const perms = await this.permRepo.find({
-        where: { module: In(modules) },
-      });
-      if (perms.length > 0) {
-        await this.rolePermRepo.save(
-          perms.map((p) =>
-            this.rolePermRepo.create({
-              roleId: adminRole.id,
-              permissionId: p.id,
-              tenantId: tenant.code,
-            }),
-          ),
-        );
-      }
+    // 根据 plan 或 enabledModules 分配权限，SYS + BASE 基础权限始终包含
+    const BASE_MODULES = ['SYS', 'BASE'];
+    const planModules = plan ? (SysController.PLAN_MODULES[(plan as string).toUpperCase()] ?? []) : [];
+    const modules: string[] = (enabledModules as string[]) ?? planModules;
+    const allModules = [...new Set([...BASE_MODULES, ...modules])];
+    const perms = await this.permRepo.find({
+      where: { module: In(allModules) },
+    });
+    if (perms.length > 0) {
+      await this.rolePermRepo.save(
+        perms.map((p) =>
+          this.rolePermRepo.create({
+            roleId: adminRole.id,
+            permissionId: p.id,
+            tenantId: tenant.code,
+          }),
+        ),
+      );
     }
 
-    // 如果创建时指定了 enabledModules，同步更新租户记录
-    if (modules.length > 0) {
-      await this.tenantRepo.update({ id: tenant.id }, { enabledModules: modules } as any);
-    }
+    // 同步更新租户记录（始终包含 SYS + BASE）
+    await this.tenantRepo.update({ id: tenant.id }, { enabledModules: allModules } as any);
+
+    // 初始化租户基础数据（异步，不阻塞返回）
+    this.provisionSvc.provision(tenant.code, allModules).catch(() => {});
 
     return { id: tenant.id };
   }
@@ -876,6 +926,39 @@ export class SysController {
     const mappedStatus = this.mapTenantStatus(body.status) ?? body.status;
     await this.tenantRepo.update({ id }, { status: mappedStatus });
     return { id };
+  }
+
+  // ─── 全局配置管理 ────────────────────────────────────────────────
+
+  @Get('configs')
+  @ApiOperation({ summary: '全局配置列表' })
+  async getConfigs(
+    @Query('group') group?: string,
+  ) {
+    const tenantId = TenantContext.requireCurrentTenant();
+    const where: Record<string, unknown> = { tenantId };
+    if (group) where.group = group;
+    return this.configRepo.find({ where, order: { group: 'ASC', key: 'ASC' } });
+  }
+
+  @Post('configs')
+  @ApiOperation({ summary: '创建/更新配置' })
+  async upsertConfig(@Body() body: { key: string; value: string; group?: string; description?: string }) {
+    const tenantId = TenantContext.requireCurrentTenant();
+    const existing = await this.configRepo.findOne({ where: { tenantId, key: body.key } });
+    if (existing) {
+      await this.configRepo.update(existing.id, { value: body.value, description: body.description });
+      return this.configRepo.findOne({ where: { id: existing.id } });
+    }
+    return this.configRepo.save(this.configRepo.create({ ...body, tenantId }));
+  }
+
+  @Delete('configs/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: '删除配置' })
+  async deleteConfig(@Param('id') id: string) {
+    const tenantId = TenantContext.requireCurrentTenant();
+    await this.configRepo.delete({ id, tenantId });
   }
 
   /** 前端小写 status → 后端大写（租户专用） */

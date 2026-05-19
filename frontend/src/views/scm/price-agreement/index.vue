@@ -24,8 +24,8 @@
           </a-tag>
         </template>
         <template #expiring="{ record }">
-          <a-tag v-if="isExpiringSoon(record.endDate as string, record.status as string)" color="orange">
-            {{ $t('scm.price-agreement.r33059', {endDate: daysUntilExpiry(record.endDate as string)}) }}
+          <a-tag v-if="isExpiringSoon(record.validTo as string, record.status as string)" color="orange">
+            {{ $t('scm.price-agreement.r33059', {endDate: daysUntilExpiry(record.validTo as string)}) }}
           </a-tag>
         </template>
         <template #action="{ record }">
@@ -65,10 +65,10 @@ const query = reactive({ supplierId: '', status: '', page: 1, pageSize: 20 })
 const columns: MTableColumn[] = [
   { key: 'supplierName', title: t('scm.price-agreement.index.供应商'), dataIndex: 'supplierName', width: 150 },
   { key: 'materialName', title: t('scm.price-agreement.index.物料名称'), dataIndex: 'materialName', width: 160 },
-  { key: 'price', title: t('scm.price-agreement.index.协议价格'), dataIndex: 'price', width: 110 },
+  { key: 'price', title: t('scm.price-agreement.index.协议价格'), dataIndex: 'unitPrice', width: 110 },
   { key: 'currency', title: t('scm.price-agreement.index.币种'), dataIndex: 'currency', width: 80 },
-  { key: 'startDate', title: t('scm.price-agreement.index.开始日期'), dataIndex: 'startDate', width: 120 },
-  { key: 'endDate', title: t('scm.price-agreement.index.结束日期'), dataIndex: 'endDate', width: 120 },
+  { key: 'startDate', title: t('scm.price-agreement.index.开始日期'), dataIndex: 'validFrom', width: 120 },
+  { key: 'endDate', title: t('scm.price-agreement.index.结束日期'), dataIndex: 'validTo', width: 120 },
   { key: 'status', title: t('scm.price-agreement.index.状态'), slotName: 'status', width: 90 },
   { key: 'expiring', title: t('scm.price-agreement.index.到期预警'), slotName: 'expiring', width: 120 },
   { key: 'action', title: t('scm.price-agreement.index.操作'), slotName: 'action', width: 120 },

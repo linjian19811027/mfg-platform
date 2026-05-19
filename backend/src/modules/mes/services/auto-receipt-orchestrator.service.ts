@@ -184,8 +184,11 @@ export class AutoReceiptOrchestratorService {
           this.logRepo.create({
             tenantId,
             woId: wo.id,
+            woNo: wo.woNo,
             triggerType: 'FULL',
             materialId: wo.materialId,
+            materialCode: wo.materialCode,
+            materialName: wo.materialName,
             quantity: qty,
             uomId: wo.uomId,
             status: 'FAILED',
@@ -204,8 +207,11 @@ export class AutoReceiptOrchestratorService {
       this.logRepo.create({
         tenantId,
         woId: wo.id,
+        woNo: wo.woNo,
         triggerType,
         materialId: wo.materialId,
+        materialCode: wo.materialCode,
+        materialName: wo.materialName,
         quantity: qty,
         uomId: wo.uomId,
         targetWarehouseId: config.targetWarehouseId,

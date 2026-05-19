@@ -243,22 +243,8 @@ export interface RenewCertificationPayload {
   remark?: string
 }
 
-// 技能认证 API
-export function getCertificationTypes() {
-  return request.get<HrCertificationType[]>('/v1/base/certification-types')
-}
-
-export function createCertificationType(data: CreateCertTypePayload) {
-  return request.post<HrCertificationType>('/v1/base/certification-types', data)
-}
-
-export function updateCertificationType(id: number, data: UpdateCertTypePayload) {
-  return request.put<HrCertificationType>(`/v1/base/certification-types/${id}`, data)
-}
-
-export function deleteCertificationType(id: number) {
-  return request.delete<void>(`/v1/base/certification-types/${id}`)
-}
+// 技能认证 API（复用 base 模块端点）
+export { getCertificationTypes, createCertificationType, updateCertificationType, deleteCertificationType } from './base'
 
 export function addCertification(data: CreateCertificationPayload) {
   const { empId, ...body } = data
@@ -338,22 +324,8 @@ export interface BatchCreateSchedulePayload {
   remark?: string
 }
 
-// 排班管理 API
-export function getShifts() {
-  return request.get<HrShift[]>('/v1/base/shifts')
-}
-
-export function createShift(data: CreateShiftPayload) {
-  return request.post<HrShift>('/v1/base/shifts', data)
-}
-
-export function updateShift(id: number, data: UpdateShiftPayload) {
-  return request.put<HrShift>(`/v1/base/shifts/${id}`, data)
-}
-
-export function deleteShift(id: number) {
-  return request.delete<void>(`/v1/base/shifts/${id}`)
-}
+// 排班管理 API（shift 复用 base 模块端点，schedule 是 HR 自有端点）
+export { getShifts, createShift, updateShift, deleteShift } from './base'
 
 export function createSchedule(data: CreateSchedulePayload) {
   return request.post<HrShiftSchedule>('/v1/hr/schedules', data)
@@ -467,18 +439,5 @@ export function deleteJobType(id: number) {
   return request.delete(`/v1/hr/job-types/${id}`)
 }
 
-export function getWorkCenters() {
-  return request.get<MfgWorkCenter[]>('/v1/base/work-centers')
-}
-
-export function createWorkCenter(data: { name: string; code?: string; type?: string; jobTypeId?: number }) {
-  return request.post('/v1/base/work-centers', data)
-}
-
-export function updateWorkCenter(id: number, data: { name?: string; code?: string; type?: string; jobTypeId?: number; enabled?: number }) {
-  return request.put(`/v1/base/work-centers/${id}`, data)
-}
-
-export function deleteWorkCenter(id: number) {
-  return request.delete(`/v1/base/work-centers/${id}`)
-}
+// 工作中心 API（复用 base 模块端点）
+export { getWorkCenters, createWorkCenter, updateWorkCenter, deleteWorkCenter } from './base'

@@ -38,7 +38,7 @@ const query = reactive({ keyword: '', page: 1, pageSize: 20 })
 const columns: MTableColumn[] = [
   { key: 'code', title: t('erp.cost-element.index.编码'), dataIndex: 'code', width: 130 },
   { key: 'name', title: t('erp.cost-element.index.名称'), dataIndex: 'name', width: 180 },
-  { key: 'type', title: t('erp.cost-element.index.类型'), dataIndex: 'type', width: 120 },
+  { key: 'type', title: t('erp.cost-element.index.类型'), dataIndex: 'elementType', width: 120 },
   { key: 'status', title: t('erp.cost-element.index.状态'), slotName: 'status', width: 90 },
   { key: 'action', title: t('erp.cost-element.index.操作'), slotName: 'action', width: 80 },
 ]

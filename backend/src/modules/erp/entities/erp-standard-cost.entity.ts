@@ -63,6 +63,9 @@ export class ErpStandardCost {
   })
   totalCost!: number;
 
+  @Column({ length: 10, default: 'CNY' })
+  currency!: string;
+
   @Column({ name: 'effective_from', type: 'date' })
   effectiveFrom!: string;
 

@@ -34,6 +34,10 @@ export class ScmReceipt {
   @Column({ name: 'supplier_id', type: 'bigint' })
   supplierId!: string;
 
+  /** 冗余：供应商名称 */
+  @Column({ name: 'supplier_name', length: 200, nullable: true })
+  supplierName?: string;
+
   @Column({ name: 'receipt_date', type: 'date' })
   receiptDate!: Date;
 

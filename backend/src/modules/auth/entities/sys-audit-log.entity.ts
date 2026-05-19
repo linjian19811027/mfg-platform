@@ -40,6 +40,7 @@ export class SysAuditLog {
   @Column({ name: 'request_body', type: 'text', nullable: true })
   requestBody?: string;
   @Column({ name: 'response_code', nullable: true }) responseCode?: number;
+  @Column({ name: 'response_body', type: 'text', nullable: true }) responseBody?: string;
   /** 错误信息（SYSTEM_ERROR / BIZ_ERROR 时填写） */
   @Column({ name: 'error_message', type: 'text', nullable: true })
   errorMessage?: string;
@@ -57,5 +58,8 @@ export class SysAuditLog {
   /** 登录结果：SUCCESS / FAILED / LOCKED */
   @Column({ name: 'login_result', length: 20, nullable: true })
   loginResult?: string;
+  /** SHA-256 签名（防篡改） */
+  @Column({ length: 64, nullable: true })
+  signature?: string;
   @CreateDateColumn({ name: 'created_at' }) createdAt!: Date;
 }

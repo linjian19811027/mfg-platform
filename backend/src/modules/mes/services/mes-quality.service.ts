@@ -139,26 +139,28 @@ export class MesQualityService {
   }): Promise<{ ncId: string }> {
     const tenantId = TenantContext.requireCurrentTenant();
 
-    // 写入 QMS 不合格品表（通过原生 SQL，QMS 模块尚未创建时的降级方案）
-    const result = await this.woRepo.manager
-      .query(
-        `INSERT INTO qms_nonconformance
-       (tenant_id, nc_no, ir_id, material_id, batch_id, quantity, defect_type, disposition, status, root_cause, created_at)
-       VALUES (?, ?, 0, ?, ?, ?, ?, ?, 'OPEN', ?, NOW())`,
-        [
-          tenantId,
-          `NC-MES-${Date.now()}`,
-          params.materialId,
-          params.batchId ?? null,
-          params.quantity,
-          params.defectType,
-          params.disposition,
-          params.reason ?? '',
-        ],
-      )
-      .catch(() => ({ insertId: 0 }));
+    // 通过事件发布不合格品信息，QMS 模块订阅后自行写入
+    await this.messageSvc.publish({
+      eventId: uuidv4(),
+      eventType: 'MES_NONCONFORMANCE_CREATED',
+      tenantId,
+      sourceModule: 'MES',
+      targetModule: 'QMS',
+      payload: {
+        woId: params.woId,
+        wooId: params.wooId,
+        materialId: params.materialId,
+        batchId: params.batchId,
+        quantity: params.quantity,
+        defectType: params.defectType,
+        disposition: params.disposition,
+        reason: params.reason,
+        ncNo: `NC-MES-${Date.now()}`,
+      },
+      createdAt: new Date(),
+    });
 
-    return { ncId: String(result.insertId ?? 0) };
+    return { ncId: '0' };
   }
 
   // ── 2.21 质量追溯 ─────────────────────────────────────────────────────────

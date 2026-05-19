@@ -56,6 +56,7 @@ function maskValue(key: string, value: unknown): unknown {
 
 function desensitize(data: unknown): unknown {
   if (data === null || data === undefined) return data;
+  if (data instanceof Date) return data;
   if (Array.isArray(data)) return data.map(desensitize);
   if (typeof data === 'object') {
     const result: Record<string, unknown> = {};

@@ -49,12 +49,12 @@ import { erpExtApi } from '@/api/erp-ext'
 const loading = ref(false); const tableData = ref<any[]>([]); const total = ref(0)
 const query = reactive({ status: '', page: 1, pageSize: 20 })
 const columns: MTableColumn[] = [
-  { key: 'code', title: t('erp.shipment.index.发货单号'), dataIndex: 'code', width: 130 },
-  { key: 'salesOrderId', title: t('erp.shipment.index.销售订单'), dataIndex: 'salesOrderId', width: 130 },
+  { key: 'code', title: t('erp.shipment.index.发货单号'), dataIndex: 'shipmentNo', width: 130 },
+  { key: 'salesOrderId', title: t('erp.shipment.index.销售订单'), dataIndex: 'soId', width: 130 },
   { key: 'carrier', title: t('erp.shipment.index.承运商'), dataIndex: 'carrier', width: 120 },
   { key: 'trackingNo', title: t('erp.shipment.index.运单号'), dataIndex: 'trackingNo', width: 140 },
   { key: 'status', title: t('erp.shipment.index.状态'), slotName: 'status', width: 100 },
-  { key: 'shippedAt', title: t('erp.shipment.index.发货时间'), dataIndex: 'shippedAt', width: 160 },
+  { key: 'shippedAt', title: t('erp.shipment.index.发货时间'), dataIndex: 'shipDate', width: 160 },
   { key: 'action', title: t('erp.shipment.index.操作'), slotName: 'action', width: 160 },
 ]
 const formSchema: MFormField[] = [

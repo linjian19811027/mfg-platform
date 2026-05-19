@@ -85,6 +85,6 @@ export class OrganizationService {
       where: { parentId: id, tenantId },
     });
     if (children > 0) throw new BadRequestException('BASE_ORG_HAS_CHILDREN');
-    await this.repo.delete({ id, tenantId });
+    await this.repo.softDelete({ id, tenantId });
   }
 }

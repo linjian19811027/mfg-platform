@@ -308,7 +308,13 @@ async function handleSubmit() {
   if (!createForm.plannedQty) { Message.warning(t('mes.请输入计划数量')); return }
   submitting.value = true
   try {
-    await mesApi.createMesWorkOrder({ ...createForm })
+    // 冗余物料信息到工单（避免跨模块查询 PLM）
+    const selectedMat = matOptions.value.find(m => m.id === createForm.materialId)
+    await mesApi.createMesWorkOrder({
+      ...createForm,
+      materialCode: selectedMat?.code ?? '',
+      materialName: selectedMat?.name ?? '',
+    })
     Message.success(t('common.success'))
     drawerVisible.value = false
     loadData()

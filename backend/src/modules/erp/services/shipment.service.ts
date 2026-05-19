@@ -311,6 +311,8 @@ export class ShipmentService {
 
     const qb = this.shipmentRepo
       .createQueryBuilder('s')
+      .leftJoin('erp_customer', 'c', 'c.id = s.customer_id AND c.tenant_id = s.tenant_id')
+      .addSelect('c.name', 'customerName')
       .where('s.tenantId = :tenantId', { tenantId });
 
     if (status) qb.andWhere('s.status = :status', { status });
@@ -321,7 +323,9 @@ export class ShipmentService {
       .skip((page - 1) * pageSize)
       .take(pageSize);
 
-    const [items, total] = await qb.getManyAndCount();
+    const { entities, raw } = await qb.getRawAndEntities();
+    const total = await qb.getCount();
+    const items = entities.map((e, i) => ({ ...e, customerName: raw[i]?.customerName }));
     return { items, total };
   }
 

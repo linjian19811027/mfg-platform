@@ -40,6 +40,6 @@ export class CertificationTypeService {
   }
 
   async delete(tenantId: string, id: number) {
-    return this.repo.delete({ id, tenantId });
+    return this.repo.softDelete({ id, tenantId });
   }
 }

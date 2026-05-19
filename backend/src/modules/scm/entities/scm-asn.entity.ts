@@ -33,6 +33,10 @@ export class ScmAsn {
   @Column({ name: 'supplier_id', type: 'bigint' })
   supplierId!: string;
 
+  /** 冗余：供应商名称 */
+  @Column({ name: 'supplier_name', length: 200, nullable: true })
+  supplierName?: string;
+
   @Column({ name: 'expected_date', type: 'date' })
   expectedDate!: Date;
 

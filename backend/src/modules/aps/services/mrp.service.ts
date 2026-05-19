@@ -17,10 +17,12 @@ import {
 
 export interface MrpLineInput {
   materialId: string;
+  materialCode?: string;
+  materialName?: string;
   requiredQty: number;
   availableQty: number;
   requiredDate: Date;
-  bomExpansion?: Array<{ materialId: string; qty: number }>;
+  bomExpansion?: Array<{ materialId: string; materialCode?: string; materialName?: string; qty: number }>;
 }
 
 export interface MrpCalculateInput {
@@ -110,15 +112,36 @@ export class MrpService {
     });
     const savedMrp = await this.mrpRepo.save(mrp);
 
-    // 处理每个 line（含 BOM 展开）
+    // 预查物料名称（跨模块，降级处理）
+    const allMatIds = [...new Set(lines.map((l) => l.materialId))];
+    const matMap = new Map<string, { code: string; name: string }>();
+    try {
+      const mats = await this.mrpRepo.manager
+        .createQueryBuilder()
+        .select(['m.id AS id', 'm.code AS code', 'm.name AS name'])
+        .from('plm_material', 'm')
+        .where('m.id IN (:...ids)', { ids: allMatIds })
+        .getRawMany<{ id: string; code: string; name: string }>();
+      mats.forEach((m) => matMap.set(String(m.id), { code: m.code, name: m.name }));
+    } catch { /* PLM 模块未启用，忽略 */ }
+
+    // 处理每个 line（含 BOM 展开），补充物料名称
     const allLineInputs: MrpLineInput[] = [];
     for (const line of lines) {
-      allLineInputs.push(line);
+      const mat = matMap.get(line.materialId);
+      allLineInputs.push({
+        ...line,
+        materialCode: line.materialCode ?? mat?.code,
+        materialName: line.materialName ?? mat?.name,
+      });
       // BOM 展开：将子物料也加入计算
       if (line.bomExpansion && line.bomExpansion.length > 0) {
         for (const bom of line.bomExpansion) {
+          const bomMat = matMap.get(bom.materialId);
           allLineInputs.push({
             materialId: bom.materialId,
+            materialCode: bomMat?.code,
+            materialName: bomMat?.name,
             requiredQty: bom.qty,
             availableQty: 0,
             requiredDate: line.requiredDate,
@@ -143,6 +166,8 @@ export class MrpService {
         tenantId,
         mrpId: savedMrp.id,
         materialId: lineInput.materialId,
+        materialCode: lineInput.materialCode,
+        materialName: lineInput.materialName,
         requiredQty: lineInput.requiredQty,
         availableQty: lineInput.availableQty,
         shortageQty,

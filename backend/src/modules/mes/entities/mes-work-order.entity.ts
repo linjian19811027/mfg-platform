@@ -38,6 +38,14 @@ export class MesWorkOrder {
   @Column({ name: 'material_id', type: 'bigint' })
   materialId!: string;
 
+  /** 冗余字段：物料编码（避免跨模块查询 plm_material） */
+  @Column({ name: 'material_code', length: 50, nullable: true })
+  materialCode?: string;
+
+  /** 冗余字段：物料名称（避免跨模块查询 plm_material） */
+  @Column({ name: 'material_name', length: 200, nullable: true })
+  materialName?: string;
+
   @Column({ name: 'bom_id', type: 'bigint', nullable: true })
   bomId?: string;
 

@@ -981,10 +981,10 @@ describe('【SC-10】多租户隔离测试', () => {
       headers: tenantBHeaders
     }).then(r => r.json())
 
-    // 验证两个租户的数据应该不同
-    // (如果数据库为空或结构不同，结果可能相同)
-    console.log('TenantA users:', JSON.stringify(tenantAUsers))
-    console.log('TenantB users:', JSON.stringify(tenantBUsers))
+    expect(tenantAUsers).toBeDefined()
+    expect(tenantBUsers).toBeDefined()
+    expect(Array.isArray(tenantAUsers?.data?.items ?? tenantAUsers?.data?.list ?? [])).toBe(true)
+    expect(Array.isArray(tenantBUsers?.data?.items ?? tenantBUsers?.data?.list ?? [])).toBe(true)
   })
 
   it('SC-10-002: 跨租户访问应返回空或403', async () => {
@@ -999,8 +999,8 @@ describe('【SC-10】多租户隔离测试', () => {
       headers: crossTenantHeaders
     })
 
-    // 应该返回 200（能访问）或 401/403（无权限）
-    expect([200, 201]).toContain(response.status)
+    // 跨租户访问不应成功返回业务数据
+    expect([401, 403, 404]).toContain(response.status)
   })
 })
 
@@ -1014,8 +1014,7 @@ describe('【SC-11】异常场景测试', () => {
       warehouseId: '1', quantity: 999999999
     })
 
-    // 可能返回 200/201（成功），400（参数错误），401（认证），404（不存在）
-    expect([200, 201]).toContain(overIssue.status)
+    expect(overIssue.status).toBeGreaterThanOrEqual(400)
   })
 
   it('SC-11-002: 重复创建应返回错误', async () => {
@@ -1033,13 +1032,12 @@ describe('【SC-11】异常场景测试', () => {
       startTime: '08:00:00', endTime: '17:00:00'
     })
 
-    // 第二次应该返回错误（400 或其他）
-    console.log('First shift:', shift1.status)
-    console.log('Second shift:', shift2.status)
+    expect([200, 201]).toContain(shift1.status)
+    expect(shift2.status).toBeGreaterThanOrEqual(400)
   })
 
   it('SC-11-003: 不存在的资源应返回404', async () => {
     const notFound = await get(API + '/mes/work-orders/999999999')
-    expect([200, 201]).toContain(notFound.status)
+    expect([404, 400]).toContain(notFound.status)
   })
 })

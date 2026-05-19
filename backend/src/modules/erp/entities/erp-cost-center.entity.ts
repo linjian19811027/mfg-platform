@@ -38,6 +38,9 @@ export class ErpCostCenter {
   @Column({ name: 'center_type', type: 'enum', enum: CostCenterType })
   centerType!: CostCenterType;
 
+  @Column({ name: 'responsible_id', type: 'bigint', nullable: true })
+  responsibleId?: string;
+
   @Column({ name: 'parent_id', type: 'bigint', nullable: true })
   parentId?: string;
 

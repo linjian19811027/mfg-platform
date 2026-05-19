@@ -332,6 +332,12 @@ export class ScmController {
     return this.asnSvc.cancel(tenantId, id);
   }
 
+  @Get('asns/:id/lines')
+  @ApiOperation({ summary: 'ASN 明细行' })
+  getAsnLines(@CurrentTenant() tenantId: string, @Param('id') id: string) {
+    return this.asnSvc.findLines(tenantId, id);
+  }
+
   // ── 到货记录 ──────────────────────────────────────────────────────────────
 
   @Get('receipts')
@@ -384,6 +390,12 @@ export class ScmController {
     body: Parameters<ReceiptService['createException']>[2],
   ) {
     return this.receiptSvc.createException(tenantId, id, body);
+  }
+
+  @Get('receipts/:id/lines')
+  @ApiOperation({ summary: '收货明细行' })
+  getReceiptLines(@CurrentTenant() tenantId: string, @Param('id') id: string) {
+    return this.receiptSvc.findLines(tenantId, id);
   }
 
   @Get('receipts/:id/exceptions')

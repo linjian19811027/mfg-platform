@@ -20,6 +20,9 @@
         <template #status="{ record }">
           <a-tag :color="record.status === 'ACTIVE' ? 'green' : 'gray'">{{ record.status === 'ACTIVE' ? $t('common.status.active') : $t('common.status.inactive') }}</a-tag>
         </template>
+        <template #objectType="{ record }">
+          {{ record.ruleType }}
+        </template>
         <template #action="{ record }">
           <a-link @click="openDrawer(record as unknown as BarcodeRule)">{{ $t('common.edit') }}</a-link>
         </template>
@@ -49,10 +52,10 @@ const total = ref(0)
 const query = reactive({ keyword: '', status: '', page: 1, pageSize: 20 })
 
 const columns: MTableColumn[] = [
-  { key: 'code', title: t('wms.barcode-rule.index.规则编码'), dataIndex: 'code', width: 130 },
+  { key: 'code', title: t('wms.barcode-rule.index.规则编码'), dataIndex: 'ruleType', width: 130 },
   { key: 'name', title: t('wms.barcode-rule.index.规则名称'), dataIndex: 'name', width: 160 },
-  { key: 'objectType', title: t('wms.barcode-rule.index.对象类型'), dataIndex: 'objectType', width: 110 },
-  { key: 'pattern', title: t('wms.barcode-rule.index.条码模板'), dataIndex: 'pattern', width: 200, ellipsis: true },
+  { key: 'objectType', title: t('wms.barcode-rule.index.对象类型'), slotName: 'objectType', width: 110 },
+  { key: 'pattern', title: t('wms.barcode-rule.index.条码模板'), dataIndex: 'template', width: 200, ellipsis: true },
   { key: 'status', title: t('wms.barcode-rule.index.状态'), slotName: 'status', width: 90 },
   { key: 'action', title: t('wms.barcode-rule.index.操作'), slotName: 'action', width: 80 },
 ]

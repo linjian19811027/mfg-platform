@@ -331,6 +331,9 @@ export class FaultService {
 
     const qb = this.faultRepo
       .createQueryBuilder('f')
+      .leftJoin('eam_equipment', 'eq', 'eq.id = f.equipment_id AND eq.tenant_id = f.tenant_id')
+      .addSelect('eq.equipment_name', 'equipmentName')
+      .addSelect('eq.equipment_code', 'equipmentCode')
       .where('f.tenantId = :tenantId', { tenantId });
 
     if (equipmentId)
@@ -340,11 +343,17 @@ export class FaultService {
     if (startDate) qb.andWhere('f.reportedAt >= :startDate', { startDate });
     if (endDate) qb.andWhere('f.reportedAt <= :endDate', { endDate });
 
-    const [data, total] = await qb
+    const { entities, raw } = await qb
       .orderBy('f.reportedAt', 'DESC')
       .skip((page - 1) * pageSize)
       .take(pageSize)
-      .getManyAndCount();
+      .getRawAndEntities();
+    const total = await qb.getCount();
+    const data = entities.map((e, i) => ({
+      ...e,
+      equipmentName: raw[i]?.equipmentName,
+      equipmentCode: raw[i]?.equipmentCode,
+    }));
 
     return { data, total };
   }

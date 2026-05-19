@@ -13,6 +13,7 @@ interface AuthState {
   tenantId: string | null
   roles: string[]
   permissions: string[]
+  enabledModules: string[]
   tenants: TenantItem[]
   _expiryTimer: ReturnType<typeof setInterval> | null
 }
@@ -29,12 +30,14 @@ function getTokenExpiry(token: string): number | null {
 
 interface LoginResponse {
   accessToken: string
+  refreshToken?: string
   user: {
     id: string
     username: string
     tenantId: string
     roles: string[]
     permissions: string[]
+    enabledModules?: string[]
   }
 }
 
@@ -46,6 +49,7 @@ export const useAuthStore = defineStore('auth', {
     tenantId: null,
     roles: [],
     permissions: [],
+    enabledModules: [],
     tenants: [],
     _expiryTimer: null,
   }),
@@ -63,6 +67,7 @@ export const useAuthStore = defineStore('auth', {
       this.tenantId = data.user.tenantId
       this.roles = data.user.roles
       this.permissions = data.user.permissions
+      this.enabledModules = data.user.enabledModules ?? []
 
       localStorage.setItem('token', data.accessToken)
       localStorage.setItem('userId', data.user.id)
@@ -70,6 +75,8 @@ export const useAuthStore = defineStore('auth', {
       localStorage.setItem('tenantId', data.user.tenantId)
       localStorage.setItem('roles', JSON.stringify(data.user.roles))
       localStorage.setItem('permissions', JSON.stringify(data.user.permissions))
+      localStorage.setItem('enabledModules', JSON.stringify(data.user.enabledModules ?? []))
+      if (data.refreshToken) localStorage.setItem('refreshToken', data.refreshToken)
 
       this.startExpiryWatch()
     },
@@ -82,6 +89,7 @@ export const useAuthStore = defineStore('auth', {
       this.tenantId = null
       this.roles = []
       this.permissions = []
+      this.enabledModules = []
       this.tenants = []
 
       localStorage.removeItem('token')
@@ -90,6 +98,8 @@ export const useAuthStore = defineStore('auth', {
       localStorage.removeItem('tenantId')
       localStorage.removeItem('roles')
       localStorage.removeItem('permissions')
+      localStorage.removeItem('enabledModules')
+      localStorage.removeItem('refreshToken')
       localStorage.removeItem('tenants')
     },
 
@@ -109,22 +119,36 @@ export const useAuthStore = defineStore('auth', {
       this.tenantId = localStorage.getItem('tenantId')
       this.roles = JSON.parse(localStorage.getItem('roles') || '[]')
       this.permissions = JSON.parse(localStorage.getItem('permissions') || '[]')
+      this.enabledModules = JSON.parse(localStorage.getItem('enabledModules') || '[]')
       this.tenants = JSON.parse(localStorage.getItem('tenants') || '[]')
       this.startExpiryWatch()
     },
 
-    /** 启动定时器，每分钟检查一次 token 是否过期 */
+    /** 启动定时器，每分钟检查 token 是否过期，过期前 2 分钟尝试静默续期 */
     startExpiryWatch() {
       this.stopExpiryWatch()
       this._expiryTimer = setInterval(async () => {
         if (!this.token) return
         const exp = getTokenExpiry(this.token)
-        if (exp && Date.now() / 1000 >= exp) {
-          this.logout()
-          const { Message } = await import('@arco-design/web-vue')
-          Message.warning('登录已过期，请重新登录')
-          window.location.href = '/login'
+        if (!exp) return
+        const remainingSec = exp - Date.now() / 1000
+        if (remainingSec > 120) return // 还有 2 分钟以上，不续期
+
+        // 尝试用 refreshToken 续期
+        const refreshToken = localStorage.getItem('refreshToken')
+        if (refreshToken) {
+          try {
+            const res = await request.post<{ accessToken: string }>('/v1/auth/refresh', { refreshToken })
+            this.token = res.accessToken
+            localStorage.setItem('token', res.accessToken)
+            return // 续期成功
+          } catch { /* 续期失败，继续登出 */ }
         }
+
+        this.logout()
+        const { Message } = await import('@arco-design/web-vue')
+        Message.warning('登录已过期，请重新登录')
+        window.location.href = '/login'
       }, 60 * 1000)
     },
 
@@ -148,7 +172,7 @@ export const useAuthStore = defineStore('auth', {
     async switchTenant(tenantId: string) {
       const { Message } = await import('@arco-design/web-vue')
       try {
-        const data = await request.post<{ accessToken: string; tenantId: string }>(
+        const data = await request.post<{ accessToken: string; refreshToken?: string; tenantId: string }>(
           '/v1/auth/switch-tenant',
           { tenantId },
         )
@@ -156,6 +180,7 @@ export const useAuthStore = defineStore('auth', {
         this.tenantId = data.tenantId
         localStorage.setItem('token', data.accessToken)
         localStorage.setItem('tenantId', data.tenantId)
+        if (data.refreshToken) localStorage.setItem('refreshToken', data.refreshToken)
         window.location.reload()
       } catch (e: unknown) {
         const msg = e instanceof Error ? e.message : '切换租户失败'

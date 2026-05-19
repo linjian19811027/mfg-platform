@@ -90,9 +90,9 @@ const query = reactive({ keyword: '', status: '', page: 1, pageSize: 20 })
 const columns: MTableColumn[] = [
   { key: 'code', title: t('plm.code-rule.index.编码'), dataIndex: 'code', width: 120 },
   { key: 'name', title: t('plm.code-rule.index.名称'), dataIndex: 'name', width: 150 },
-  { key: 'pattern', title: t('plm.code-rule.index.规则模板'), dataIndex: 'pattern', width: 200, ellipsis: true },
-  { key: 'prefix', title: t('plm.code-rule.index.前缀'), dataIndex: 'prefix', width: 100 },
-  { key: 'seqDigits', title: t('plm.code-rule.index.序号位数'), dataIndex: 'seqDigits', width: 100 },
+  { key: 'pattern', title: t('plm.code-rule.index.规则模板'), dataIndex: 'segments', width: 200, ellipsis: true },
+  { key: 'prefix', title: t('plm.code-rule.index.前缀'), slotName: 'prefix', width: 100 },
+  { key: 'serialLength', title: t('plm.code-rule.index.序号位数'), dataIndex: 'serialLength', width: 100 },
   { key: 'status', title: t('plm.code-rule.index.状态'), slotName: 'status', width: 90 },
   { key: 'action', title: t('plm.code-rule.index.操作'), slotName: 'action', width: 80 },
 ]

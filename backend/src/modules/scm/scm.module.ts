@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { BaseModule } from '../base/base.module.js';
 
 import { ScmSupplier } from './entities/scm-supplier.entity.js';
 import { ScmSupplierQualification } from './entities/scm-supplier-qualification.entity.js';
@@ -8,8 +9,10 @@ import { ScmPurchaseRequest } from './entities/scm-purchase-request.entity.js';
 import { ScmPurchaseOrder } from './entities/scm-purchase-order.entity.js';
 import { ScmPurchaseOrderLine } from './entities/scm-purchase-order-line.entity.js';
 import { ScmReceipt } from './entities/scm-receipt.entity.js';
+import { ScmReceiptLine } from './entities/scm-receipt-line.entity.js';
 import { ScmReceiptException } from './entities/scm-receipt-exception.entity.js';
 import { ScmAsn } from './entities/scm-asn.entity.js';
+import { ScmAsnLine } from './entities/scm-asn-line.entity.js';
 import { ScmInquiry } from './entities/scm-inquiry.entity.js';
 import { ScmInquiryLine } from './entities/scm-inquiry-line.entity.js';
 import { ScmPriceAgreement } from './entities/scm-price-agreement.entity.js';
@@ -41,8 +44,10 @@ import { MessageModule } from '../../shared/message/message.module.js';
       ScmPurchaseOrder,
       ScmPurchaseOrderLine,
       ScmReceipt,
+      ScmReceiptLine,
       ScmReceiptException,
       ScmAsn,
+      ScmAsnLine,
       ScmInquiry,
       ScmInquiryLine,
       ScmPriceAgreement,
@@ -50,6 +55,7 @@ import { MessageModule } from '../../shared/message/message.module.js';
       ScmReconciliation,
     ]),
     MessageModule,
+    BaseModule,
   ],
   controllers: [ScmController],
   providers: [

@@ -73,9 +73,9 @@ const total = ref(0)
 const query = reactive({ status: '', page: 1, pageSize: 20 })
 
 const columns: MTableColumn[] = [
-  { key: 'code', title: t('wms.picking-task.index.任务编号'), dataIndex: 'code', width: 140 },
+  { key: 'taskNo', title: t('wms.picking-task.index.任务编号'), dataIndex: 'taskNo', width: 140 },
   { key: 'priority', title: t('wms.picking-task.index.优先级'), slotName: 'priority', width: 90 },
-  { key: 'referenceType', title: t('wms.picking-task.index.来源类型'), dataIndex: 'referenceType', width: 110 },
+  { key: 'sourceType', title: t('wms.picking-task.index.来源类型'), dataIndex: 'sourceType', width: 110 },
   { key: 'status', title: t('wms.picking-task.index.状态'), slotName: 'status', width: 100 },
   { key: 'createdAt', title: t('wms.picking-task.index.创建时间'), dataIndex: 'createdAt', width: 160 },
   { key: 'action', title: t('wms.picking-task.index.操作'), slotName: 'action', width: 160 },

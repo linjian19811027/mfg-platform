@@ -14,9 +14,15 @@ export class MesReceiptLog {
   @PrimaryGeneratedColumn({ type: 'bigint' }) id!: string;
   @Column({ name: 'tenant_id', length: 50 }) tenantId!: string;
   @Column({ name: 'wo_id', type: 'bigint' }) woId!: string;
+  /** 冗余字段：工单号（避免跨模块查询 mes_work_order） */
+  @Column({ name: 'wo_no', length: 50, nullable: true }) woNo?: string;
   /** FULL = 全部完工触发, PARTIAL = 部分完工触发 */
   @Column({ name: 'trigger_type', length: 10 }) triggerType!: string;
   @Column({ name: 'material_id', type: 'bigint' }) materialId!: string;
+  /** 冗余字段：物料编码 */
+  @Column({ name: 'material_code', length: 50, nullable: true }) materialCode?: string;
+  /** 冗余字段：物料名称 */
+  @Column({ name: 'material_name', length: 200, nullable: true }) materialName?: string;
   @Column({ type: 'decimal', precision: 18, scale: 6 }) quantity!: number;
   @Column({ name: 'uom_id', type: 'bigint', nullable: true }) uomId?: string;
   @Column({ name: 'target_warehouse_id', type: 'bigint', nullable: true })

@@ -176,9 +176,9 @@ async function refresh() {
   loading.value = true
   try {
     const [h, m, t] = await Promise.all([getHealth(), getMetrics(), getMetricsTrend()])
-    health.value = (h as any).data ?? h
-    metrics.value = (m as any).data ?? m
-    trend.value = ((t as any).data ?? t)?.points ?? []
+    health.value = h ?? { status: 'DOWN', mode: 'UNKNOWN' }
+    metrics.value = m ?? {}
+    trend.value = t?.points ?? []
     renderCharts()
   } catch (e: any) {
     Message.error(e.message || t('sys.加载失败'))

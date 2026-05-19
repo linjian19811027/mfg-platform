@@ -141,15 +141,19 @@ export const SEED_PERMISSIONS: SeedPermission[] = [
 
       { code: 'mes:wip', name: '在制品(WIP)', type: 'MENU', module: 'MES',
         path: '/mes/wip', component: '/views/mes/wip/index.vue', icon: 'IconLoading', sortOrder: 15 },
+      { code: 'mes:wip:view', name: '查看在制品', type: 'BUTTON', module: 'MES', parentCode: 'mes:wip' },
 
       { code: 'mes:labor', name: '工时记录', type: 'MENU', module: 'MES',
         path: '/mes/labor', component: '/views/mes/labor/index.vue', icon: 'IconHistory', sortOrder: 20 },
+      { code: 'mes:labor:view', name: '查看工时', type: 'BUTTON', module: 'MES', parentCode: 'mes:labor' },
 
       { code: 'mes:quality-board', name: '质量看板', type: 'MENU', module: 'MES',
         path: '/mes/quality-board', component: '/views/mes/quality-board/index.vue', icon: 'IconComputer', sortOrder: 25 },
+      { code: 'mes:quality:view', name: '查看质量看板', type: 'BUTTON', module: 'MES', parentCode: 'mes:quality-board' },
 
       { code: 'mes:dashboard', name: '生产看板', type: 'MENU', module: 'MES',
         path: '/mes/dashboard', component: '/views/mes/dashboard/index.vue', icon: 'IconDashboard', sortOrder: 30 },
+      { code: 'mes:dashboard:view', name: '查看生产看板', type: 'BUTTON', module: 'MES', parentCode: 'mes:dashboard' },
 
       { code: 'mes:auto-receipt', name: '自动入库配置', type: 'MENU', module: 'MES',
         path: '/mes/auto-receipt-config', component: '/views/mes/auto-receipt-config/index.vue', icon: 'IconSettings', sortOrder: 35 },
@@ -193,17 +197,22 @@ export const SEED_PERMISSIONS: SeedPermission[] = [
 
       { code: 'wms:safety-stock', name: '安全库存', type: 'MENU', module: 'WMS',
         path: '/wms/safety-stock', component: '/views/wms/safety-stock/index.vue', icon: 'IconSafe', sortOrder: 25 },
+      { code: 'wms:safety:view', name: '查看安全库存', type: 'BUTTON', module: 'WMS', parentCode: 'wms:safety-stock' },
       { code: 'wms:safety-stock:edit', name: '设置安全库存', type: 'BUTTON', module: 'WMS', parentCode: 'wms:safety-stock' },
 
       { code: 'wms:barcode-rule', name: '条码规则', type: 'MENU', module: 'WMS',
         path: '/wms/barcode-rules', component: '/views/wms/barcode-rule/index.vue', icon: 'IconStorage', sortOrder: 30 },
+      { code: 'wms:barcode:view', name: '查看条码规则', type: 'BUTTON', module: 'WMS', parentCode: 'wms:barcode-rule' },
 
       { code: 'wms:ledger', name: '库存台账', type: 'MENU', module: 'WMS',
         path: '/wms/reports/ledger', component: '/views/wms/reports/ledger.vue', icon: 'IconBook', sortOrder: 35 },
+      { code: 'wms:report:view', name: '查看报表', type: 'BUTTON', module: 'WMS', parentCode: 'wms:ledger' },
       { code: 'wms:turnover', name: '库存周转率', type: 'MENU', module: 'WMS',
         path: '/wms/reports/turnover', component: '/views/wms/reports/turnover.vue', icon: 'IconDashboard', sortOrder: 40 },
       { code: 'wms:dashboard', name: '仓储看板', type: 'MENU', module: 'WMS',
         path: '/wms/dashboard', component: '/views/wms/dashboard/index.vue', icon: 'IconDashboard', sortOrder: 45 },
+      { code: 'wms:dashboard:view', name: '查看仓储看板', type: 'BUTTON', module: 'WMS', parentCode: 'wms:dashboard' },
+      { code: 'wms:count:view', name: '查看盘点', type: 'BUTTON', module: 'WMS', parentCode: 'wms:inventory-count' },
     ],
   },
 
@@ -502,8 +511,130 @@ export const SEED_PERMISSIONS: SeedPermission[] = [
       { code: 'sys:tenant:view', name: '查看租户', type: 'BUTTON', module: 'SYS', parentCode: 'sys:tenant' },
       { code: 'sys:tenant:create', name: '创建租户', type: 'BUTTON', module: 'SYS', parentCode: 'sys:tenant' },
       { code: 'sys:tenant:update', name: '编辑租户', type: 'BUTTON', module: 'SYS', parentCode: 'sys:tenant' },
+
+      { code: 'sys:uom', name: '计量单位', type: 'MENU', module: 'SYS',
+        path: '/sys/uom', component: '/views/sys/uom/index.vue', icon: 'IconStorage', sortOrder: 40 },
+      { code: 'sys:uom:view', name: '查看计量单位', type: 'BUTTON', module: 'SYS', parentCode: 'sys:uom' },
+      { code: 'sys:uom:create', name: '创建计量单位', type: 'BUTTON', module: 'SYS', parentCode: 'sys:uom' },
+      { code: 'sys:uom:update', name: '编辑计量单位', type: 'BUTTON', module: 'SYS', parentCode: 'sys:uom' },
+      { code: 'sys:uom:delete', name: '删除计量单位', type: 'BUTTON', module: 'SYS', parentCode: 'sys:uom' },
+
+      { code: 'sys:config', name: '全局配置', type: 'MENU', module: 'SYS',
+        path: '/sys/config', component: '/views/sys/config/index.vue', icon: 'IconSettings', sortOrder: 45 },
+      { code: 'sys:config:view', name: '查看配置', type: 'BUTTON', module: 'SYS', parentCode: 'sys:config' },
     ],
   },
+
+  // ════════════════════════════════════════════
+  // 追溯管理
+  // ════════════════════════════════════════════
+  {
+    code: 'traceability', name: '追溯管理', type: 'MENU', module: 'TRACEABILITY',
+    icon: 'IconSearch', sortOrder: 90, isVisible: 1,
+    children: [
+      { code: 'traceability:dashboard', name: '追溯看板', type: 'MENU', module: 'TRACEABILITY',
+        path: '/traceability/dashboard', component: '/views/traceability/dashboard/index.vue', icon: 'IconDashboard', sortOrder: 1 },
+      { code: 'traceability:dashboard:view', name: '查看追溯看板', type: 'BUTTON', module: 'TRACEABILITY', parentCode: 'traceability:dashboard' },
+
+      { code: 'traceability:batch', name: '批次追溯', type: 'MENU', module: 'TRACEABILITY',
+        path: '/traceability/batches', component: '/views/traceability/batches/index.vue', icon: 'IconList', sortOrder: 5 },
+      { code: 'traceability:batch:view', name: '查看批次', type: 'BUTTON', module: 'TRACEABILITY', parentCode: 'traceability:batch' },
+
+      { code: 'traceability:forward', name: '正向追溯', type: 'MENU', module: 'TRACEABILITY',
+        path: '/traceability', component: '/views/traceability/index.vue', icon: 'IconArrowRight', sortOrder: 10 },
+      { code: 'traceability:forward:view', name: '正向追溯查看', type: 'BUTTON', module: 'TRACEABILITY', parentCode: 'traceability:forward' },
+
+      { code: 'traceability:backward', name: '反向追溯', type: 'MENU', module: 'TRACEABILITY',
+        path: '/traceability', component: '/views/traceability/index.vue', icon: 'IconArrowLeft', sortOrder: 15 },
+      { code: 'traceability:backward:view', name: '反向追溯查看', type: 'BUTTON', module: 'TRACEABILITY', parentCode: 'traceability:backward' },
+
+      { code: 'traceability:recall', name: '召回管理', type: 'MENU', module: 'TRACEABILITY',
+        path: '/traceability/recall', component: '/views/traceability/recall/index.vue', icon: 'IconExport', sortOrder: 20 },
+      { code: 'traceability:recall:view', name: '查看召回', type: 'BUTTON', module: 'TRACEABILITY', parentCode: 'traceability:recall' },
+    ],
+  },
+
+  // ════════════════════════════════════════════
+  // 外协加工
+  // ════════════════════════════════════════════
+  {
+    code: 'outsourcing', name: '外协加工', type: 'MENU', module: 'OUTSOURCING',
+    icon: 'IconRelation', sortOrder: 95, isVisible: 1,
+    children: [
+      { code: 'outsourcing:order', name: '外协订单', type: 'MENU', module: 'OUTSOURCING',
+        path: '/outsourcing/orders', component: '/views/outsourcing/orders/index.vue', icon: 'IconFile', sortOrder: 1 },
+      { code: 'outsourcing:order:view', name: '查看外协订单', type: 'BUTTON', module: 'OUTSOURCING', parentCode: 'outsourcing:order' },
+      { code: 'outsourcing:order:create', name: '创建外协订单', type: 'BUTTON', module: 'OUTSOURCING', parentCode: 'outsourcing:order' },
+    ],
+  },
+
+  // ════════════════════════════════════════════
+  // 补充缺失的权限码（为已有 MENU 添加 :view BUTTON）
+  // ════════════════════════════════════════════
+  // QMS 补充
+  { code: 'qms:standard:view', name: '查看检验标准', type: 'BUTTON', module: 'QMS', parentCode: 'qms:standard' },
+  { code: 'qms:spc:view', name: '查看SPC', type: 'BUTTON', module: 'QMS', parentCode: 'qms:spc' },
+  { code: 'qms:nonconform:view', name: '查看不合格品', type: 'BUTTON', module: 'QMS', parentCode: 'qms:nonconformance' },
+  { code: 'qms:complaint:view', name: '查看投诉', type: 'BUTTON', module: 'QMS', parentCode: 'qms' },
+  { code: 'qms:recall:view', name: '查看召回', type: 'BUTTON', module: 'QMS', parentCode: 'qms' },
+  { code: 'qms:supplier:view', name: '查看供应商质量', type: 'BUTTON', module: 'QMS', parentCode: 'qms' },
+
+  // EAM 补充
+  { code: 'eam:fault:view', name: '查看故障', type: 'BUTTON', module: 'EAM', parentCode: 'eam:repair' },
+  { code: 'eam:inspection:view', name: '查看点检', type: 'BUTTON', module: 'EAM', parentCode: 'eam' },
+  { code: 'eam:knowledge:view', name: '查看知识库', type: 'BUTTON', module: 'EAM', parentCode: 'eam' },
+  { code: 'eam:oee:view', name: '查看OEE', type: 'BUTTON', module: 'EAM', parentCode: 'eam' },
+  { code: 'eam:sparepart:view', name: '查看备件', type: 'BUTTON', module: 'EAM', parentCode: 'eam' },
+  { code: 'eam:strategy:view', name: '查看策略', type: 'BUTTON', module: 'EAM', parentCode: 'eam' },
+
+  // ERP 补充
+  { code: 'erp:customer:view', name: '查看客户', type: 'BUTTON', module: 'ERP', parentCode: 'erp' },
+  { code: 'erp:salesorder:view', name: '查看销售订单', type: 'BUTTON', module: 'ERP', parentCode: 'erp' },
+  { code: 'erp:quotation:view', name: '查看报价', type: 'BUTTON', module: 'ERP', parentCode: 'erp' },
+  { code: 'erp:shipment:view', name: '查看发货', type: 'BUTTON', module: 'ERP', parentCode: 'erp' },
+  { code: 'erp:return:view', name: '查看退货', type: 'BUTTON', module: 'ERP', parentCode: 'erp' },
+  { code: 'erp:receivable:view', name: '查看应收', type: 'BUTTON', module: 'ERP', parentCode: 'erp' },
+  { code: 'erp:payable:view', name: '查看应付', type: 'BUTTON', module: 'ERP', parentCode: 'erp' },
+  { code: 'erp:account:view', name: '查看科目', type: 'BUTTON', module: 'ERP', parentCode: 'erp' },
+  { code: 'erp:voucher:view', name: '查看凭证', type: 'BUTTON', module: 'ERP', parentCode: 'erp' },
+  { code: 'erp:cost:view', name: '查看成本', type: 'BUTTON', module: 'ERP', parentCode: 'erp' },
+  { code: 'erp:analytics:view', name: '查看分析', type: 'BUTTON', module: 'ERP', parentCode: 'erp' },
+
+  // SCM 补充
+  { code: 'scm:purchase:view', name: '查看采购订单', type: 'BUTTON', module: 'SCM', parentCode: 'scm' },
+  { code: 'scm:pr:view', name: '查看采购申请', type: 'BUTTON', module: 'SCM', parentCode: 'scm' },
+  { code: 'scm:asn:view', name: '查看ASN', type: 'BUTTON', module: 'SCM', parentCode: 'scm' },
+  { code: 'scm:rfq:view', name: '查看询价', type: 'BUTTON', module: 'SCM', parentCode: 'scm' },
+  { code: 'scm:receipt:view', name: '查看到货', type: 'BUTTON', module: 'SCM', parentCode: 'scm' },
+  { code: 'scm:reconcile:view', name: '查看对账', type: 'BUTTON', module: 'SCM', parentCode: 'scm' },
+
+  // APS 补充
+  { code: 'aps:schedule:view', name: '查看排程', type: 'BUTTON', module: 'APS', parentCode: 'aps' },
+  { code: 'aps:calendar:view', name: '查看日历', type: 'BUTTON', module: 'APS', parentCode: 'aps' },
+  { code: 'aps:resource:view', name: '查看资源', type: 'BUTTON', module: 'APS', parentCode: 'aps' },
+  { code: 'aps:mrp:view', name: '查看MRP', type: 'BUTTON', module: 'APS', parentCode: 'aps' },
+  { code: 'aps:capacity:view', name: '查看产能', type: 'BUTTON', module: 'APS', parentCode: 'aps' },
+
+  // HR 补充
+  { code: 'hr:cert:view', name: '查看认证', type: 'BUTTON', module: 'HR', parentCode: 'hr' },
+  { code: 'hr:schedule:view', name: '查看排班', type: 'BUTTON', module: 'HR', parentCode: 'hr' },
+  { code: 'hr:workhour:view', name: '查看工时', type: 'BUTTON', module: 'HR', parentCode: 'hr' },
+
+  // SYS 补充
+  { code: 'sys:role:view', name: '查看角色', type: 'BUTTON', module: 'SYS', parentCode: 'sys:role' },
+  { code: 'sys:user:view', name: '查看用户', type: 'BUTTON', module: 'SYS', parentCode: 'sys:user' },
+  { code: 'sys:log:view', name: '查看日志', type: 'BUTTON', module: 'SYS', parentCode: 'sys:audit' },
+  { code: 'sys:monitor:view', name: '查看监控', type: 'BUTTON', module: 'SYS', parentCode: 'sys' },
+
+  // BASE 补充
+  { code: 'base:file:view', name: '查看文件', type: 'BUTTON', module: 'BASE', parentCode: 'base:file' },
+  { code: 'base:certtype:view', name: '查看认证类型', type: 'BUTTON', module: 'BASE', parentCode: 'base:cert-type' },
+  { code: 'base:batch:view', name: '查看批次', type: 'BUTTON', module: 'BASE', parentCode: 'base:batch' },
+  { code: 'base:shift:view', name: '查看班次', type: 'BUTTON', module: 'BASE', parentCode: 'base:shift' },
+  { code: 'base:work-center:view', name: '查看工作中心', type: 'BUTTON', module: 'BASE', parentCode: 'base:work-center' },
+
+  // PLM 补充
+  { code: 'plm:code:view', name: '查看编码规则', type: 'BUTTON', module: 'PLM', parentCode: 'plm:code-rule' },
 ]
 
 /**

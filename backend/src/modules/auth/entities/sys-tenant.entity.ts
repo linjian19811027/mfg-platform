@@ -41,6 +41,18 @@ export class SysTenant {
   @Column({ name: 'contact_email', length: 100, nullable: true })
   contactEmail?: string;
 
+  @Column({ name: 'logo_url', length: 500, nullable: true })
+  logoUrl?: string;
+
+  @Column({ name: 'brand_color', length: 20, nullable: true })
+  brandColor?: string;
+
+  @Column({ length: 100, nullable: true })
+  title?: string;
+
+  @Column({ name: 'login_bg', length: 500, nullable: true })
+  loginBg?: string;
+
   @Column({ type: 'json', nullable: true })
   attributes?: Record<string, unknown>;
 

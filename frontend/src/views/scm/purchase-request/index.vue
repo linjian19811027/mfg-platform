@@ -106,7 +106,7 @@ const STATUS_MAP: Record<string, { label: string; color: string }> = {
 }
 
 const columns: MTableColumn[] = [
-  { key: 'code', title: t('scm.purchase-request.index.申请编号'), dataIndex: 'code', width: 130 },
+  { key: 'code', title: t('scm.purchase-request.index.申请编号'), dataIndex: 'prNo', width: 130 },
   { key: 'materialName', title: t('scm.purchase-request.index.物料名称'), dataIndex: 'materialName', width: 160 },
   { key: 'qty', title: t('scm.purchase-request.index.申请数量'), dataIndex: 'qty', width: 100 },
   { key: 'expectedDate', title: t('scm.purchase-request.index.期望到货'), dataIndex: 'expectedDate', width: 120 },

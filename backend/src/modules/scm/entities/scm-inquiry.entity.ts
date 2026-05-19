@@ -31,6 +31,14 @@ export class ScmInquiry {
   @Column({ name: 'material_id', type: 'bigint' })
   materialId!: string;
 
+  /** 冗余字段：物料编码（跨模块，避免查询 plm_material） */
+  @Column({ name: 'material_code', length: 50, nullable: true })
+  materialCode?: string;
+
+  /** 冗余字段：物料名称（跨模块，避免查询 plm_material） */
+  @Column({ name: 'material_name', length: 200, nullable: true })
+  materialName?: string;
+
   @Column({ type: 'decimal', precision: 18, scale: 6 })
   quantity!: number;
 

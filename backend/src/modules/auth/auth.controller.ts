@@ -7,6 +7,7 @@ import {
   HttpCode,
   HttpStatus,
   Req,
+  ForbiddenException,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -128,6 +129,25 @@ export class AuthController {
     @CurrentUser() user: JwtPayload,
     @Body() body: { tenantId: string },
   ) {
+    if (!user.roles?.includes('SUPER_ADMIN')) {
+      throw new ForbiddenException('只有超级管理员可以切换租户');
+    }
     return this.authService.switchTenant(user.sub, body.tenantId);
+  }
+
+  @Get('tenant-branding')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '获取当前租户品牌配置（Logo/标题/品牌色）' })
+  async getTenantBranding(@CurrentUser() user: JwtPayload) {
+    const tenant = await this.tenantRepo.findOne({
+      where: { code: user.tenantId },
+      select: ['logoUrl', 'brandColor', 'title', 'loginBg'],
+    });
+    return {
+      logoUrl: tenant?.logoUrl ?? null,
+      brandColor: tenant?.brandColor ?? null,
+      title: tenant?.title ?? null,
+      loginBg: tenant?.loginBg ?? null,
+    };
   }
 }

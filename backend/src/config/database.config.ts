@@ -23,7 +23,7 @@ export function getDatabaseConfig(config: ConfigService): TypeOrmModuleOptions {
     charset: 'utf8mb4',
     timezone: '+08:00',
     extra: {
-      connectionLimit: 10,
+      connectionLimit: config.get<number>('DB_CONNECTION_LIMIT', 10),
     },
   };
 }

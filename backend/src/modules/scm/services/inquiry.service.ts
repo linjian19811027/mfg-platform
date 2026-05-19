@@ -12,6 +12,8 @@ import { ScmInquiryLine } from '../entities/scm-inquiry-line.entity.js';
 
 export interface CreateInquiryDto {
   materialId: string;
+  materialCode?: string;
+  materialName?: string;
   quantity: number;
   uomId: string;
   requiredDate?: Date;
@@ -87,6 +89,8 @@ export class InquiryService {
         tenantId,
         inquiryNo,
         materialId: data.materialId,
+        materialCode: data.materialCode,
+        materialName: data.materialName,
         quantity: data.quantity,
         uomId: data.uomId,
         requiredDate: data.requiredDate,

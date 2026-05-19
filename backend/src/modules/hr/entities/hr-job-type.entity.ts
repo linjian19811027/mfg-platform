@@ -4,6 +4,7 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  DeleteDateColumn,
 } from 'typeorm';
 
 @Entity('hr_job_type')
@@ -27,4 +28,5 @@ export class HrJobType {
 
   @CreateDateColumn({ name: 'created_at' }) createdAt!: Date;
   @UpdateDateColumn({ name: 'updated_at' }) updatedAt!: Date;
+  @DeleteDateColumn({ name: 'deleted_at' }) deletedAt?: Date;
 }

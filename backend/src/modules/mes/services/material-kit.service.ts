@@ -51,7 +51,7 @@ export class MaterialKitService {
     if (!wo) throw new NotFoundException('MES_WO_NOT_FOUND');
     if (!wo.bomId) return { woId, kitRate: 1, isComplete: true, shortages: [] };
 
-    // 查 BOM 需求
+    // 查 BOM 需求（跨模块查询，降级处理）
     const bomLines: {
       material_id: string;
       quantity: number;
@@ -62,12 +62,12 @@ export class MaterialKitService {
          FROM plm_bom_line bl
          WHERE bl.bom_id = ? AND bl.tenant_id = ?`,
       [wo.bomId, tenantId],
-    );
+    ).catch(() => []);
 
     if (bomLines.length === 0)
       return { woId, kitRate: 1, isComplete: true, shortages: [] };
 
-    // 查 WMS 可用库存
+    // 查 WMS 可用库存（跨模块查询，降级处理）
     const matIds = bomLines.map((l) => l.material_id);
     const inventory: { material_id: string; available_qty: number }[] =
       await this.woRepo.manager.query(
@@ -76,7 +76,7 @@ export class MaterialKitService {
          WHERE tenant_id = ? AND material_id IN (?) AND status = 'AVAILABLE'
          GROUP BY material_id`,
         [tenantId, matIds],
-      );
+      ).catch(() => []);
     const invMap = new Map(
       inventory.map((i) => [i.material_id, Number(i.available_qty)]),
     );

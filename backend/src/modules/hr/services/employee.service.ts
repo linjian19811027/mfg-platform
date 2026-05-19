@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { escapeLikePattern } from '../../../shared/utils/sanitize.js';
+import { NumberingService } from '../../base/services/numbering.service.js';
 import { Repository, DataSource } from 'typeorm';
 import * as ExcelJS from 'exceljs';
 import { HrEmployee, EmployeeStatus } from '../entities/hr-employee.entity.js';
@@ -73,23 +74,28 @@ export class EmployeeService {
     private readonly workHourRepo: Repository<HrWorkHourRecord>,
     private readonly dataSource: DataSource,
     private readonly historySvc: EmployeeHistoryService,
+    private readonly numberingSvc: NumberingService,
   ) {}
 
   // ── 生成工号 ──────────────────────────────────────────────────────────────
 
   async generateEmpNo(tenantId: string): Promise<string> {
-    const result = await this.dataSource.query<{ maxNo: string | null }[]>(
-      `SELECT MAX(emp_no) AS maxNo FROM hr_employee WHERE tenant_id = ?`,
-      [tenantId],
-    );
-    const maxNo = result[0]?.maxNo;
-    let seq = 1;
-    if (maxNo) {
-      // 格式 EMP-000001，解析末尾6位数字
-      const match = /EMP-(\d{6})/.exec(maxNo);
-      if (match) seq = parseInt(match[1], 10) + 1;
+    try {
+      return await this.numberingSvc.generate('HR_EMP', tenantId);
+    } catch {
+      // 编码规则不存在时降级
+      const result = await this.dataSource.query<{ maxNo: string | null }[]>(
+        `SELECT MAX(emp_no) AS maxNo FROM hr_employee WHERE tenant_id = ?`,
+        [tenantId],
+      );
+      const maxNo = result[0]?.maxNo;
+      let seq = 1;
+      if (maxNo) {
+        const match = /EMP-(\d{6})/.exec(maxNo);
+        if (match) seq = parseInt(match[1], 10) + 1;
+      }
+      return `EMP-${String(seq).padStart(6, '0')}`;
     }
-    return `EMP-${String(seq).padStart(6, '0')}`;
   }
 
   // ── 创建员工 ──────────────────────────────────────────────────────────────

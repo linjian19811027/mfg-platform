@@ -18,6 +18,7 @@ export enum ReceivableStatus {
 @Index('uk_erp_receivable', ['tenantId', 'receivableNo'], { unique: true })
 @Index('idx_erp_receivable_status', ['tenantId', 'status'])
 @Index('idx_erp_receivable_customer', ['customerId'])
+@Index('idx_erp_receivable_due_date', ['tenantId', 'dueDate'])
 export class ErpReceivable {
   @PrimaryGeneratedColumn({ type: 'bigint' })
   id!: string;

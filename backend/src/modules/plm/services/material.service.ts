@@ -120,22 +120,25 @@ export class MaterialService {
     if (!data.code) {
       // 如果未提供编码，尝试根据规则自动生成
       if (!rule) {
-        throw new BadRequestException('PLM_MATERIAL_CODE_REQUIRED');
+        // 没有编码规则时使用兜底逻辑：MAT-{时间戳后5位}
+        const fallbackSerial = Date.now().toString().slice(-5);
+        data.code = `MAT-${fallbackSerial}`;
       }
 
-      if (rule.codeType === 'AUTO') {
+      if (rule && rule.codeType === 'AUTO') {
         let categoryCode: string | undefined;
         if (data.categoryId) {
           const category = await this.categoryRepo.findOne({ where: { id: data.categoryId, tenantId } });
           categoryCode = category?.code;
         }
         data.code = await this.codeSvc.generate(rule.id, categoryCode);
-      } else if (rule.codeType === 'MIXED') {
+      } else if (rule && rule.codeType === 'MIXED') {
         // MIXED 模式通常需要用户提供后缀，如果未提供则报错
         throw new BadRequestException('PLM_MATERIAL_CODE_SUFFIX_REQUIRED');
-      } else {
-        // MANUAL 模式必须提供编码
-        throw new BadRequestException('PLM_MATERIAL_CODE_REQUIRED');
+      } else if (rule && rule.codeType === 'MANUAL') {
+        // MANUAL 模式：兜底生成
+        const fallbackSerial = Date.now().toString().slice(-5);
+        data.code = `MAT-${fallbackSerial}`;
       }
     } else {
       // 如果提供了编码，校验唯一性并根据规则校验（如果是 MANUAL 模式）

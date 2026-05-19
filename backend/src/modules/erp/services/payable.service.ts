@@ -31,6 +31,7 @@ export interface PayableCreatedPayload {
   reconId: string;
   reconNo: string;
   supplierId: string;
+  supplierName?: string;
   amount: number;
   dueDate?: string;
   paymentPlan?: PaymentPlanItem[];
@@ -98,6 +99,7 @@ export class PayableService implements OnModuleInit {
       tenantId,
       payableNo,
       supplierId: payload.supplierId,
+      supplierName: payload.supplierName,
       reconId: payload.reconId,
       amount: payload.amount,
       paidAmount: 0,

@@ -29,6 +29,10 @@ export class ErpPayable {
   @Column({ name: 'supplier_id', type: 'bigint' })
   supplierId!: string;
 
+  /** 冗余字段：供应商名称（跨模块，避免查询 scm_supplier） */
+  @Column({ name: 'supplier_name', length: 200, nullable: true })
+  supplierName?: string;
+
   @Column({ name: 'recon_id', type: 'bigint', nullable: true })
   reconId?: string;
 

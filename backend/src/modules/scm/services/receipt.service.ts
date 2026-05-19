@@ -8,6 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { ScmReceipt, ReceiptStatus } from '../entities/scm-receipt.entity.js';
+import { ScmReceiptLine } from '../entities/scm-receipt-line.entity.js';
 import {
   ScmReceiptException,
   ExceptionType,
@@ -57,6 +58,8 @@ export class ReceiptService {
   constructor(
     @InjectRepository(ScmReceipt)
     private readonly receiptRepo: Repository<ScmReceipt>,
+    @InjectRepository(ScmReceiptLine)
+    private readonly lineRepo: Repository<ScmReceiptLine>,
     @InjectRepository(ScmReceiptException)
     private readonly exceptionRepo: Repository<ScmReceiptException>,
     @Inject(MESSAGE_SERVICE)
@@ -93,17 +96,49 @@ export class ReceiptService {
   async create(tenantId: string, data: CreateReceiptDto): Promise<ScmReceipt> {
     const receiptNo = await this.generateReceiptNo(tenantId);
 
+    // 查找供应商名称（同模块）
+    let supplierName: string | undefined;
+    if (data.supplierId) {
+      const sup = await this.receiptRepo.manager
+        .createQueryBuilder()
+        .select('name')
+        .from('scm_supplier', 's')
+        .where('id = :id AND tenant_id = :tid', { id: data.supplierId, tid: tenantId })
+        .getRawOne<{ name: string }>();
+      supplierName = sup?.name;
+    }
+
     const receipt = this.receiptRepo.create({
       tenantId,
       receiptNo,
       poId: data.poId,
       supplierId: data.supplierId,
+      supplierName,
       receiptDate: data.receiptDate,
       status: ReceiptStatus.PENDING,
       items: data.items ?? [],
     });
+    const savedReceipt = await this.receiptRepo.save(receipt);
 
-    return this.receiptRepo.save(receipt);
+    // 保存明细行
+    if (data.items && data.items.length > 0) {
+      const lines = data.items.map((item, idx) =>
+        this.lineRepo.create({
+          tenantId,
+          receiptId: savedReceipt.id,
+          lineNo: idx + 1,
+          materialId: (item as any).materialId,
+          materialCode: (item as any).materialCode,
+          materialName: (item as any).materialName,
+          receivedQty: (item as any).receivedQty ?? (item as any).quantity ?? 0,
+          uomId: (item as any).uomId,
+          unitPrice: (item as any).unitPrice,
+        }),
+      );
+      await this.lineRepo.save(lines);
+    }
+
+    return savedReceipt;
   }
 
   // ── 2. findAll ──────────────────────────────────────────────────────────────
@@ -116,6 +151,8 @@ export class ReceiptService {
 
     const qb = this.receiptRepo
       .createQueryBuilder('r')
+      .leftJoin('scm_supplier', 'sup', 'sup.id = r.supplier_id AND sup.tenant_id = r.tenant_id')
+      .addSelect('sup.name', 'supplierName')
       .where('r.tenantId = :tenantId', { tenantId });
 
     if (status) qb.andWhere('r.status = :status', { status });
@@ -126,7 +163,10 @@ export class ReceiptService {
       .skip((page - 1) * pageSize)
       .take(pageSize);
 
-    const [items, total] = await qb.getManyAndCount();
+    const { entities, raw } = await qb.getRawAndEntities();
+    const total = await qb.getCount();
+    const items = entities.map((e, i) => ({ ...e, supplierName: raw[i]?.supplierName }));
+    return { items, total };
     return { items, total };
   }
 
@@ -136,6 +176,13 @@ export class ReceiptService {
     const receipt = await this.receiptRepo.findOne({ where: { id, tenantId } });
     if (!receipt) throw new NotFoundException(`到货记录 ${id} 不存在`);
     return receipt;
+  }
+
+  async findLines(tenantId: string, receiptId: string): Promise<ScmReceiptLine[]> {
+    return this.lineRepo.find({
+      where: { tenantId, receiptId },
+      order: { lineNo: 'ASC' },
+    });
   }
 
   // ── 4. startInspection ─────────────────────────────────────────────────────

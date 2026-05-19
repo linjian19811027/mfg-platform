@@ -23,6 +23,7 @@
             {{ record.status === 'CONFIRMED' ? t('scm.reconciliation.r33063') : record.status === 'DISPUTED' ? $t('scm.reconciliation.lbl1615') : $t('scm.reconciliation.draft') }}
           </a-tag>
         </template>
+        <template #period="{ record }">{{ record.periodStart }} ~ {{ record.periodEnd }}</template>
         <template #action="{ record }">
           <a-space>
             <a-link @click="openDrawer(record as unknown as ScmReconciliation)">{{ $t('common.edit') }}</a-link>
@@ -58,9 +59,9 @@ const query = reactive({ supplierId: '', status: '', page: 1, pageSize: 20 })
 
 const columns: MTableColumn[] = [
   { key: 'supplierName', title: t('scm.reconciliation.index.供应商'), dataIndex: 'supplierName', width: 150 },
-  { key: 'period', title: t('scm.reconciliation.index.对账期间'), dataIndex: 'period', width: 120 },
-  { key: 'amount', title: t('scm.reconciliation.index.对账金额'), dataIndex: 'amount', width: 120 },
-  { key: 'currency', title: t('scm.reconciliation.index.币种'), dataIndex: 'currency', width: 80 },
+  { key: 'period', title: t('scm.reconciliation.index.对账期间'), slotName: 'period', width: 120 },
+  { key: 'amount', title: t('scm.reconciliation.index.对账金额'), dataIndex: 'totalAmount', width: 120 },
+  { key: 'currency', title: t('scm.reconciliation.index.币种'), dataIndex: 'currencyCode', width: 80 },
   { key: 'status', title: t('scm.reconciliation.index.状态'), slotName: 'status', width: 100 },
   { key: 'createdAt', title: t('scm.reconciliation.index.创建时间'), dataIndex: 'createdAt', width: 160 },
   { key: 'action', title: t('scm.reconciliation.index.操作'), slotName: 'action', width: 120 },

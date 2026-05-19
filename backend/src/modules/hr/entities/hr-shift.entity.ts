@@ -4,6 +4,7 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  DeleteDateColumn,
 } from 'typeorm';
 
 @Entity('hr_shift')
@@ -40,4 +41,5 @@ export class HrShift {
   @Column({ name: 'updated_by', type: 'bigint', nullable: true })
   updatedBy?: string;
   @UpdateDateColumn({ name: 'updated_at' }) updatedAt!: Date;
+  @DeleteDateColumn({ name: 'deleted_at' }) deletedAt?: Date;
 }

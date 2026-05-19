@@ -121,7 +121,7 @@ const issuePage = ref(1)
 const issueColumns: MTableColumn[] = [
   { key: 'materialCode', title: t('mes.picking.index.物料编码'), dataIndex: 'materialCode', width: 130 },
   { key: 'batchId', title: t('mes.picking.index.批次号'), dataIndex: 'batchId', width: 120 },
-  { key: 'qty', title: t('mes.picking.index.数量'), dataIndex: 'qty', width: 90 },
+  { key: 'qty', title: t('mes.picking.index.数量'), dataIndex: 'quantity', width: 90 },
   { key: 'issueType', title: t('mes.picking.index.类型'), dataIndex: 'issueType', width: 100 },
   { key: 'operatorId', title: t('mes.picking.index.操作员'), dataIndex: 'operatorId', width: 100 },
   { key: 'issueTime', title: t('mes.picking.index.时间'), dataIndex: 'issueTime', width: 160 },

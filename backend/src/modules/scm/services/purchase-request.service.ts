@@ -60,8 +60,29 @@ export class PurchaseRequestService {
     data: Partial<ScmPurchaseRequest>,
   ): Promise<ScmPurchaseRequest> {
     const prNo = await this.generatePrNo(tenantId);
+
+    // 自动查找物料编码和名称（跨模块，降级处理）
+    let materialCode = data.materialCode;
+    let materialName = data.materialName;
+    if (data.materialId && (!materialCode || !materialName)) {
+      try {
+        const mat = await this.prRepo.manager
+          .createQueryBuilder()
+          .select(['code', 'name'])
+          .from('plm_material', 'm')
+          .where('m.id = :id', { id: data.materialId })
+          .getRawOne<{ code: string; name: string }>();
+        if (mat) {
+          materialCode = materialCode ?? mat.code;
+          materialName = materialName ?? mat.name;
+        }
+      } catch { /* PLM 未启用 */ }
+    }
+
     const entity = this.prRepo.create({
       ...data,
+      materialCode,
+      materialName,
       tenantId,
       prNo,
       status: PrStatus.DRAFT,

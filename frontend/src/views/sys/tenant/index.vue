@@ -65,6 +65,7 @@
 
         <template #action="{ record }">
           <a-space>
+            <a-button type="text" size="small" @click="handleEnterTenant(record as unknown as Tenant)">进入</a-button>
             <a-button type="text" size="small" @click="openEdit(record as unknown as Tenant)">{{ $t('sys.tenant.edit') }}</a-button>
             <a-popconfirm
               v-if="record.status !== 'disabled'"
@@ -160,6 +161,20 @@
           />
         </a-form-item>
 
+        <a-form-item field="plan" label="套餐">
+          <a-select v-model="formData.plan" @change="onPlanChange">
+            <a-option value="BASIC">基础版（MES + WMS）</a-option>
+            <a-option value="STANDARD">标准版（+ PLM + QMS + HR）</a-option>
+            <a-option value="PROFESSIONAL">专业版（+ SCM + ERP + APS）</a-option>
+            <a-option value="ENTERPRISE">旗舰版（全部模块）</a-option>
+          </a-select>
+        </a-form-item>
+
+        <a-form-item label="启用模块">
+          <a-checkbox-group v-model="formData.enabledModules" :options="moduleOptions" />
+
+        </a-form-item>
+
         <a-form-item field="status" :label="$t('common.status')">
           <a-select v-model="formData.status">
             <a-option value="trial">{{ $t('sys.tenant.lbl1787') }}</a-option>
@@ -195,7 +210,7 @@ import { ref, reactive, onMounted } from 'vue'
 import { Message } from '@arco-design/web-vue'
 import MTable from '@/components/MTable/index.vue'
 import type { MTableColumn } from '@/components/MTable/index.vue'
-import { tenantApi, type Tenant, type TenantStatus, type TenantFormData } from '@/api/sys'
+import { tenantApi, type Tenant, type TenantStatus } from '@/api/sys'
 
 // ---- 状态映射 ----
 const STATUS_COLOR: Record<TenantStatus, string> = {
@@ -234,7 +249,7 @@ const columns: MTableColumn[] = [
   { key: 'expireAt', title: t('sys.tenant.index.到期时间'), width: 200, slotName: 'expireAt' },
   { key: 'status', title: t('sys.tenant.index.状态'), width: 90, slotName: 'status' },
   { key: 'createdAt', title: t('sys.tenant.index.创建时间'), width: 160 },
-  { key: 'action', title: t('sys.tenant.index.操作'), width: 140, slotName: 'action' },
+  { key: 'action', title: t('sys.tenant.index.操作'), width: 200, slotName: 'action' },
 ]
 
 // ---- 列表状态 ----
@@ -283,13 +298,38 @@ const editingTenant = ref<Tenant | null>(null)
 const formRef = ref()
 const submitting = ref(false)
 
-const formData = reactive<TenantFormData>({
+const moduleOptions = [
+  { label: 'PLM 产品管理', value: 'PLM' },
+  { label: 'MES 生产执行', value: 'MES' },
+  { label: 'WMS 仓储管理', value: 'WMS' },
+  { label: 'QMS 质量管理', value: 'QMS' },
+  { label: 'SCM 供应链', value: 'SCM' },
+  { label: 'ERP 财务', value: 'ERP' },
+  { label: 'APS 排程', value: 'APS' },
+  { label: 'EAM 设备', value: 'EAM' },
+  { label: 'HR 人力', value: 'HR' },
+]
+
+const PLAN_MODULES: Record<string, string[]> = {
+  BASIC: ['MES', 'WMS'],
+  STANDARD: ['MES', 'WMS', 'PLM', 'QMS', 'HR'],
+  PROFESSIONAL: ['MES', 'WMS', 'PLM', 'QMS', 'HR', 'SCM', 'ERP', 'APS'],
+  ENTERPRISE: ['PLM', 'MES', 'WMS', 'QMS', 'SCM', 'ERP', 'APS', 'EAM', 'HR'],
+}
+
+function onPlanChange(plan: string) {
+  formData.enabledModules = PLAN_MODULES[plan] ?? []
+}
+
+const formData = reactive({
   name: '',
   code: '',
   contact: '',
   phone: '',
   email: '',
   expireAt: '',
+  plan: 'STANDARD',
+  enabledModules: ['MES', 'WMS', 'PLM', 'QMS', 'HR'] as string[],
   status: 'trial',
   remark: '',
 })
@@ -298,7 +338,9 @@ function openCreate() {
   editingTenant.value = null
   Object.assign(formData, {
     name: '', code: '', contact: '', phone: '',
-    email: '', expireAt: '', status: 'trial', remark: '',
+    email: '', expireAt: '', plan: 'STANDARD',
+    enabledModules: ['MES', 'WMS', 'PLM', 'QMS', 'HR'],
+    status: 'trial', remark: '',
   })
   drawerVisible.value = true
 }
@@ -323,13 +365,13 @@ async function handleSubmit() {
   if (valid) return
   submitting.value = true
   try {
-    const payload: TenantFormData = { ...formData }
+    const payload: Record<string, unknown> = { ...formData }
     if (!payload.expireAt) delete payload.expireAt
     if (editingTenant.value) {
-      await tenantApi.updateTenant(editingTenant.value.id, payload)
+      await tenantApi.updateTenant(editingTenant.value.id, payload as any)
       Message.success(t('sys.保存成功'))
     } else {
-      await tenantApi.createTenant(payload)
+      await tenantApi.createTenant(payload as any)
       Message.success(t('sys.创建成功'))
     }
     drawerVisible.value = false
@@ -354,6 +396,17 @@ async function handleToggleStatus(tenant: Tenant, status: TenantStatus) {
     Message.error(t('sys.操作失败'))
   } finally {
     toggleLoadingId.value = null
+  }
+}
+
+// ---- 进入租户 ----
+async function handleEnterTenant(tenant: Tenant) {
+  try {
+    const { useAuthStore } = await import('@/stores/auth')
+    const authStore = useAuthStore()
+    await authStore.switchTenant(tenant.code)
+  } catch (e: any) {
+    Message.error(e.message || '切换租户失败')
   }
 }
 

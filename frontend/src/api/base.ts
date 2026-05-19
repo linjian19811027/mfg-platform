@@ -288,6 +288,23 @@ export const baseApi = {
     request.delete<void>(`/v1/base/work-centers/${id}`),
 }
 
+// ── 独立函数导出（供 hr.ts 等其他模块复用） ────────────────────
+export const getShifts = baseApi.getShifts
+export const getAllShifts = baseApi.getAllShifts
+export const createShift = baseApi.createShift
+export const updateShift = baseApi.updateShift
+export const deleteShift = baseApi.deleteShift
+
+export const getCertificationTypes = baseApi.getCertificationTypes
+export const createCertificationType = baseApi.createCertificationType
+export const updateCertificationType = baseApi.updateCertificationType
+export const deleteCertificationType = baseApi.deleteCertificationType
+
+export const getWorkCenters = baseApi.getWorkCenters
+export const createWorkCenter = baseApi.createWorkCenter
+export const updateWorkCenter = baseApi.updateWorkCenter
+export const deleteWorkCenter = baseApi.deleteWorkCenter
+
 export const batchApi = {
   // 批次列表
   getBatches: async (params: BatchListParams): Promise<{ list: MaterialBatch[]; total: number }> => {

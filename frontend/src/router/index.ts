@@ -131,6 +131,7 @@ const routes: RouteRecordRaw[] = [
       { path: 'sys/monitor', name: 'SysMonitor', component: () => import('@/views/sys/monitor/index.vue') },
       { path: 'sys/logs', name: 'SysLogs', component: () => import('@/views/sys/logs/index.vue') },
       { path: 'sys/numbering', name: 'SysNumbering', component: () => import('@/views/sys/numbering/index.vue') },
+      { path: 'sys/config', name: 'SysConfig', component: () => import('@/views/sys/config/index.vue') },
       // HR
       { path: 'hr/employees', name: 'HrEmployee', component: () => import('@/views/hr/employees/index.vue') },
       { path: 'hr/employees/:id', name: 'HrEmployeeDetail', component: () => import('@/views/hr/employees/detail.vue') },

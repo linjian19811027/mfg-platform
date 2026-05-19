@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { BaseModule } from '../base/base.module.js';
 
 import { ErpCustomer } from './entities/erp-customer.entity.js';
 import { ErpQuotation } from './entities/erp-quotation.entity.js';
@@ -65,6 +66,7 @@ import { MessageModule } from '../../shared/message/message.module.js';
       ErpCostElement,
     ]),
     MessageModule,
+    BaseModule,
   ],
   controllers: [ErpController],
   providers: [

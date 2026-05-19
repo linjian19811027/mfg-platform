@@ -10,6 +10,7 @@ import {
 @Entity('hr_work_hour_record')
 @Index('idx_hr_whr_emp_date', ['tenantId', 'empId', 'reportDate'])
 @Index('idx_hr_whr_mes_report', ['tenantId', 'mesReportId'], { unique: true })
+@Index('idx_hr_whr_date', ['tenantId', 'reportDate'])
 export class HrWorkHourRecord {
   @PrimaryGeneratedColumn({ type: 'bigint' }) id!: number;
   @Column({ name: 'tenant_id', length: 50 }) tenantId!: string;

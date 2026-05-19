@@ -4,6 +4,7 @@ export interface MenuItem {
   icon?: string
   path?: string
   permission?: string
+  platformOnly?: boolean
   children?: MenuItem[]
 }
 
@@ -34,6 +35,8 @@ export const menuConfig: MenuItem[] = [
       { key: 'mes-labor', title: '工时记录', path: '/mes/labor', icon: 'IconHistory', permission: 'mes:labor:view' },
       { key: 'mes-quality-board', title: '质量看板', path: '/mes/quality-board', icon: 'IconComputer', permission: 'mes:quality:view' },
       { key: 'mes-dashboard', title: '生产看板', path: '/mes/dashboard', icon: 'IconDashboard', permission: 'mes:dashboard:view' },
+      { key: 'mes-auto-receipt', title: '自动入库配置', path: '/mes/auto-receipt-config', icon: 'IconSettings', permission: 'mes:workorder:view' },
+      { key: 'mes-receipt-logs', title: '入库日志', path: '/mes/receipt-logs', icon: 'IconBook', permission: 'mes:workorder:view' },
     ],
   },
   {
@@ -81,6 +84,9 @@ export const menuConfig: MenuItem[] = [
       { key: 'erp-std-cost', title: '标准成本', path: '/erp/standard-costs', icon: 'IconSafe', permission: 'erp:cost:view' },
       { key: 'erp-cost-analysis', title: '成本分析', path: '/erp/cost-analysis', icon: 'IconBarChart', permission: 'erp:cost:view' },
       { key: 'erp-sales-analytics', title: '销售分析', path: '/erp/sales-analytics', icon: 'IconDashboard', permission: 'erp:analytics:view' },
+      { key: 'erp-cost-element', title: '成本要素', path: '/erp/cost-elements', icon: 'IconStorage', permission: 'erp:cost:view' },
+      { key: 'erp-ledger', title: '总账', path: '/erp/ledger/general', icon: 'IconBook', permission: 'erp:account:view' },
+      { key: 'erp-financial-report', title: '财务报表', path: '/erp/financial-reports', icon: 'IconBarChart', permission: 'erp:analytics:view' },
     ],
   },
   {
@@ -94,6 +100,10 @@ export const menuConfig: MenuItem[] = [
       { key: 'scm-receipt', title: '到货记录', path: '/scm/receipt', icon: 'IconDownload', permission: 'scm:receipt:view' },
       { key: 'scm-reconcile', title: '供应商对账', path: '/scm/reconciliations', icon: 'IconRelation', permission: 'scm:reconcile:view' },
       { key: 'scm-performance', title: '供应商绩效', path: '/scm/supplier-performance', icon: 'IconDashboard', permission: 'scm:supplier:view' },
+      { key: 'scm-price-agreement', title: '价格协议', path: '/scm/price-agreements', icon: 'IconSafe', permission: 'scm:purchase:view' },
+      { key: 'scm-qualification', title: '供应商资质', path: '/scm/qualifications', icon: 'IconCheckCircle', permission: 'scm:supplier:view' },
+      { key: 'scm-receipt-exception', title: '到货异常', path: '/scm/receipt-exceptions', icon: 'IconNotification', permission: 'scm:receipt:view' },
+      { key: 'scm-analytics', title: '采购分析', path: '/scm/analytics', icon: 'IconBarChart', permission: 'scm:purchase:view' },
     ],
   },
   {
@@ -105,6 +115,7 @@ export const menuConfig: MenuItem[] = [
       { key: 'aps-resource', title: '资源管理', path: '/aps/resources', icon: 'IconLayers', permission: 'aps:resource:view' },
       { key: 'aps-mrp', title: 'MRP 运算', path: '/aps/mrp', icon: 'IconSync', permission: 'aps:mrp:view' },
       { key: 'aps-capacity', title: '产能分析', path: '/aps/capacity', icon: 'IconBook', permission: 'aps:capacity:view' },
+      { key: 'aps-priority-rule', title: '优先级规则', path: '/aps/priority-rules', icon: 'IconSettings', permission: 'aps:schedule:view' },
     ],
   },
   {
@@ -118,6 +129,7 @@ export const menuConfig: MenuItem[] = [
       { key: 'eam-spare-part', title: '备件管理', path: '/eam/spare-part', icon: 'IconTool', permission: 'eam:sparepart:view' },
       { key: 'eam-oee', title: 'OEE 管理', path: '/eam/oee', icon: 'IconDashboard', permission: 'eam:oee:view' },
       { key: 'eam-knowledge', title: '故障知识库', path: '/eam/knowledge', icon: 'IconBook', permission: 'eam:knowledge:view' },
+      { key: 'eam-analytics', title: '维保分析', path: '/eam/analytics', icon: 'IconBarChart', permission: 'eam:maintenance:view' },
     ],
   },
   {
@@ -127,6 +139,23 @@ export const menuConfig: MenuItem[] = [
       { key: 'hr-cert-expiring', title: '认证预警', path: '/hr/certifications/expiring', icon: 'IconNotification', permission: 'hr:cert:view' },
       { key: 'hr-schedules', title: '排班管理', path: '/hr/schedules', icon: 'IconSchedule', permission: 'hr:schedule:view' },
       { key: 'hr-work-hours-summary', title: '工时查询', path: '/hr/work-hours/summary', icon: 'IconHistory', permission: 'hr:workhour:view' },
+      { key: 'hr-work-hours-dashboard', title: '工时看板', path: '/hr/work-hours/dashboard', icon: 'IconDashboard', permission: 'hr:workhour:view' },
+    ],
+  },
+  {
+    key: 'traceability', title: '追溯管理', icon: 'IconSearch',
+    children: [
+      { key: 'trace-dashboard', title: '追溯看板', path: '/traceability/dashboard', icon: 'IconDashboard', permission: 'traceability:dashboard:view' },
+      { key: 'trace-batch', title: '批次追溯', path: '/traceability/batches', icon: 'IconList', permission: 'traceability:batch:view' },
+      { key: 'trace-forward', title: '正向追溯', path: '/traceability', icon: 'IconArrowRight', permission: 'traceability:forward:view' },
+      { key: 'trace-backward', title: '反向追溯', path: '/traceability', icon: 'IconArrowLeft', permission: 'traceability:backward:view' },
+      { key: 'trace-recall', title: '召回管理', path: '/traceability/recall', icon: 'IconExport', permission: 'traceability:recall:view' },
+    ],
+  },
+  {
+    key: 'outsourcing', title: '外协加工', icon: 'IconRelation',
+    children: [
+      { key: 'oc-orders', title: '外协订单', path: '/outsourcing/orders', icon: 'IconFile', permission: 'outsourcing:order:view' },
     ],
   },
   {
@@ -140,16 +169,24 @@ export const menuConfig: MenuItem[] = [
     ],
   },
   {
+    key: 'platform', title: '平台管理', icon: 'IconCloud',
+    platformOnly: true,
+    children: [
+      { key: 'plat-tenant', title: '租户管理', path: '/sys/tenant', icon: 'IconUserGroup', permission: 'sys:tenant:view' },
+      { key: 'plat-monitor', title: '平台监控', path: '/sys/monitor', icon: 'IconDashboard', permission: 'sys:monitor:view' },
+    ],
+  },
+  {
     key: 'sys', title: '系统管理', icon: 'IconSettings',
     children: [
       { key: 'sys-user', title: '用户管理', path: '/sys/user', icon: 'IconUser', permission: 'sys:user:view' },
       { key: 'sys-role', title: '角色管理', path: '/sys/role', icon: 'IconCommon', permission: 'sys:role:view' },
-      { key: 'sys-audit-log', title: '审计日志', path: '/sys/audit-log', icon: 'IconBook', permission: 'sys:log:view' },
-      { key: 'sys-logs', title: '系统日志', path: '/sys/logs', icon: 'IconFile', permission: 'sys:log:view' },
-      { key: 'sys-monitor', title: '系统监控', path: '/sys/monitor', icon: 'IconDashboard', permission: 'sys:monitor:view' },
       { key: 'sys-organization', title: '组织架构', path: '/sys/organization', icon: 'IconNav', permission: 'sys:org:view' },
+      { key: 'sys-uom', title: '计量单位', path: '/sys/uom', icon: 'IconStorage', permission: 'sys:uom:view' },
       { key: 'sys-permission', title: '权限管理', path: '/sys/permission', icon: 'IconSafe', permission: 'sys:permission:view' },
       { key: 'sys-numbering', title: '通用编码管理', path: '/sys/numbering', icon: 'IconCode', permission: 'sys:config:view' },
+      { key: 'sys-config', title: '全局配置', path: '/sys/config', icon: 'IconSettings', permission: 'sys:config:view' },
+      { key: 'sys-audit-log', title: '审计日志', path: '/sys/audit-log', icon: 'IconBook', permission: 'sys:log:view' },
     ],
   },
 ]

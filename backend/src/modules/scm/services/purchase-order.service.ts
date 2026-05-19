@@ -3,6 +3,7 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
+import { NumberingService } from '../../base/services/numbering.service.js';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, EntityManager, DataSource } from 'typeorm';
 import {
@@ -77,34 +78,22 @@ export class PurchaseOrderService {
     @InjectRepository(ScmAsn)
     private readonly asnRepo: Repository<ScmAsn>,
     private readonly dataSource: DataSource,
+    private readonly numberingSvc: NumberingService,
   ) {}
 
   // ── poNo 生成 ───────────────────────────────────────────────────────────────
 
-  private async generatePoNo(
-    tenantId: string,
-    em: EntityManager,
-  ): Promise<string> {
-    const today = new Date();
-    const dateStr = today.toISOString().slice(0, 10).replace(/-/g, ''); // YYYYMMDD
-    const prefix = `PO-${dateStr}-`;
-
-    const result = await em
-      .createQueryBuilder(ScmPurchaseOrder, 'po')
-      .select('po.poNo', 'poNo')
-      .where('po.tenantId = :tenantId', { tenantId })
-      .andWhere('po.poNo LIKE :prefix', { prefix: `${prefix}%` })
-      .orderBy('po.poNo', 'DESC')
-      .limit(1)
-      .getRawOne<{ poNo: string }>();
-
-    let seq = 1;
-    if (result?.poNo) {
-      const lastSeq = parseInt(result.poNo.slice(prefix.length), 10);
-      if (!isNaN(lastSeq)) seq = lastSeq + 1;
+  private async generatePoNo(tenantId: string): Promise<string> {
+    try {
+      return await this.numberingSvc.generate('SCM_PO', tenantId);
+    } catch {
+      // 编码规则不存在时降级
+      const today = new Date();
+      const dateStr = today.toISOString().slice(0, 10).replace(/-/g, '');
+      const prefix = `PO-${dateStr}-`;
+      const count = await this.poRepo.count({ where: { tenantId } });
+      return `${prefix}${String(count + 1).padStart(3, '0')}`;
     }
-
-    return `${prefix}${String(seq).padStart(3, '0')}`;
   }
 
   // ── 1. create ───────────────────────────────────────────────────────────────
@@ -115,7 +104,7 @@ export class PurchaseOrderService {
     lines: CreatePoLineDto[],
   ): Promise<ScmPurchaseOrder> {
     return this.dataSource.transaction(async (em) => {
-      const poNo = await this.generatePoNo(tenantId, em);
+      const poNo = await this.generatePoNo(tenantId);
 
       // 计算 totalAmount
       const totalAmount = lines.reduce((sum, l) => {

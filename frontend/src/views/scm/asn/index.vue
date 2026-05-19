@@ -60,7 +60,7 @@ const total = ref(0)
 const query = reactive({ supplierId: '', status: '', page: 1, pageSize: 20 })
 
 const columns: MTableColumn[] = [
-  { key: 'code', title: t('scm.asn.index.ASN编号'), dataIndex: 'code', width: 130 },
+  { key: 'code', title: t('scm.asn.index.ASN编号'), dataIndex: 'asnNo', width: 130 },
   { key: 'supplierName', title: t('scm.asn.index.供应商'), dataIndex: 'supplierName', width: 150 },
   { key: 'poId', title: t('scm.asn.index.采购订单'), dataIndex: 'poId', width: 130 },
   { key: 'expectedDate', title: t('scm.asn.index.预计到货'), dataIndex: 'expectedDate', width: 120 },

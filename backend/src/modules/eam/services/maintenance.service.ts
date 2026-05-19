@@ -180,6 +180,9 @@ export class MaintenanceService {
 
     const qb = this.planRepo
       .createQueryBuilder('p')
+      .leftJoin('eam_equipment', 'eq', 'eq.id = p.equipment_id AND eq.tenant_id = p.tenant_id')
+      .addSelect('eq.equipment_name', 'equipmentName')
+      .addSelect('eq.equipment_code', 'equipmentCode')
       .where('p.tenantId = :tenantId', { tenantId });
 
     if (equipmentId)
@@ -189,11 +192,17 @@ export class MaintenanceService {
     if (startDate) qb.andWhere('p.plannedDate >= :startDate', { startDate });
     if (endDate) qb.andWhere('p.plannedDate <= :endDate', { endDate });
 
-    const [data, total] = await qb
+    const { entities, raw } = await qb
       .orderBy('p.plannedDate', 'ASC')
       .skip((page - 1) * pageSize)
       .take(pageSize)
-      .getManyAndCount();
+      .getRawAndEntities();
+    const total = await qb.getCount();
+    const data = entities.map((e, i) => ({
+      ...e,
+      equipmentName: raw[i]?.equipmentName,
+      equipmentCode: raw[i]?.equipmentCode,
+    }));
 
     return { data, total };
   }

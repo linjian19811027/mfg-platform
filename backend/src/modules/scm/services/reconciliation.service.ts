@@ -121,6 +121,8 @@ export class ReconciliationService {
 
     const qb = this.reconRepo
       .createQueryBuilder('r')
+      .leftJoin('scm_supplier', 'sup', 'sup.id = r.supplier_id AND sup.tenant_id = r.tenant_id')
+      .addSelect('sup.name', 'supplierName')
       .where('r.tenantId = :tenantId', { tenantId });
 
     if (status) qb.andWhere('r.status = :status', { status });
@@ -130,7 +132,9 @@ export class ReconciliationService {
       .skip((page - 1) * pageSize)
       .take(pageSize);
 
-    const [items, total] = await qb.getManyAndCount();
+    const { entities, raw } = await qb.getRawAndEntities();
+    const total = await qb.getCount();
+    const items = entities.map((e, i) => ({ ...e, supplierName: raw[i]?.supplierName }));
     return { items, total };
   }
 
