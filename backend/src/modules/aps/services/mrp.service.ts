@@ -97,7 +97,8 @@ export class MrpService {
     tenantId: string,
     input: MrpCalculateInput,
   ): Promise<MrpCalculateResult> {
-    const { soId, lines } = input;
+    const { soId } = input;
+    const lines = input.lines ?? [];
 
     // 生成 MRP 编号
     const mrpNo = await this.generateMrpNo(tenantId);

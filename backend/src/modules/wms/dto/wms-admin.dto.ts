@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import { IsInt, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
 
 export class PageQueryDto {
   @IsOptional()
@@ -56,25 +56,42 @@ export class CreateSafetyStockDto {
   @IsString()
   materialId!: string;
 
-  @Type(() => Number)
-  @IsInt()
-  @Min(0)
-  minQty!: number;
+  @IsOptional()
+  @IsString()
+  warehouseId?: string;
 
   @Type(() => Number)
-  @IsInt()
+  @IsNumber()
   @Min(0)
-  maxQty!: number;
+  safetyQty!: number;
+
+  @IsOptional()
+  @IsString()
+  uomId?: string;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(0)
+  reorderQty?: number;
 }
 
 export class CreateBarcodeRuleDto {
   @IsString()
-  ruleName!: string;
+  ruleType!: string;
 
   @IsString()
-  pattern!: string;
+  name!: string;
+
+  @IsString()
+  template!: string;
 
   @IsOptional()
   @IsString()
-  description?: string;
+  prefix?: string;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  serialLength?: number;
 }

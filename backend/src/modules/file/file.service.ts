@@ -128,4 +128,59 @@ export class FileService {
     }
     await this.fileRepo.delete(id);
   }
+
+  /** 读取文本文件内容 */
+  async readTextContent(id: string): Promise<{ content: string; mimeType?: string; originalName: string }> {
+    const tenantId = TenantContext.requireCurrentTenant();
+    const file = await this.fileRepo.findOne({ where: { id, tenantId } });
+    if (!file) throw new NotFoundException('FILE_NOT_FOUND');
+
+    const textMimes = ['text/plain', 'text/csv', 'application/json', 'text/xml', 'text/html', 'text/css', 'text/javascript'];
+    const isText = textMimes.some(m => (file.mimeType ?? '').includes(m.replace('text/', ''))) || (file.mimeType ?? '').startsWith('text/');
+    if (!isText) throw new BadRequestException('FILE_NOT_TEXT_TYPE');
+
+    const filePath = path.join(this.storagePath, file.fileKey);
+    if (!fs.existsSync(filePath)) throw new NotFoundException('FILE_NOT_FOUND_ON_DISK');
+
+    const content = fs.readFileSync(filePath, 'utf-8');
+    return { content, mimeType: file.mimeType, originalName: file.originalName };
+  }
+
+  /** 保存文本文件编辑（创建新版本） */
+  async saveTextContent(id: string, content: string, updatedBy: string): Promise<SysFile> {
+    const tenantId = TenantContext.requireCurrentTenant();
+    const file = await this.fileRepo.findOne({ where: { id, tenantId } });
+    if (!file) throw new NotFoundException('FILE_NOT_FOUND');
+
+    const filePath = path.join(this.storagePath, file.fileKey);
+    if (!fs.existsSync(filePath)) throw new NotFoundException('FILE_NOT_FOUND_ON_DISK');
+
+    // 写入新内容
+    const buffer = Buffer.from(content, 'utf-8');
+    fs.writeFileSync(filePath, buffer);
+
+    // 更新 checksum 和版本号
+    const checksum = crypto.createHash('md5').update(buffer).digest('hex');
+    await this.fileRepo.update(id, {
+      sizeBytes: String(buffer.length),
+      checksum,
+      version: file.version + 1,
+      uploadedBy: updatedBy,
+    } as any);
+
+    return this.fileRepo.findOne({ where: { id } }) as Promise<SysFile>;
+  }
+
+  /** 获取文件版本历史 */
+  async getVersions(id: string): Promise<SysFile[]> {
+    const tenantId = TenantContext.requireCurrentTenant();
+    const file = await this.fileRepo.findOne({ where: { id, tenantId } });
+    if (!file) throw new NotFoundException('FILE_NOT_FOUND');
+
+    // 查找同 fileKey 的所有版本
+    return this.fileRepo.find({
+      where: { tenantId, fileKey: file.fileKey },
+      order: { version: 'DESC' },
+    });
+  }
 }

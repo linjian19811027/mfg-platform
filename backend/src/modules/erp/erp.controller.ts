@@ -699,9 +699,10 @@ export class ErpController {
   @ApiOperation({ summary: '科目余额表' })
   getBalanceSheetAccounts(
     @CurrentTenant() tenantId: string,
-    @Query('period') period: string,
+    @Query('period') period?: string,
   ) {
-    return this.ledgerSvc.getBalanceSheet(tenantId, period);
+    const p = period ?? new Date().toISOString().slice(0, 7); // 默认当月 YYYY-MM
+    return this.ledgerSvc.getBalanceSheet(tenantId, p);
   }
 
   @Get('ledger/journal')
@@ -859,9 +860,11 @@ export class ErpController {
   @ApiOperation({ summary: '资产负债表' })
   getBalanceSheet(
     @CurrentTenant() tenantId: string,
-    @Query('date') date: string,
+    @Query('date') date?: string,
+    @Query('period') period?: string,
   ) {
-    return this.financialReportSvc.getBalanceSheet(tenantId, date);
+    const d = date ?? period ?? new Date().toISOString().slice(0, 7);
+    return this.financialReportSvc.getBalanceSheet(tenantId, d);
   }
 
   @Get('reports/income-statement')

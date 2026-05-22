@@ -2,6 +2,7 @@ import {
   Controller,
   Post,
   Get,
+  Put,
   Delete,
   Param,
   Body,
@@ -71,5 +72,36 @@ export class FileController {
   @ApiOperation({ summary: '删除文件' })
   delete(@Param('id') id: string) {
     return this.fileService.delete(id);
+  }
+
+  @Get(':id/preview')
+  @ApiOperation({ summary: '预览文件（内嵌显示）' })
+  async preview(@Param('id') id: string, @Res() res: Response) {
+    const { filePath, file } = await this.fileService.download(id);
+    res.setHeader('Content-Type', file.mimeType || 'application/octet-stream');
+    res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(file.originalName)}"`);
+    res.sendFile(path.resolve(filePath));
+  }
+
+  @Get(':id/content')
+  @ApiOperation({ summary: '读取文本文件内容' })
+  async readContent(@Param('id') id: string) {
+    return this.fileService.readTextContent(id);
+  }
+
+  @Put(':id/content')
+  @ApiOperation({ summary: '保存文本文件编辑' })
+  async saveContent(
+    @Param('id') id: string,
+    @Body() body: { content: string },
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.fileService.saveTextContent(id, body.content, user.sub);
+  }
+
+  @Get(':id/versions')
+  @ApiOperation({ summary: '获取文件版本历史' })
+  async getVersions(@Param('id') id: string) {
+    return this.fileService.getVersions(id);
   }
 }

@@ -44,6 +44,7 @@ import { ReportModule } from './modules/report/report.module.js';
 import { OutsourcingModule } from './modules/outsourcing/outsourcing.module.js';
 import { HrModule } from './modules/hr/hr.module.js';
 import { TraceabilityModule } from './modules/traceability/traceability.module.js';
+import { RptModule } from './modules/rpt/rpt.module.js';
 import { getDatabaseConfig } from './config/database.config.js';
 import { InitSeedService } from './modules/shared/seed/init-seed.service.js';
 
@@ -109,6 +110,7 @@ import { InitSeedService } from './modules/shared/seed/init-seed.service.js';
     OutsourcingModule,
     HrModule,
     TraceabilityModule,
+    RptModule,
   ],
   controllers: [AppController],
   providers: [
