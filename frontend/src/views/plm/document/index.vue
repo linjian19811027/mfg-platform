@@ -214,8 +214,8 @@ const uploading = ref(false)
 const uploadFormRef = ref()
 const uploadForm = reactive({ refType: '', refId: '', file: null as File | null })
 
-function onFileChange(_: unknown, fileList: { file: File }[]) {
-  uploadForm.file = fileList.length ? fileList[fileList.length - 1].file : null
+function onFileChange(fileList: any[]) {
+  uploadForm.file = fileList.length ? fileList[fileList.length - 1]?.file ?? null : null
 }
 
 function openUploadDrawer() {

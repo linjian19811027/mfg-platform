@@ -198,7 +198,7 @@ const columns = [
   { title: t('traceability.recall.index.受影响订单'), dataIndex: 'affectedSoCount', width: 120 },
   { title: t('traceability.recall.index.风险分布'), dataIndex: 'riskLevel', slotName: 'riskLevel', width: 250 },
   { title: t('traceability.recall.index.创建时间'), dataIndex: 'createdAt', width: 160 },
-  { title: t('traceability.recall.index.操作'), slotName: 'action', width: 200, fixed: 'right' },
+  { title: t('traceability.recall.index.操作'), slotName: 'action', width: 200, fixed: 'right' as const },
 ]
 
 onMounted(() => {

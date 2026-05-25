@@ -165,7 +165,7 @@ const columns = [
   { title: t('outsourcing.orders.index.状态'), dataIndex: 'status', slotName: 'status', width: 90 },
   { title: t('outsourcing.orders.index.计划交期'), dataIndex: 'plannedDeliveryDate', width: 120 },
   { title: t('outsourcing.orders.index.逾期'), dataIndex: 'isOverdue', slotName: 'isOverdue', width: 90 },
-  { title: t('outsourcing.orders.index.操作'), slotName: 'action', width: 180, fixed: 'right' },
+  { title: t('outsourcing.orders.index.操作'), slotName: 'action', width: 180, fixed: 'right' as const },
 ]
 
 const createVisible = ref(false)

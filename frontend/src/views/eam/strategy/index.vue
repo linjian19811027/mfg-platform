@@ -62,7 +62,7 @@ const formSchema: MFormField[] = [
   ]},
   { field: 'triggerValue', label: t('eam.strategy.lbl1148'), type: 'number', required: true, props: { min: 1 } },
   { field: 'content', label: t('eam.strategy.lbl1149'), type: 'textarea', props: { autoSize: { minRows: 2 } } },
-  { field: 'isActive', label: t('eam.strategy.status'), type: 'select', options: [{ label: t('eam.strategy.enable'), value: true }, { label: t('eam.strategy.disable'), value: false }] },
+  { field: 'isActive', label: t('eam.strategy.status'), type: 'select', options: [{ label: t('eam.strategy.enable'), value: 'true' as const }, { label: t('eam.strategy.disable'), value: 'false' as const }] },
 ]
 async function loadData() {
   loading.value = true

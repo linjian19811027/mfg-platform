@@ -160,8 +160,8 @@ async function loadTree() {
   }
 }
 
-function onNodeSelect(keys: string[], data: { node: TreeNode }) {
-  selectedKeys.value = keys
+function onNodeSelect(keys: (string | number)[], data: { node?: any }) {
+  selectedKeys.value = keys as string[]
   selectedCategory.value = keys.length ? data.node : null
   if (keys.length) loadMaterials()
 }

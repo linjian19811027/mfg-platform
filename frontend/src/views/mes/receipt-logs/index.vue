@@ -81,7 +81,7 @@ const columns = [
   { title: t('mes.receipt-logs.index.状态'), dataIndex: 'status', slotName: 'status', width: 90 },
   { title: t('mes.receipt-logs.index.重试次数'), dataIndex: 'retryCount', width: 90 },
   { title: t('mes.receipt-logs.index.创建时间'), dataIndex: 'createdAt', width: 160 },
-  { title: t('mes.receipt-logs.index.操作'), slotName: 'action', width: 140, fixed: 'right' },
+  { title: t('mes.receipt-logs.index.操作'), slotName: 'action', width: 140, fixed: 'right' as const },
 ]
 
 onMounted(fetchData)

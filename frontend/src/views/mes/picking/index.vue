@@ -23,7 +23,7 @@
         <a-descriptions :column="4" :data="[
           { label: t('mes.picking.workOrderCode'), value: currentWo.code },
           { label: t('mes.picking.lbl1295'), value: currentWo.materialName ?? currentWo.materialId },
-          { label: t('mes.picking.lbl1296'), value: currentWo.plannedQty },
+          { label: t('mes.picking.lbl1296'), value: String(currentWo.plannedQty) },
           { label: t('mes.picking.status'), value: currentWo.status },
         ]" />
       </a-card>

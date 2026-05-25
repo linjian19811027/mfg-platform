@@ -239,8 +239,8 @@ async function loadTree() {
   }
 }
 
-function handleSelect(keys: string[]) {
-  selectedKeys.value = keys
+function handleSelect(keys: (string | number)[]) {
+  selectedKeys.value = keys as string[]
   selectedOrg.value = keys.length ? (allNodes.value.find(n => n.id === keys[0]) ?? null) : null
 }
 

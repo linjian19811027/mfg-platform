@@ -61,7 +61,7 @@
 
     <!-- 效果验证弹窗 -->
     <a-modal v-model:visible="verifyModalVisible" :title="$t('qms.capa.index.效果验证')" :ok-loading="verifying" @ok="handleVerify" @cancel="verifyModalVisible = false">
-      <a-form layout="vertical">
+      <a-form :model="verifyForm" layout="vertical">
         <a-form-item :label="$t('qms.capa.index.验证结果')" required>
           <a-radio-group v-model="verifyForm.result">
             <a-radio value="EFFECTIVE">{{ $t('qms.capa.valid') }}</a-radio>
@@ -94,7 +94,7 @@ const loading = ref(false)
 const tableData = ref<any[]>([])
 const total = ref(0)
 const query = reactive({ keyword: '', status: '', page: 1, pageSize: 20 })
-const employeeOptions = ref<{ label: string; value: unknown }[]>([])
+const employeeOptions = ref<{ label: string; value: string | number }[]>([])
 
 const STATUS_MAP: Record<string, { label: string; color: string }> = {
   OPEN: { label: t('qms.capa.lbl1453'), color: 'red' },

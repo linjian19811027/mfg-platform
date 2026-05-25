@@ -38,7 +38,7 @@
 
     <!-- 入库/出库弹窗 -->
     <a-modal v-model:visible="inOutModalVisible" :title="inOutType === 'IN' ? $t('eam.spare-part.index.备件入库') : $t('eam.spare-part.index.备件出库')" :ok-loading="inOutting" @ok="handleInOut" @cancel="inOutModalVisible = false">
-      <a-form layout="vertical">
+      <a-form :model="inOutForm" layout="vertical">
         <a-form-item :label="$t('eam.spare-part.index.备件ID')" required><a-input v-model="inOutForm.sparePartId" /></a-form-item>
         <a-form-item :label="$t('eam.spare-part.index.数量')" required><a-input-number v-model="inOutForm.qty" :min="1" style="width:100%" /></a-form-item>
         <a-form-item :label="$t('common.remark')"><a-input v-model="inOutForm.remark" /></a-form-item>

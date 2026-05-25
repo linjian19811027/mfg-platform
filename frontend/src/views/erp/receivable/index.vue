@@ -30,7 +30,7 @@
       </MTable>
     </a-card>
     <a-modal v-model:visible="paymentModalVisible" :title="$t('erp.receivable.index.记录收款')" :ok-loading="paying" @ok="handlePayment" @cancel="paymentModalVisible = false">
-      <a-form layout="vertical">
+      <a-form :model="paymentForm" layout="vertical">
         <a-form-item :label="$t('erp.receivable.index.收款金额')" required><a-input-number v-model="paymentForm.amount" :min="0.01" :precision="2" style="width:100%" /></a-form-item>
         <a-form-item :label="$t('erp.receivable.index.收款日期')" required><a-date-picker v-model="paymentForm.paymentDate" style="width:100%" /></a-form-item>
         <a-form-item :label="$t('erp.receivable.index.银行账户')"><a-input v-model="paymentForm.bankAccount" /></a-form-item>

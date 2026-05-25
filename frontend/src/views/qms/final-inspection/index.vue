@@ -38,7 +38,7 @@
 
     <!-- 录入结果弹窗 -->
     <a-modal v-model:visible="resultModalVisible" :title="$t('qms.final-inspection.index.录入检验结果')" :ok-loading="submitting" @ok="handleSubmitResult" @cancel="resultModalVisible = false">
-      <a-form layout="vertical">
+      <a-form :model="resultForm" layout="vertical">
         <a-form-item :label="$t('qms.final-inspection.index.检验结果')" required>
           <a-radio-group v-model="resultForm.result">
             <a-radio value="PASS"><a-tag color="green">{{ $t('qms.final-inspection.qualified') }}</a-tag></a-radio>

@@ -30,7 +30,8 @@
     "arch:check:no-fk": "node scripts/check-no-foreign-keys.mjs",
     "arch:check:any-baseline": "node scripts/check-any-baseline.mjs",
     "arch:check:tenant": "node scripts/check-no-query-tenant.mjs",
-    "arch:guard": "npm run arch:check:no-fk && npm run arch:check:tenant && npm run arch:check:any-baseline"
+    "arch:guard": "npm run arch:check:no-fk && npm run arch:check:tenant && npm run arch:check:any-baseline",
+    "test:swagger:smoke": "jest --runInBand --testPathPatterns=openapi-smoke.spec.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",

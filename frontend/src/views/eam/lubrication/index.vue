@@ -50,7 +50,7 @@
 
     <!-- 记录润滑弹窗 -->
     <a-modal v-model:visible="recordModalVisible" :title="$t('eam.lubrication.index.记录润滑操作')" :ok-loading="recording" @ok="handleRecord" @cancel="recordModalVisible = false">
-      <a-form layout="vertical">
+      <a-form :model="recordForm" layout="vertical">
         <a-form-item :label="$t('eam.lubrication.index.润滑点')">
           <a-input :model-value="currentPoint?.pointName" disabled />
         </a-form-item>

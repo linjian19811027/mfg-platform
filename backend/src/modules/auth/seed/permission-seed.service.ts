@@ -32,11 +32,15 @@ export class PermissionSeedService implements OnApplicationBootstrap {
     // Flatten the tree into ordered list
     const flatList: SeedPermission[] = [];
 
-    function flatten(items: SeedPermission[]) {
+    function flatten(items: SeedPermission[], parentCode?: string) {
       for (const item of items) {
+        // 自动设置 parentCode（子项跟随父级的 code）
+        if (parentCode && !item.parentCode) {
+          (item as any).parentCode = parentCode;
+        }
         flatList.push(item);
         if (item.children) {
-          flatten(item.children as SeedPermission[]);
+          flatten(item.children as SeedPermission[], item.code);
         }
       }
     }
@@ -44,44 +48,66 @@ export class PermissionSeedService implements OnApplicationBootstrap {
 
     // Find new permissions that don't exist in DB yet
     const newItems = flatList.filter((item) => !existingCodes.has(item.code));
-    if (newItems.length === 0) {
-      this.logger.log(`All ${flatList.length} permissions already exist — nothing to seed`);
-      return;
-    }
-
-    this.logger.log(`Seeding ${newItems.length} new permissions...`);
     const codeMap = new Map<string, SysPermission>();
 
-    // Load existing permissions into codeMap for parent linking
+    // Load ALL existing permissions into codeMap
     for (const existing of await this.permRepo.find()) {
       codeMap.set(existing.code, existing);
     }
 
-    // First pass: insert new permissions, map code → entity
-    for (const item of newItems) {
-      const perm = new SysPermission();
-      perm.code = item.code;
-      perm.name = item.name;
-      perm.type = item.type;
-      perm.module = item.module;
-      perm.path = item.path ?? undefined;
-      perm.component = item.component ?? undefined;
-      perm.icon = item.icon ?? undefined;
-      perm.sortOrder = item.sortOrder ?? 0;
-      perm.isVisible = item.isVisible ?? 1;
-      perm.parentId = undefined; // will fix in second pass
-      const entity = await this.permRepo.save(perm);
-      codeMap.set(entity.code, entity);
+    // First pass: insert new permissions（同时设置 parentCode）
+    if (newItems.length > 0) {
+      this.logger.log(`Seeding ${newItems.length} new permissions...`);
+      for (const item of newItems) {
+        const perm = new SysPermission();
+        perm.code = item.code;
+        perm.name = item.name;
+        perm.type = item.type;
+        perm.module = item.module;
+        perm.path = item.path ?? undefined;
+        perm.component = item.component ?? undefined;
+        perm.icon = item.icon ?? undefined;
+        perm.sortOrder = item.sortOrder ?? 0;
+        perm.isVisible = item.isVisible ?? 1;
+        perm.parentCode = item.parentCode ?? undefined;
+        const entity = await this.permRepo.save(perm);
+        codeMap.set(entity.code, entity);
+      }
     }
 
-    // Second pass: link parentId using parentCode for new items
-    for (const item of newItems) {
-      if (item.parentCode && codeMap.has(item.code)) {
-        const parent = codeMap.get(item.parentCode);
-        if (parent) {
-          await this.permRepo.update({ code: item.code }, { parentId: parent.id });
-        }
+    // Second pass: 修正所有记录的 parentCode（确保已有记录的 parentCode 不为空）
+    let parentCodeFixed = 0;
+    for (const item of flatList) {
+      if (!item.parentCode) continue;
+      const entity = codeMap.get(item.code);
+      if (entity && !entity.parentCode) {
+        await this.permRepo.update({ code: item.code }, { parentCode: item.parentCode });
+        entity.parentCode = item.parentCode;
+        parentCodeFixed++;
       }
+    }
+    if (parentCodeFixed > 0) {
+      this.logger.log(`Fixed parentCode for ${parentCodeFixed} existing records`);
+    }
+
+    // Third pass: 修正所有记录的 parentId（不仅限新增，确保已有记录也正确关联）
+    let linked = 0;
+    for (const item of flatList) {
+      if (!item.parentCode) continue;
+      const entity = codeMap.get(item.code);
+      const parent = codeMap.get(item.parentCode);
+      if (entity && parent && String(entity.parentId) !== String(parent.id)) {
+        await this.permRepo.update({ code: item.code }, { parentId: parent.id });
+        linked++;
+      }
+    }
+
+    if (newItems.length === 0 && parentCodeFixed === 0 && linked === 0) {
+      this.logger.log(`All ${flatList.length} permissions already exist and linked — nothing to seed`);
+      return;
+    }
+    if (linked > 0) {
+      this.logger.log(`Linked ${linked} permissions to their parents`);
     }
 
     // Update TENANT_ADMIN role with any new permissions (if role exists)

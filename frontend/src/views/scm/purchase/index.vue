@@ -124,10 +124,10 @@ const detailItems = computed(() => {
   const o = currentOrder.value
   if (!o) return []
   return [
-    { label: t('scm.purchase.lbl1580'), value: o.code }, { label: t('scm.purchase.lbl1581'), value: o.supplierName },
-    { label: t('scm.purchase.status'), value: statusLabel(o.status) }, { label: t('scm.purchase.lbl1582'), value: o.totalAmount },
-    { label: t('scm.purchase.lbl1583'), value: o.currency }, { label: t('scm.purchase.lbl1584'), value: o.orderDate },
-    { label: t('scm.purchase.lbl1585'), value: o.expectedDate },
+    { label: t('scm.purchase.lbl1580'), value: o.code ?? '-' }, { label: t('scm.purchase.lbl1581'), value: o.supplierName ?? '-' },
+    { label: t('scm.purchase.status'), value: statusLabel(o.status) }, { label: t('scm.purchase.lbl1582'), value: String(o.totalAmount) },
+    { label: t('scm.purchase.lbl1583'), value: o.currency ?? '-' }, { label: t('scm.purchase.lbl1584'), value: o.orderDate ?? '-' },
+    { label: t('scm.purchase.lbl1585'), value: o.expectedDate ?? '-' },
   ]
 })
 

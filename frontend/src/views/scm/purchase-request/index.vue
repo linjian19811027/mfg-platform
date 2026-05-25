@@ -70,7 +70,7 @@
 
     <!-- 转采购订单弹窗 -->
     <a-modal v-model:visible="convertModalVisible" :title="$t('scm.purchase-request.index.转采购订单')" :ok-loading="converting" @ok="handleConvert" @cancel="convertModalVisible = false">
-      <a-form layout="vertical">
+      <a-form :model="convertForm" layout="vertical">
         <a-form-item :label="$t('scm.purchase-request.index.供应商')" required>
           <SupplierSelect v-model="convertForm.supplierId" />
         </a-form-item>

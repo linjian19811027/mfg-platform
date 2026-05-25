@@ -171,6 +171,9 @@ export class AuthService {
       tokenVersion: user.tokenVersion ?? 0,
     };
 
+    // 9. 构建菜单树
+    const menus = await this.getMenus(tenant.code, roles, permissions);
+
     return {
       accessToken: this.jwtService.sign(payload),
       refreshToken: this.jwtService.sign(payload, {
@@ -187,6 +190,7 @@ export class AuthService {
         permissions,
         enabledModules: tenant.enabledModules ?? [],
       },
+      menus,
     };
   }
 
@@ -234,6 +238,91 @@ export class AuthService {
     return bcrypt.hash(plain, SALT_ROUNDS);
   }
 
+  /**
+   * 构建菜单树：查全部权限建树（保持父子关系），只返回 MENU 类型节点
+   */
+  async getMenus(tenantCode: string, roles: string[], permissions: string[]): Promise<Record<string, unknown>[]> {
+    const isSuperAdmin = roles.includes('SUPER_ADMIN');
+
+    // 查全部权限（不仅 MENU，也查 BUTTON/API，用于构建完整父子关系）
+    const allPerms = await this.permRepo.find({
+      order: { sortOrder: 'ASC' },
+    });
+
+    // 超管看全部，其他角色按 enabledModules 过滤
+    let visibleIds: Set<string> | null = null;
+    if (!isSuperAdmin) {
+      const tenant = await this.tenantRepo.findOne({
+        where: { code: tenantCode },
+        select: ['enabledModules'],
+      });
+      const enabled = tenant?.enabledModules ?? [];
+      const alwaysVisible = new Set(['SYS', 'BASE']);
+      visibleIds = new Set(
+        allPerms
+          .filter((p) => alwaysVisible.has(p.module) || enabled.includes(p.module))
+          .map((p) => p.id),
+      );
+    }
+
+    // 构建完整树（所有类型），然后只保留 MENU 节点
+    const tree = this.buildMenuTree(allPerms, visibleIds);
+
+    // 诊断日志
+    const menuCount = allPerms.filter(p => p.type === 'MENU').length;
+    const linkedCount = allPerms.filter(p => p.parentCode).length;
+    this.logger.log(`[getMenus] total=${allPerms.length} menu=${menuCount} parentCodeSet=${linkedCount} tree=${tree.length}`);
+
+    return tree;
+  }
+
+  /**
+   * 构建菜单树
+   * @param allPerms 全部权限（用于构建父子关系）
+   * @param visibleIds 可见权限 ID 集合（null = 全部可见）
+   *
+   * 使用 parentCode（如 'plm'、'mes'）而非 parentId（数据库 ID）构建树，
+   * 因为 parentCode 在种子阶段直接赋值，不依赖单独的 linking pass。
+   */
+  private buildMenuTree(allPerms: SysPermission[], visibleIds: Set<string> | null): Record<string, unknown>[] {
+    // 按 parentCode 分组（parentCode=null 的为根节点）
+    const childrenMap = new Map<string, SysPermission[]>();
+    for (const p of allPerms) {
+      const pid = p.parentCode ?? '__root__';
+      if (!childrenMap.has(pid)) childrenMap.set(pid, []);
+      childrenMap.get(pid)!.push(p);
+    }
+
+    // 递归构建树，只保留 MENU 类型 + 可见节点
+    const build = (parentCode: string): Record<string, unknown>[] => {
+      const children = childrenMap.get(parentCode) ?? [];
+      const result: Record<string, unknown>[] = [];
+
+      for (const m of children) {
+        // 可见性检查
+        if (visibleIds && !visibleIds.has(m.id)) continue;
+
+        // 只保留 MENU 类型节点（BUTTON/API 不进菜单）
+        if (m.type !== 'MENU') continue;
+
+        const childNodes = build(m.code);
+
+        result.push({
+          key: m.code,
+          title: m.name,
+          icon: m.icon,
+          path: m.path,
+          sortOrder: m.sortOrder,
+          children: childNodes.length > 0 ? childNodes : undefined,
+        });
+      }
+
+      return result.sort((a, b) => ((a.sortOrder as number) ?? 0) - ((b.sortOrder as number) ?? 0));
+    };
+
+    return build('__root__');
+  }
+
   async switchTenant(userId: string, tenantCode: string) {
     // 验证目标租户存在且活跃
     const tenant = await this.tenantRepo.findOne({
@@ -269,10 +358,13 @@ export class AuthService {
       permissions,
     };
 
+    const menus = await this.getMenus(tenantCode, roles, permissions);
+
     return {
       accessToken: this.jwtService.sign(payload),
       refreshToken: this.jwtService.sign(payload, { expiresIn: this.config.get('JWT_REFRESH_EXPIRES_IN', '7d') }),
       tenantId: tenantCode,
+      menus,
     };
   }
 

@@ -280,7 +280,7 @@
       @ok="handleCopy"
       @cancel="copyModalVisible = false"
     >
-      <a-form layout="vertical">
+      <a-form :model="{copyTargetMaterialId}" layout="vertical">
         <a-form-item :label="$t('plm.routing.目标物料可选留空则复')">
           <a-select
             v-model="copyTargetMaterialId"

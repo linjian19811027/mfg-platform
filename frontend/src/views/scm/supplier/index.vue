@@ -92,9 +92,9 @@ const detailItems = computed(() => {
   if (!s) return []
   return [
     { label: t('scm.supplier.code'), value: s.code }, { label: t('scm.supplier.name'), value: s.name },
-    { label: t('scm.supplier.lbl1640'), value: s.grade }, { label: t('scm.supplier.status'), value: statusLabel(s.status) },
-    { label: t('scm.supplier.lbl1641'), value: s.contactName }, { label: t('scm.supplier.lbl1642'), value: s.contactPhone },
-    { label: t('scm.supplier.lbl1643'), value: s.email },
+    { label: t('scm.supplier.lbl1640'), value: s.grade ?? '-' }, { label: t('scm.supplier.status'), value: statusLabel(s.status) },
+    { label: t('scm.supplier.lbl1641'), value: s.contactName ?? '-' }, { label: t('scm.supplier.lbl1642'), value: s.contactPhone ?? '-' },
+    { label: t('scm.supplier.lbl1643'), value: s.email ?? '-' },
   ]
 })
 

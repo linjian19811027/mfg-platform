@@ -15,7 +15,7 @@
             >
               <a-checkbox
                 :model-value="visibleKeys.includes(col.key)"
-                @change="(val: boolean) => toggleColumn(col.key, val)"
+                @change="(val: boolean | (string | number | boolean)[]) => toggleColumn(col.key, !!val)"
               >
                 {{ col.title }}
               </a-checkbox>
@@ -163,7 +163,7 @@ const tableColumns = computed(() =>
         key: col.key,
         width: col.width,
         ellipsis: col.ellipsis,
-        sortable: col.sortable ? { sortDirections: ['ascend', 'descend'] } : undefined,
+        sortable: col.sortable ? { sortDirections: ['ascend' as const, 'descend' as const] } : undefined,
         slotName: col.slotName,
       }
     }
@@ -174,7 +174,7 @@ const tableColumns = computed(() =>
       key: col.key,
       width: col.width,
       ellipsis: col.ellipsis,
-      sortable: col.sortable ? { sortDirections: ['ascend', 'descend'] } : undefined,
+      sortable: col.sortable ? { sortDirections: ['ascend' as const, 'descend' as const] } : undefined,
       render: col.render
         ? ({ record }: { record: Record<string, unknown> }) => col.render!(record)
         : ({ record }: { record: Record<string, unknown> }) => {

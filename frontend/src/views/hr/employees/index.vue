@@ -175,7 +175,7 @@ const columns = [
   { title: t('hr.employees.index.状态'), dataIndex: 'status', slotName: 'status', width: 80 },
   { title: t('hr.employees.index.入职日期'), dataIndex: 'hireDate', width: 120 },
   { title: t('hr.employees.index.联系电话'), dataIndex: 'phone', width: 130 },
-  { title: t('hr.employees.index.操作'), slotName: 'action', width: 180, fixed: 'right' },
+  { title: t('hr.employees.index.操作'), slotName: 'action', width: 180, fixed: 'right' as const },
 ]
 
 const modalVisible = ref(false)

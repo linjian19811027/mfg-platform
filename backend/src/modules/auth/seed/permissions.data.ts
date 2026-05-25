@@ -247,6 +247,15 @@ export const SEED_PERMISSIONS: SeedPermission[] = [
       { code: 'qms:capa:view', name: '查看 CAPA', type: 'BUTTON', module: 'QMS', parentCode: 'qms:capa' },
       { code: 'qms:capa:create', name: '创建 CAPA', type: 'BUTTON', module: 'QMS', parentCode: 'qms:capa' },
       { code: 'qms:capa:approve', name: '审批 CAPA', type: 'BUTTON', module: 'QMS', parentCode: 'qms:capa' },
+
+      { code: 'qms:final', name: '成品检验', type: 'MENU', module: 'QMS',
+        path: '/qms/final-inspection', component: '/views/qms/final-inspection/index.vue', icon: 'IconSkin', sortOrder: 25 },
+      { code: 'qms:supplier', name: '供应商质量', type: 'MENU', module: 'QMS',
+        path: '/qms/supplier-quality', component: '/views/qms/supplier-quality/index.vue', icon: 'IconUser', sortOrder: 30 },
+      { code: 'qms:complaint', name: '客户投诉', type: 'MENU', module: 'QMS',
+        path: '/qms/complaints', component: '/views/qms/complaint/index.vue', icon: 'IconBulb', sortOrder: 35 },
+      { code: 'qms:recall', name: '召回管理', type: 'MENU', module: 'QMS',
+        path: '/qms/recalls', component: '/views/qms/recall/index.vue', icon: 'IconExport', sortOrder: 40 },
     ],
   },
 
@@ -275,6 +284,25 @@ export const SEED_PERMISSIONS: SeedPermission[] = [
 
       { code: 'scm:evaluation', name: '供应商评估', type: 'MENU', module: 'SCM',
         path: '/scm/evaluations', component: '/views/scm/evaluation/index.vue', icon: 'IconStar', sortOrder: 15 },
+
+      { code: 'scm:asn', name: 'ASN 到货通知', type: 'MENU', module: 'SCM',
+        path: '/scm/asn', component: '/views/scm/asn/index.vue', icon: 'IconMessage', sortOrder: 20 },
+      { code: 'scm:rfq', name: '询价管理', type: 'MENU', module: 'SCM',
+        path: '/scm/rfqs', component: '/views/scm/rfq/index.vue', icon: 'IconSearch', sortOrder: 25 },
+      { code: 'scm:receipt', name: '到货记录', type: 'MENU', module: 'SCM',
+        path: '/scm/receipt', component: '/views/scm/receipt/index.vue', icon: 'IconDownload', sortOrder: 30 },
+      { code: 'scm:reconcile', name: '供应商对账', type: 'MENU', module: 'SCM',
+        path: '/scm/reconciliations', component: '/views/scm/reconciliation/index.vue', icon: 'IconRelation', sortOrder: 35 },
+      { code: 'scm:performance', name: '供应商绩效', type: 'MENU', module: 'SCM',
+        path: '/scm/supplier-performance', component: '/views/scm/performance/index.vue', icon: 'IconDashboard', sortOrder: 40 },
+      { code: 'scm:price-agreement', name: '价格协议', type: 'MENU', module: 'SCM',
+        path: '/scm/price-agreements', component: '/views/scm/price-agreement/index.vue', icon: 'IconSafe', sortOrder: 45 },
+      { code: 'scm:qualification', name: '供应商资质', type: 'MENU', module: 'SCM',
+        path: '/scm/qualifications', component: '/views/scm/qualification/index.vue', icon: 'IconCheckCircle', sortOrder: 50 },
+      { code: 'scm:receipt-exception', name: '到货异常', type: 'MENU', module: 'SCM',
+        path: '/scm/receipt-exceptions', component: '/views/scm/receipt-exception/index.vue', icon: 'IconNotification', sortOrder: 55 },
+      { code: 'scm:analytics', name: '采购分析', type: 'MENU', module: 'SCM',
+        path: '/scm/analytics', component: '/views/scm/analytics/index.vue', icon: 'IconBarChart', sortOrder: 60 },
     ],
   },
 
@@ -303,6 +331,33 @@ export const SEED_PERMISSIONS: SeedPermission[] = [
 
       { code: 'erp:mrp', name: 'MRP 物料需求', type: 'MENU', module: 'ERP',
         path: '/erp/mrp', component: '/views/erp/mrp/index.vue', icon: 'IconGrid', sortOrder: 20 },
+
+      { code: 'erp:voucher', name: '财务凭证', type: 'MENU', module: 'ERP',
+        path: '/erp/voucher', component: '/views/erp/voucher/index.vue', icon: 'IconAudit', sortOrder: 25 },
+      { code: 'erp:shipment', name: '发货管理', type: 'MENU', module: 'ERP',
+        path: '/erp/shipments', component: '/views/erp/shipment/index.vue', icon: 'IconTruck', sortOrder: 30 },
+      { code: 'erp:return', name: '销售退货', type: 'MENU', module: 'ERP',
+        path: '/erp/sales-returns', component: '/views/erp/sales-return/index.vue', icon: 'IconUndo', sortOrder: 35 },
+      { code: 'erp:receivable', name: '应收账款', type: 'MENU', module: 'ERP',
+        path: '/erp/receivables', component: '/views/erp/receivable/index.vue', icon: 'IconDoubleDown', sortOrder: 40 },
+      { code: 'erp:payable', name: '应付账款', type: 'MENU', module: 'ERP',
+        path: '/erp/payables', component: '/views/erp/payable/index.vue', icon: 'IconDoubleUp', sortOrder: 45 },
+      { code: 'erp:account', name: '科目管理', type: 'MENU', module: 'ERP',
+        path: '/erp/accounts', component: '/views/erp/account/index.vue', icon: 'IconStorage', sortOrder: 50 },
+      { code: 'erp:cost-center', name: '成本中心', type: 'MENU', module: 'ERP',
+        path: '/erp/cost-centers', component: '/views/erp/cost-center/index.vue', icon: 'IconNav', sortOrder: 55 },
+      { code: 'erp:std-cost', name: '标准成本', type: 'MENU', module: 'ERP',
+        path: '/erp/standard-costs', component: '/views/erp/standard-cost/index.vue', icon: 'IconSafe', sortOrder: 60 },
+      { code: 'erp:cost-analysis', name: '成本分析', type: 'MENU', module: 'ERP',
+        path: '/erp/cost-analysis', component: '/views/erp/cost-analysis/index.vue', icon: 'IconBarChart', sortOrder: 65 },
+      { code: 'erp:sales-analytics', name: '销售分析', type: 'MENU', module: 'ERP',
+        path: '/erp/sales-analytics', component: '/views/erp/sales-analytics/index.vue', icon: 'IconDashboard', sortOrder: 70 },
+      { code: 'erp:cost-element', name: '成本要素', type: 'MENU', module: 'ERP',
+        path: '/erp/cost-elements', component: '/views/erp/cost-element/index.vue', icon: 'IconStorage', sortOrder: 75 },
+      { code: 'erp:ledger', name: '总账', type: 'MENU', module: 'ERP',
+        path: '/erp/ledger/general', component: '/views/erp/ledger/index.vue', icon: 'IconBook', sortOrder: 80 },
+      { code: 'erp:financial-report', name: '财务报表', type: 'MENU', module: 'ERP',
+        path: '/erp/financial-reports', component: '/views/erp/financial-report/index.vue', icon: 'IconBarChart', sortOrder: 85 },
     ],
   },
 
@@ -361,6 +416,17 @@ export const SEED_PERMISSIONS: SeedPermission[] = [
 
       { code: 'aps:gantt', name: '甘特图', type: 'MENU', module: 'APS',
         path: '/aps/gantt', component: '/views/aps/gantt/index.vue', icon: 'IconGrid', sortOrder: 5 },
+
+      { code: 'aps:calendar', name: '资源日历', type: 'MENU', module: 'APS',
+        path: '/aps/calendar', component: '/views/aps/calendar/index.vue', icon: 'IconCalendar', sortOrder: 10 },
+      { code: 'aps:resource', name: '资源管理', type: 'MENU', module: 'APS',
+        path: '/aps/resources', component: '/views/aps/resource/index.vue', icon: 'IconLayers', sortOrder: 15 },
+      { code: 'aps:mrp', name: 'MRP 运算', type: 'MENU', module: 'APS',
+        path: '/aps/mrp', component: '/views/aps/mrp/index.vue', icon: 'IconSync', sortOrder: 20 },
+      { code: 'aps:capacity', name: '产能分析', type: 'MENU', module: 'APS',
+        path: '/aps/capacity', component: '/views/aps/capacity/index.vue', icon: 'IconBook', sortOrder: 25 },
+      { code: 'aps:priority-rule', name: '优先级规则', type: 'MENU', module: 'APS',
+        path: '/aps/priority-rules', component: '/views/aps/priority-rule/index.vue', icon: 'IconSettings', sortOrder: 30 },
     ],
   },
 
@@ -387,6 +453,8 @@ export const SEED_PERMISSIONS: SeedPermission[] = [
 
       { code: 'hr:workhour', name: '工时查询', type: 'MENU', module: 'HR',
         path: '/hr/work-hours/summary', component: '/views/hr/work-hours/summary.vue', icon: 'IconHistory', sortOrder: 15 },
+      { code: 'hr:workhour-dashboard', name: '工时看板', type: 'MENU', module: 'HR',
+        path: '/hr/work-hours/dashboard', component: '/views/hr/work-hours/dashboard.vue', icon: 'IconDashboard', sortOrder: 20 },
     ],
   },
 
@@ -399,6 +467,8 @@ export const SEED_PERMISSIONS: SeedPermission[] = [
     children: [
       { code: 'traceability:forward', name: '正向追溯', type: 'MENU', module: 'TRACEABILITY',
         path: '/traceability/forward', component: '/views/traceability/forward/index.vue', icon: 'IconArrowForward', sortOrder: 1 },
+      { code: 'traceability:batch', name: '批次追溯', type: 'MENU', module: 'TRACEABILITY',
+        path: '/traceability/batches', component: '/views/traceability/batch/index.vue', icon: 'IconList', sortOrder: 3 },
       { code: 'traceability:backward', name: '反向追溯', type: 'MENU', module: 'TRACEABILITY',
         path: '/traceability/backward', component: '/views/traceability/backward/index.vue', icon: 'IconArrowBack', sortOrder: 5 },
       { code: 'traceability:recall', name: '召回管理', type: 'MENU', module: 'TRACEABILITY',
@@ -420,6 +490,32 @@ export const SEED_PERMISSIONS: SeedPermission[] = [
       { code: 'outsourcing:order:view', name: '查看外协订单', type: 'BUTTON', module: 'OUTSOURCING', parentCode: 'outsourcing:order' },
       { code: 'outsourcing:order:create', name: '创建外协订单', type: 'BUTTON', module: 'OUTSOURCING', parentCode: 'outsourcing:order' },
       { code: 'outsourcing:order:receive', name: '外协收货', type: 'BUTTON', module: 'OUTSOURCING', parentCode: 'outsourcing:order' },
+    ],
+  },
+
+  // ════════════════════════════════════════════
+  // RPT 报表设计
+  // ════════════════════════════════════════════
+  {
+    code: 'rpt', name: '报表设计', type: 'MENU', module: 'RPT',
+    icon: 'IconBarChart', sortOrder: 115, isVisible: 1,
+    children: [
+      { code: 'rpt:list', name: '我的报表', type: 'MENU', module: 'RPT',
+        path: '/rpt/list', component: '/views/rpt/list/index.vue', icon: 'IconFile', sortOrder: 1 },
+    ],
+  },
+
+  // ════════════════════════════════════════════
+  // 平台管理（仅超管可见）
+  // ════════════════════════════════════════════
+  {
+    code: 'platform', name: '平台管理', type: 'MENU', module: 'PLATFORM',
+    icon: 'IconCloud', sortOrder: 250, isVisible: 1,
+    children: [
+      { code: 'platform:tenant', name: '租户管理', type: 'MENU', module: 'PLATFORM',
+        path: '/sys/tenant', component: '/views/sys/tenant/index.vue', icon: 'IconUserGroup', sortOrder: 1 },
+      { code: 'platform:monitor', name: '平台监控', type: 'MENU', module: 'PLATFORM',
+        path: '/sys/monitor', component: '/views/sys/monitor/index.vue', icon: 'IconDashboard', sortOrder: 5 },
     ],
   },
 
@@ -500,7 +596,7 @@ export const SEED_PERMISSIONS: SeedPermission[] = [
 
       { code: 'sys:numbering', name: '通用编码管理', type: 'MENU', module: 'SYS',
         path: '/sys/numbering', component: '/views/sys/numbering/index.vue', icon: 'IconCode', sortOrder: 30 },
-      { code: 'sys:config:view', name: '查看配置', type: 'BUTTON', module: 'SYS', parentCode: 'sys:numbering' },
+      { code: 'sys:numbering:view', name: '查看编码规则', type: 'BUTTON', module: 'SYS', parentCode: 'sys:numbering' },
 
       { code: 'sys:permission', name: '权限管理', type: 'MENU', module: 'SYS',
         path: '/sys/permission', component: '/views/sys/permission/index.vue', icon: 'IconSafe', sortOrder: 32 },
@@ -526,49 +622,6 @@ export const SEED_PERMISSIONS: SeedPermission[] = [
   },
 
   // ════════════════════════════════════════════
-  // 追溯管理
-  // ════════════════════════════════════════════
-  {
-    code: 'traceability', name: '追溯管理', type: 'MENU', module: 'TRACEABILITY',
-    icon: 'IconSearch', sortOrder: 90, isVisible: 1,
-    children: [
-      { code: 'traceability:dashboard', name: '追溯看板', type: 'MENU', module: 'TRACEABILITY',
-        path: '/traceability/dashboard', component: '/views/traceability/dashboard/index.vue', icon: 'IconDashboard', sortOrder: 1 },
-      { code: 'traceability:dashboard:view', name: '查看追溯看板', type: 'BUTTON', module: 'TRACEABILITY', parentCode: 'traceability:dashboard' },
-
-      { code: 'traceability:batch', name: '批次追溯', type: 'MENU', module: 'TRACEABILITY',
-        path: '/traceability/batches', component: '/views/traceability/batches/index.vue', icon: 'IconList', sortOrder: 5 },
-      { code: 'traceability:batch:view', name: '查看批次', type: 'BUTTON', module: 'TRACEABILITY', parentCode: 'traceability:batch' },
-
-      { code: 'traceability:forward', name: '正向追溯', type: 'MENU', module: 'TRACEABILITY',
-        path: '/traceability', component: '/views/traceability/index.vue', icon: 'IconArrowRight', sortOrder: 10 },
-      { code: 'traceability:forward:view', name: '正向追溯查看', type: 'BUTTON', module: 'TRACEABILITY', parentCode: 'traceability:forward' },
-
-      { code: 'traceability:backward', name: '反向追溯', type: 'MENU', module: 'TRACEABILITY',
-        path: '/traceability', component: '/views/traceability/index.vue', icon: 'IconArrowLeft', sortOrder: 15 },
-      { code: 'traceability:backward:view', name: '反向追溯查看', type: 'BUTTON', module: 'TRACEABILITY', parentCode: 'traceability:backward' },
-
-      { code: 'traceability:recall', name: '召回管理', type: 'MENU', module: 'TRACEABILITY',
-        path: '/traceability/recall', component: '/views/traceability/recall/index.vue', icon: 'IconExport', sortOrder: 20 },
-      { code: 'traceability:recall:view', name: '查看召回', type: 'BUTTON', module: 'TRACEABILITY', parentCode: 'traceability:recall' },
-    ],
-  },
-
-  // ════════════════════════════════════════════
-  // 外协加工
-  // ════════════════════════════════════════════
-  {
-    code: 'outsourcing', name: '外协加工', type: 'MENU', module: 'OUTSOURCING',
-    icon: 'IconRelation', sortOrder: 95, isVisible: 1,
-    children: [
-      { code: 'outsourcing:order', name: '外协订单', type: 'MENU', module: 'OUTSOURCING',
-        path: '/outsourcing/orders', component: '/views/outsourcing/orders/index.vue', icon: 'IconFile', sortOrder: 1 },
-      { code: 'outsourcing:order:view', name: '查看外协订单', type: 'BUTTON', module: 'OUTSOURCING', parentCode: 'outsourcing:order' },
-      { code: 'outsourcing:order:create', name: '创建外协订单', type: 'BUTTON', module: 'OUTSOURCING', parentCode: 'outsourcing:order' },
-    ],
-  },
-
-  // ════════════════════════════════════════════
   // 补充缺失的权限码（为已有 MENU 添加 :view BUTTON）
   // ════════════════════════════════════════════
   // QMS 补充
@@ -590,7 +643,6 @@ export const SEED_PERMISSIONS: SeedPermission[] = [
   // ERP 补充
   { code: 'erp:customer:view', name: '查看客户', type: 'BUTTON', module: 'ERP', parentCode: 'erp' },
   { code: 'erp:salesorder:view', name: '查看销售订单', type: 'BUTTON', module: 'ERP', parentCode: 'erp' },
-  { code: 'erp:quotation:view', name: '查看报价', type: 'BUTTON', module: 'ERP', parentCode: 'erp' },
   { code: 'erp:shipment:view', name: '查看发货', type: 'BUTTON', module: 'ERP', parentCode: 'erp' },
   { code: 'erp:return:view', name: '查看退货', type: 'BUTTON', module: 'ERP', parentCode: 'erp' },
   { code: 'erp:receivable:view', name: '查看应收', type: 'BUTTON', module: 'ERP', parentCode: 'erp' },
@@ -626,12 +678,9 @@ export const SEED_PERMISSIONS: SeedPermission[] = [
   { code: 'sys:log:view', name: '查看日志', type: 'BUTTON', module: 'SYS', parentCode: 'sys:audit' },
   { code: 'sys:monitor:view', name: '查看监控', type: 'BUTTON', module: 'SYS', parentCode: 'sys' },
 
-  // BASE 补充
+  // BASE 补充（已在主体树中定义的不重复）
   { code: 'base:file:view', name: '查看文件', type: 'BUTTON', module: 'BASE', parentCode: 'base:file' },
   { code: 'base:certtype:view', name: '查看认证类型', type: 'BUTTON', module: 'BASE', parentCode: 'base:cert-type' },
-  { code: 'base:batch:view', name: '查看批次', type: 'BUTTON', module: 'BASE', parentCode: 'base:batch' },
-  { code: 'base:shift:view', name: '查看班次', type: 'BUTTON', module: 'BASE', parentCode: 'base:shift' },
-  { code: 'base:work-center:view', name: '查看工作中心', type: 'BUTTON', module: 'BASE', parentCode: 'base:work-center' },
 
   // PLM 补充
   { code: 'plm:code:view', name: '查看编码规则', type: 'BUTTON', module: 'PLM', parentCode: 'plm:code-rule' },

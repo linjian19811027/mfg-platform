@@ -30,10 +30,10 @@ const STATUS_TRANSITIONS: Record<string, string[]> = {
 // 各状态允许操作的角色（空数组=任意角色可操作）
 const STATUS_ALLOWED_ROLES: Record<string, string[]> = {
   DESIGN: [],
-  TRIAL: ['ENGINEER', 'ADMIN'],
-  ACTIVE: ['ENGINEER', 'ADMIN'],
-  INACTIVE: ['ENGINEER', 'ADMIN'],
-  OBSOLETE: ['ADMIN'],
+  TRIAL: ['ENGINEER', 'ADMIN', 'TENANT_ADMIN'],
+  ACTIVE: ['ENGINEER', 'ADMIN', 'TENANT_ADMIN'],
+  INACTIVE: ['ENGINEER', 'ADMIN', 'TENANT_ADMIN'],
+  OBSOLETE: ['ADMIN', 'TENANT_ADMIN'],
 };
 
 export interface MaterialQuery {
@@ -187,7 +187,6 @@ export class MaterialService {
 
     const updateData = {
       ...allowedData,
-      updatedBy: UserContext.getCurrentUserId(),
     };
     await this.repo.update(id, updateData);
     // 失效缓存

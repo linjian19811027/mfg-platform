@@ -19,7 +19,7 @@
       </MTable>
     </a-card>
     <a-modal v-model:visible="paymentModalVisible" :title="$t('erp.payable.index.记录付款')" :ok-loading="paying" @ok="handlePayment" @cancel="paymentModalVisible = false">
-      <a-form layout="vertical">
+      <a-form :model="paymentForm" layout="vertical">
         <a-form-item :label="$t('erp.payable.index.付款金额')" required><a-input-number v-model="paymentForm.amount" :min="0.01" :precision="2" style="width:100%" /></a-form-item>
         <a-form-item :label="$t('erp.payable.index.付款日期')" required><a-date-picker v-model="paymentForm.paymentDate" style="width:100%" /></a-form-item>
         <a-form-item :label="t('erp.payable.r33016')"><a-select v-model="paymentForm.method"><a-option value="BANK_TRANSFER">{{ $t('erp.payable.bankTransfer') }}</a-option><a-option value="CHECK">{{ $t('erp.payable.r44001') }}</a-option><a-option value="CASH">{{ $t('erp.payable.cash') }}</a-option></a-select></a-form-item>

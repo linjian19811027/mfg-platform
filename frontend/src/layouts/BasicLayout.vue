@@ -136,8 +136,7 @@
 import { ref, watch, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { useAuthStore } from '@/stores/auth'
-import { menuConfig, type MenuItem } from '@/config/menu'
+import { useAuthStore, type MenuNode } from '@/stores/auth'
 import { uiAudio } from '@/utils/audio'
 import {
   IconDashboard, IconApps, IconSettings, IconStorage,
@@ -203,38 +202,14 @@ function getTheme(key: string) {
   return themeMap[key] || { gradient: 'linear-gradient(135deg, #f0f0f0, #e0e0e0)', color: '#3b82f6' }
 }
 
-function hasPermission(item: MenuItem): boolean {
-  if (!item.permission) return true
-  if (authStore.roles.some(r => r === 'SUPER_ADMIN' || r === 'TENANT_ADMIN')) return true
-  return authStore.permissions.includes(item.permission)
+// 后端已按 enabledModules + 权限过滤菜单，前端直接使用
+const visibleMenus = computed(() => authStore.menus)
+
+function getVisibleChildren(item: MenuNode): MenuNode[] {
+  return item.children || []
 }
 
-function getVisibleChildren(item: MenuItem): MenuItem[] {
-  return (item.children || []).filter(hasPermission)
-}
-
-// 模块级过滤：SYS/BASE 始终显示，其他模块按 enabledModules 过滤
-// platformOnly 菜单仅 SUPER_ADMIN 可见
-function isModuleEnabled(item: MenuItem): boolean {
-  // 平台专属菜单：只有超管可见
-  if (item.platformOnly && !authStore.roles.includes('SUPER_ADMIN')) return false
-  const moduleKey = item.key.toUpperCase()
-  if (moduleKey === 'SYS' || moduleKey === 'BASE' || moduleKey === 'DASHBOARD' || moduleKey === 'PLATFORM') return true
-  // 超管看所有模块
-  if (authStore.roles.some(r => r === 'SUPER_ADMIN')) return true
-  if (authStore.enabledModules.length === 0) return true
-  return authStore.enabledModules.some(m => m.toUpperCase() === moduleKey)
-}
-
-const visibleMenus = computed(() =>
-  menuConfig.filter((item) => {
-    if (!isModuleEnabled(item)) return false
-    if (!item.children || item.children.length === 0) return true
-    return getVisibleChildren(item).length > 0
-  }),
-)
-
-function isSelected(item: MenuItem): boolean {
+function isSelected(item: MenuNode): boolean {
   const currentPath = route.path
   if (item.path === currentPath) return true
   if (item.children) {
@@ -283,7 +258,7 @@ function handleLanguageChange(val: any) {
   playClickSound()
 }
 
-function getTitle(item: MenuItem) {
+function getTitle(item: MenuNode) {
   const key = `menu.${item.key}`
   const translated = t(key)
   return translated === key ? item.title : translated
@@ -303,7 +278,7 @@ function getTitleByKey(key: string) {
 }
 
 function getPageInfo(targetPath: string): { title: string, key: string } {
-  for (const item of menuConfig) {
+  for (const item of authStore.menus) {
     if (item.path === targetPath) return { title: item.title, key: item.key }
     if (item.children) {
       const child = item.children.find((c) => c.path === targetPath)

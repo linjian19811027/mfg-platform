@@ -150,10 +150,11 @@ async function loadBomList() {
   }
 }
 
-async function onBomSelect(bomId: string) {
+async function onBomSelect(bomId: string | number | boolean | Record<string, any> | (string | number | boolean | Record<string, any>)[]) {
+  const id = String(bomId)
   bomTreeLoading.value = true
   try {
-    bomTree.value = await plmApi.expandBom(bomId)
+    bomTree.value = await plmApi.expandBom(id)
   } finally {
     bomTreeLoading.value = false
   }

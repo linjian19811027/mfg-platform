@@ -122,7 +122,7 @@ const columns = [
   { title: t('sys.logs.index.耗时ms'), dataIndex: 'durationMs', width: 90 },
   { title: 'IP', dataIndex: 'ipAddress', width: 130 },
   { title: t('sys.logs.index.时间'), dataIndex: 'createdAt', width: 160 },
-  { title: t('sys.logs.index.操作'), slotName: 'action', width: 70, fixed: 'right' },
+  { title: t('sys.logs.index.操作'), slotName: 'action', width: 70, fixed: 'right' as const },
 ]
 
 onMounted(fetchData)

@@ -158,6 +158,11 @@ const routes: RouteRecordRaw[] = [
       // 外协加工
       { path: 'outsourcing/orders', name: 'OutsourcingOrders', component: () => import('@/views/outsourcing/orders/index.vue') },
       { path: 'outsourcing/orders/:id', name: 'OutsourcingOrderDetail', component: () => import('@/views/outsourcing/orders/detail.vue') },
+      // 报表设计器
+      { path: 'rpt/list', name: 'RptList', component: () => import('@/views/rpt/list/index.vue') },
+      { path: 'rpt/designer/:id', name: 'RptDesigner', component: () => import('@/views/rpt/designer/index.vue') },
+      { path: 'rpt/preview/:id', name: 'RptPreview', component: () => import('@/views/rpt/preview/index.vue') },
+
       // ECN 执行计划
       { path: 'plm/ecn-execution-plans', name: 'EcnExecutionPlans', component: () => import('@/views/plm/ecn-execution-plans/index.vue') },
       { path: 'plm/ecn-execution-plans/:id', name: 'EcnExecutionPlanDetail', component: () => import('@/views/plm/ecn-execution-plans/detail.vue') },

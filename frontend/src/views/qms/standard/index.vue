@@ -62,7 +62,7 @@
 
     <!-- 发布新版本弹窗 -->
     <a-modal v-model:visible="versionModalVisible" :title="$t('qms.standard.index.发布新版本')" :ok-loading="versioning" @ok="handleNewVersion" @cancel="versionModalVisible = false">
-      <a-form layout="vertical">
+      <a-form :model="{versionReason}" layout="vertical">
         <a-form-item :label="$t('qms.standard.index.变更说明')">
           <a-textarea v-model="versionReason" :auto-size="{ minRows: 3 }" :placeholder="$t('qms.standard.index.请描述本次版本变更内容')" />
         </a-form-item>

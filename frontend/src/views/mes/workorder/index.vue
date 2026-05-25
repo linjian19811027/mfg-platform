@@ -40,7 +40,7 @@
           <a-checkbox
             :model-value="selectedKeys.includes(record.id as string)"
             :disabled="!['RELEASED'].includes(record.status as string)"
-            @change="(val: boolean) => toggleSelect(record.id as string, val)"
+            @change="(val: boolean | (string | number | boolean)[]) => toggleSelect(record.id as string, val as boolean)"
           />
         </template>
         <template #status="{ record }">

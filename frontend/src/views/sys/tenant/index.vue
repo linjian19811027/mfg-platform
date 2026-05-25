@@ -317,8 +317,9 @@ const PLAN_MODULES: Record<string, string[]> = {
   ENTERPRISE: ['PLM', 'MES', 'WMS', 'QMS', 'SCM', 'ERP', 'APS', 'EAM', 'HR'],
 }
 
-function onPlanChange(plan: string) {
-  formData.enabledModules = PLAN_MODULES[plan] ?? []
+function onPlanChange(plan: string | number | boolean | Record<string, any> | (string | number | boolean | Record<string, any>)[]) {
+  const p = String(plan)
+  formData.enabledModules = PLAN_MODULES[p] ?? []
 }
 
 const formData = reactive({

@@ -131,7 +131,7 @@ const expiringColumns = [
   { title: t('hr.certifications.expiring.证书编号'), dataIndex: 'certNo', width: 150 },
   { title: t('hr.certifications.expiring.有效期至'), dataIndex: 'expireDate', width: 120 },
   { title: t('hr.certifications.expiring.剩余天数'), dataIndex: 'daysLeft', slotName: 'daysLeft', width: 100 },
-  { title: t('hr.certifications.expiring.操作'), slotName: 'action', width: 100, fixed: 'right' },
+  { title: t('hr.certifications.expiring.操作'), slotName: 'action', width: 100, fixed: 'right' as const },
 ]
 
 const expiredColumns = [
@@ -140,7 +140,7 @@ const expiredColumns = [
   { title: t('hr.certifications.expiring.认证类型'), dataIndex: 'certTypeName', width: 150 },
   { title: t('hr.certifications.expiring.证书编号'), dataIndex: 'certNo', width: 150 },
   { title: t('hr.certifications.expiring.过期日期'), dataIndex: 'expireDate', slotName: 'expireDate', width: 120 },
-  { title: t('hr.certifications.expiring.操作'), slotName: 'action', width: 100, fixed: 'right' },
+  { title: t('hr.certifications.expiring.操作'), slotName: 'action', width: 100, fixed: 'right' as const },
 ]
 
 const renewModalVisible = ref(false)

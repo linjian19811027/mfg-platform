@@ -29,7 +29,7 @@
       <MForm :schema="formSchema" v-model="formData" :loading="saving" :submit-text="$t('erp.shipment.index.创建')" @submit="handleCreate" @cancel="drawerVisible = false" />
     </a-drawer>
     <a-modal v-model:visible="logisticsModalVisible" :title="$t('erp.shipment.index.更新物流信息')" :ok-loading="updating" @ok="handleUpdateLogistics" @cancel="logisticsModalVisible = false">
-      <a-form layout="vertical">
+      <a-form :model="logisticsForm" layout="vertical">
         <a-form-item :label="$t('erp.shipment.index.承运商')"><a-input v-model="logisticsForm.carrier" /></a-form-item>
         <a-form-item :label="$t('erp.shipment.index.运单号')"><a-input v-model="logisticsForm.trackingNo" /></a-form-item>
       </a-form>

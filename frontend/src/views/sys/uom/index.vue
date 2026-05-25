@@ -156,7 +156,7 @@
             = ? <strong>{{ getBaseUnitName(conversionUom.type) }}</strong>
           </template>
         </a-alert>
-        <a-form layout="vertical">
+        <a-form :model="{ conversionFactor }" layout="vertical">
           <a-form-item :label="$t('sys.uom.index.换算系数')">
             <a-input-number
               v-model="conversionFactor"

@@ -29,6 +29,7 @@
             <a-space>
               <a-button size="small" @click="expandAll">{{ $t('sys.permission.lbl1751') }}</a-button>
               <a-button size="small" @click="collapseAll">{{ $t('sys.permission.lbl1752') }}</a-button>
+              <a-button size="small" type="primary" @click="openCreate(null)">{{ $t('common.create') || '新建模块' }}</a-button>
             </a-space>
           </div>
 
@@ -50,6 +51,15 @@
           >
             <template #title="nodeData">
               <span v-html="highlightTitle(nodeData.name, nodeData.code)" />
+              <span style="float: right" @click.stop>
+                <a-space :size="2">
+                  <a-button size="mini" type="text" @click="openCreate(nodeData)">+</a-button>
+                  <a-button size="mini" type="text" @click="openEdit(nodeData)">&#9998;</a-button>
+                  <a-popconfirm content="确认删除？" @ok="handleDelete(nodeData)">
+                    <a-button size="mini" type="text" status="danger">&#10005;</a-button>
+                  </a-popconfirm>
+                </a-space>
+              </span>
             </template>
           </a-tree>
         </a-card>
@@ -98,14 +108,60 @@
         </a-card>
       </a-col>
     </a-row>
+
+    <!-- 新建/编辑权限抽屉 -->
+    <a-drawer v-model:visible="drawerVisible" :title="editingId ? '编辑权限' : '新建权限'" :width="480">
+      <a-form :model="formData" layout="vertical">
+        <a-form-item label="权限编码" required>
+          <a-input v-model="formData.code" placeholder="如 mes:workorder:view" :disabled="!!editingId" />
+        </a-form-item>
+        <a-form-item label="权限名称" required>
+          <a-input v-model="formData.name" placeholder="如 查看工单" />
+        </a-form-item>
+        <a-form-item label="类型" required>
+          <a-select v-model="formData.type">
+            <a-option value="MENU">菜单</a-option>
+            <a-option value="BUTTON">按钮</a-option>
+            <a-option value="API">接口</a-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item label="所属模块" required>
+          <a-select v-model="formData.module">
+            <a-option v-for="m in moduleOptions" :key="m" :value="m">{{ m }}</a-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item label="路由路径" v-if="formData.type === 'MENU'">
+          <a-input v-model="formData.path" placeholder="/mes/workorder" />
+        </a-form-item>
+        <a-form-item label="组件路径" v-if="formData.type === 'MENU'">
+          <a-input v-model="formData.component" placeholder="/views/mes/workorder/index.vue" />
+        </a-form-item>
+        <a-form-item label="图标" v-if="formData.type === 'MENU'">
+          <a-input v-model="formData.icon" placeholder="IconFile" />
+        </a-form-item>
+        <a-form-item label="父级编码">
+          <a-input v-model="formData.parentCode" placeholder="如 mes:workorder" />
+        </a-form-item>
+        <a-form-item label="排序">
+          <a-input-number v-model="formData.sortOrder" :min="0" />
+        </a-form-item>
+      </a-form>
+      <template #footer>
+        <a-space>
+          <a-button @click="drawerVisible = false">取消</a-button>
+          <a-button type="primary" :loading="saving" @click="handleSave">保存</a-button>
+        </a-space>
+      </template>
+    </a-drawer>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, reactive } from 'vue'
+import { Message } from '@arco-design/web-vue'
 import { roleApi, type PermissionNode } from '@/api/sys'
+import { request } from '@/utils/request'
 const { t } = useI18n()
 
 // ---- 状态 ----
@@ -238,9 +294,9 @@ function collapseAll() {
   expandedKeys.value = []
 }
 
-function onNodeSelect(keys: string[], data: { node: PermissionNode }) {
+function onNodeSelect(keys: (string | number)[], data: { node?: any }) {
   if (!keys.length) return
-  selectedKeys.value = keys
+  selectedKeys.value = keys as string[]
   selectedNode.value = data.node
   loadRoleCount(data.node.code)
 }
@@ -267,6 +323,65 @@ async function loadRoleCount(permKey: string) {
   } finally {
     roleCountLoading.value = false
   }
+}
+
+// ---- CRUD ----
+const drawerVisible = ref(false)
+const saving = ref(false)
+const editingId = ref<string | null>(null)
+const formData = reactive({
+  code: '', name: '', type: 'MENU', module: 'SYS',
+  path: '', component: '', icon: '', parentCode: '', sortOrder: 0,
+})
+
+const moduleOptions = ['SYS', 'BASE', 'PLM', 'MES', 'WMS', 'QMS', 'SCM', 'ERP', 'APS', 'EAM', 'HR', 'TRACEABILITY', 'OUTSOURCING', 'RPT']
+
+function openCreate(parent: PermissionNode | null) {
+  editingId.value = null
+  Object.assign(formData, {
+    code: '', name: '', type: 'MENU', module: 'SYS',
+    path: '', component: '', icon: '', parentCode: parent?.code ?? '', sortOrder: 0,
+  })
+  drawerVisible.value = true
+}
+
+function openEdit(node: PermissionNode) {
+  editingId.value = (node as any).id ?? null
+  Object.assign(formData, {
+    code: node.code, name: node.name, type: 'MENU', module: getModuleTitle(node.code),
+    path: '', component: '', icon: '', parentCode: '', sortOrder: 0,
+  })
+  drawerVisible.value = true
+}
+
+async function handleSave() {
+  if (!formData.code || !formData.name) { Message.warning('请填写编码和名称'); return }
+  saving.value = true
+  try {
+    if (editingId.value) {
+      await request.put(`/v1/sys/permissions/${editingId.value}`, { ...formData })
+      Message.success('更新成功')
+    } else {
+      await request.post('/v1/sys/permissions', { ...formData })
+      Message.success('创建成功')
+    }
+    drawerVisible.value = false
+    // 刷新树
+    treeLoading.value = true
+    allTree.value = await roleApi.getPermissionTree()
+    treeLoading.value = false
+    expandAll()
+  } catch { Message.error('操作失败') } finally { saving.value = false }
+}
+
+async function handleDelete(node: PermissionNode) {
+  try {
+    await request.delete(`/v1/sys/permissions/${(node as any).id}`)
+    Message.success('删除成功')
+    treeLoading.value = true
+    allTree.value = await roleApi.getPermissionTree()
+    treeLoading.value = false
+  } catch { Message.error('删除失败') }
 }
 
 // ---- 初始化 ----

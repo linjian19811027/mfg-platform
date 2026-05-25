@@ -308,6 +308,27 @@ export class SysController {
     return this.buildPermTree(all);
   }
 
+  @Post('permissions')
+  @ApiOperation({ summary: '创建权限（菜单/按钮/API）' })
+  async createPermission(@Body() body: Record<string, unknown>) {
+    const tenantId = TenantContext.getCurrentTenant() ?? '__SYSTEM__';
+    return this.permRepo.save(this.permRepo.create({ ...body, tenantId } as any));
+  }
+
+  @Put('permissions/:id')
+  @ApiOperation({ summary: '更新权限' })
+  async updatePermission(@Param('id') id: string, @Body() body: Record<string, unknown>) {
+    await this.permRepo.update(id, body as any);
+    return this.permRepo.findOne({ where: { id } });
+  }
+
+  @Delete('permissions/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: '删除权限' })
+  async deletePermission(@Param('id') id: string) {
+    await this.permRepo.delete(id);
+  }
+
   /**
    * 根据当前用户角色过滤可见权限：
    * - SUPER_ADMIN → 所有权限

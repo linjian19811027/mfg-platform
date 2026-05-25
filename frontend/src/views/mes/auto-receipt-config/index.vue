@@ -82,7 +82,7 @@ const columns = [
   { title: t('mes.auto-receipt-config.index.目标仓库'), dataIndex: 'targetWarehouseId', width: 120 },
   { title: t('mes.auto-receipt-config.index.目标库位'), dataIndex: 'targetLocationId', width: 120 },
   { title: t('mes.auto-receipt-config.index.状态'), dataIndex: 'enabled', slotName: 'enabled', width: 80 },
-  { title: t('mes.auto-receipt-config.index.操作'), slotName: 'action', width: 180, fixed: 'right' },
+  { title: t('mes.auto-receipt-config.index.操作'), slotName: 'action', width: 180, fixed: 'right' as const },
 ]
 
 const modalVisible = ref(false)

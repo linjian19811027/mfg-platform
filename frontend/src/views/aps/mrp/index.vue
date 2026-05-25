@@ -26,7 +26,7 @@
 
     <!-- 触发计算弹窗 -->
     <a-modal v-model:visible="calcModalVisible" :title="$t('aps.mrp.index.触发MRP计算')" :ok-loading="calculating" @ok="handleCalculate" @cancel="calcModalVisible = false">
-      <a-form layout="vertical">
+      <a-form :model="calcForm" layout="vertical">
         <a-form-item :label="$t('aps.mrp.index.计划周期天')"><a-input-number v-model="calcForm.planDays" :min="1" :max="365" style="width:100%" /></a-form-item>
         <a-form-item :label="$t('aps.mrp.index.需求来源')">
           <a-checkbox-group v-model="calcForm.sources">

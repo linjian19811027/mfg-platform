@@ -37,15 +37,15 @@
               {{ record.description || '-' }}
             </template>
           </a-table-column>
-          <a-table-column :title="$t('base.work-center.index.状态')" data-index="enabled" width="80">
+          <a-table-column :title="$t('base.work-center.index.状态')" data-index="enabled" :width="80">
             <template #cell="{ record }">
               <a-tag :color="record.enabled ? 'green' : 'red'">
                 {{ record.enabled ? $t('common.enabled') : $t('common.disabled') }}
               </a-tag>
             </template>
           </a-table-column>
-          <a-table-column :title="$t('base.work-center.index.创建时间')" data-index="createdAt" width="160" />
-          <a-table-column :title="$t('common.action')" width="200">
+          <a-table-column :title="$t('base.work-center.index.创建时间')" data-index="createdAt" :width="160" />
+          <a-table-column :title="$t('common.action')" :width="200">
             <template #cell="{ record }">
               <a-space>
                 <a-button type="text" size="small" @click="openEdit(record)">

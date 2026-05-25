@@ -21,6 +21,10 @@ export class SysPermission {
   @Column({ name: 'parent_id', type: 'bigint', nullable: true })
   parentId?: string;
 
+  /** 父级权限编码（用于菜单树构建，比 parentId 更可靠） */
+  @Column({ name: 'parent_code', length: 100, nullable: true })
+  parentCode?: string;
+
   @Column({ length: 200, nullable: true })
   path?: string; // 前端路由路径
 

@@ -30,7 +30,7 @@
               :model-value="record.status as string"
               size="mini"
               style="width: 100px"
-              @change="(v: string) => handleStatusChange(record.id as string, v)"
+              @change="(v: string | number | boolean | Record<string, any> | (string | number | boolean | Record<string, any>)[]) => handleStatusChange(record.id as string, v as string)"
             >
               <a-option value="AVAILABLE">{{ $t('aps.resource.status.available') }}</a-option>
               <a-option value="MAINTENANCE">{{ $t('aps.resource.status.maintenance') }}</a-option>

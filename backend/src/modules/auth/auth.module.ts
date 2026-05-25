@@ -14,6 +14,7 @@ import { JwtStrategy } from './strategies/jwt.strategy.js';
 import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
 import { RolesGuard } from './guards/roles.guard.js';
 import { PermissionsGuard } from './guards/permissions.guard.js';
+import { ModuleGuard } from './guards/module.guard.js';
 import { SysUser } from './entities/sys-user.entity.js';
 import { SysTenant } from './entities/sys-tenant.entity.js';
 import { SysRole } from './entities/sys-role.entity.js';
@@ -84,6 +85,7 @@ import { ErpCostCenter } from '../erp/entities/erp-cost-center.entity.js';
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
     { provide: APP_GUARD, useClass: PermissionsGuard },
+    { provide: APP_GUARD, useClass: ModuleGuard },
   ],
   exports: [AuthService, JwtModule],
 })

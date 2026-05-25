@@ -90,20 +90,11 @@
         <template #action="{ record }">
           <a-space>
             <a-button
-              v-if="isImage(record.fileType as FileType)"
               type="text"
               size="small"
               @click="openPreview(record as unknown as FileRecord)"
             >
               {{ $t('base.file.action.preview') }}
-            </a-button>
-            <a-button
-              v-else
-              type="text"
-              size="small"
-              @click="openFileInfo(record as unknown as FileRecord)"
-            >
-              {{ $t('base.file.action.detail') }}
             </a-button>
             <a-button
               type="text"
@@ -124,55 +115,9 @@
       </MTable>
     </a-card>
 
-    <!-- 图片预览 Modal -->
-    <a-modal
-      v-model:visible="previewVisible"
-      :title="previewFile?.fileName"
-      :width="800"
-      :footer="false"
-    >
-      <div class="preview-container">
-        <img
-          v-if="previewFile"
-          :src="previewFile.url || `https://picsum.photos/seed/${previewFile.id}/800/600`"
-          :alt="previewFile.fileName"
-          class="preview-image"
-        />
-      </div>
-    </a-modal>
+    <!-- 文件预览组件 -->
+    <FilePreview :file-id="previewFileId" @close="previewFileId = null" />
 
-    <!-- 文件信息 Modal（非图片） -->
-    <a-modal
-      v-model:visible="fileInfoVisible"
-      :title="$t('base.file.index.文件详情')"
-      :width="480"
-      :footer="false"
-    >
-      <template v-if="infoFile">
-        <div class="file-info-icon">
-          <component :is="getTypeIcon(infoFile.fileType)" :style="{ fontSize: '48px', color: getTypeIconColor(infoFile.fileType) }" />
-        </div>
-        <a-descriptions :column="1" bordered size="small" style="margin-top: 16px">
-          <a-descriptions-item :label="$t('base.file.index.文件名')">{{ infoFile.fileName }}</a-descriptions-item>
-          <a-descriptions-item :label="$t('base.file.index.文件类型')">
-            <a-tag :color="getTypeColor(infoFile.fileType)" size="small">{{ getTypeLabel(infoFile.fileType) }}</a-tag>
-          </a-descriptions-item>
-          <a-descriptions-item :label="$t('base.file.index.文件大小')">{{ formatSize(infoFile.fileSize) }}</a-descriptions-item>
-          <a-descriptions-item :label="$t('base.file.index.上传人')">{{ infoFile.uploader }}</a-descriptions-item>
-          <a-descriptions-item :label="$t('base.file.index.上传时间')">{{ infoFile.uploadedAt }}</a-descriptions-item>
-          <a-descriptions-item :label="$t('base.file.index.关联业务')">
-            <a-tag color="arcoblue" size="small">{{ infoFile.bizType }}</a-tag>
-            <span v-if="infoFile.bizNo" style="margin-left: 6px">{{ infoFile.bizNo }}</span>
-          </a-descriptions-item>
-        </a-descriptions>
-        <div style="margin-top: 16px; text-align: center">
-          <a-button type="primary" @click="handleDownload(infoFile)">
-            <template #icon><icon-download /></template>
-            {{ $t('base.file.action.download') }}
-          </a-button>
-        </div>
-      </template>
-    </a-modal>
   </div>
 </template>
 
@@ -182,11 +127,12 @@ import { useI18n } from 'vue-i18n'
 import { ref, reactive, onMounted } from 'vue'
 import { Message } from '@arco-design/web-vue'
 import {
-  IconUpload, IconDownload, IconFile,
+  IconUpload, IconFile,
   IconImage, IconFile as IconDoc, IconStorage,
 } from '@arco-design/web-vue/es/icon'
 import MTable from '@/components/MTable/index.vue'
 import type { MTableColumn } from '@/components/MTable/index.vue'
+import FilePreview from '@/components/FilePreview/index.vue'
 import { fileApi, type FileRecord, type FileType } from '@/api/base'
 
 // ---- 常量 ----
@@ -216,21 +162,6 @@ function getTypeIcon(type: FileType) {
     other: IconFile,
   }
   return map[type] ?? IconFile
-}
-
-function getTypeIconColor(type: FileType): string {
-  const map: Record<FileType, string> = {
-    image: '#00b42a',
-    document: '#165dff',
-    spreadsheet: '#7bc616',
-    pdf: '#f53f3f',
-    other: '#86909c',
-  }
-  return map[type] ?? '#86909c'
-}
-
-function isImage(type: FileType): boolean {
-  return type === 'image'
 }
 
 function formatSize(bytes: number): string {
@@ -310,7 +241,7 @@ interface UploadQueueItem {
 const uploading = ref(false)
 const uploadQueue = ref<UploadQueueItem[]>([])
 
-async function handleUpload(option: { fileItem: { file: File }; onProgress: (p: { percent: number }) => void; onSuccess: () => void; onError: () => void }) {
+function handleUpload(option: any): Record<string, unknown> {
   const file = option.fileItem.file
   const queueItem: UploadQueueItem = {
     name: file.name,
@@ -330,28 +261,32 @@ async function handleUpload(option: { fileItem: { file: File }; onProgress: (p: 
     }
   }, 200)
 
-  try {
-    await fileApi.uploadFile(file)
-    clearInterval(timer)
-    queueItem.percent = 100
-    queueItem.status = 'success'
-    queueItem.statusText = t('base.file.lbl1038')
-    option.onSuccess()
-    Message.success(`${file.name} ${t('base.file.uploadSuccess')}`)
-    loadData()
-  } catch {
-    clearInterval(timer)
-    queueItem.status = 'danger'
-    queueItem.statusText = t('base.file.lbl1039')
-    option.onError()
-    Message.error(`${file.name} ${t('base.file.uploadFailed')}`)
-  } finally {
-    uploading.value = uploadQueue.value.some(i => i.status === 'normal')
-    // 3秒后清除已完成项
-    setTimeout(() => {
-      uploadQueue.value = uploadQueue.value.filter(i => i.status === 'normal')
-    }, 3000)
-  }
+  ;(async () => {
+    try {
+      await fileApi.uploadFile(file)
+      clearInterval(timer)
+      queueItem.percent = 100
+      queueItem.status = 'success'
+      queueItem.statusText = t('base.file.lbl1038')
+      option.onSuccess()
+      Message.success(`${file.name} ${t('base.file.uploadSuccess')}`)
+      loadData()
+    } catch {
+      clearInterval(timer)
+      queueItem.status = 'danger'
+      queueItem.statusText = t('base.file.lbl1039')
+      option.onError()
+      Message.error(`${file.name} ${t('base.file.uploadFailed')}`)
+    } finally {
+      uploading.value = uploadQueue.value.some(i => i.status === 'normal')
+      // 3秒后清除已完成项
+      setTimeout(() => {
+        uploadQueue.value = uploadQueue.value.filter(i => i.status === 'normal')
+      }, 3000)
+    }
+  })()
+
+  return { abort: () => { clearInterval(timer) } }
 }
 
 // ---- 下载 ----
@@ -382,24 +317,12 @@ async function handleDelete(file: FileRecord) {
   }
 }
 
-// ---- 图片预览 ----
+// ---- 文件预览 ----
 
-const previewVisible = ref(false)
-const previewFile = ref<FileRecord | null>(null)
+const previewFileId = ref<string | null>(null)
 
 function openPreview(file: FileRecord) {
-  previewFile.value = file
-  previewVisible.value = true
-}
-
-// ---- 文件详情（非图片） ----
-
-const fileInfoVisible = ref(false)
-const infoFile = ref<FileRecord | null>(null)
-
-function openFileInfo(file: FileRecord) {
-  infoFile.value = file
-  fileInfoVisible.value = true
+  previewFileId.value = file.id
 }
 
 // ---- 初始化 ----

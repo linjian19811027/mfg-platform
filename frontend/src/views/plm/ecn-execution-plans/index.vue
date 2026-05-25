@@ -76,7 +76,7 @@ const columns = [
   { title: t('plm.ecn-execution-plans.index.受影响BOM数'), dataIndex: 'affectedBomCount', width: 110 },
   { title: t('plm.ecn-execution-plans.index.受影响工艺数'), dataIndex: 'affectedRoutingCount', width: 110 },
   { title: t('plm.ecn-execution-plans.index.创建时间'), dataIndex: 'createdAt', width: 160 },
-  { title: t('plm.ecn-execution-plans.index.操作'), slotName: 'action', width: 200, fixed: 'right' },
+  { title: t('plm.ecn-execution-plans.index.操作'), slotName: 'action', width: 200, fixed: 'right' as const },
 ]
 
 onMounted(fetchData)

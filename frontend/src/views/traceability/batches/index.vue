@@ -167,7 +167,7 @@ const columns = [
   { title: t('traceability.batches.index.检验状态'), dataIndex: 'inspectionStatus', slotName: 'inspectionStatus', width: 100 },
   { title: t('traceability.batches.index.库存状态'), dataIndex: 'inventoryStatus', slotName: 'inventoryStatus', width: 100 },
   { title: t('traceability.batches.index.是否冻结'), dataIndex: 'isFrozen', slotName: 'isFrozen', width: 90 },
-  { title: t('traceability.batches.index.操作'), slotName: 'action', width: 260, fixed: 'right' },
+{ title: t('traceability.batches.index.操作'), slotName: 'action', width: 260, fixed: 'right' as const },
 ]
 
 const modalVisible = ref(false)

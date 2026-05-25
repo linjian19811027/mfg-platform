@@ -160,8 +160,8 @@ const descItems = computed(() => {
     { label: t('mes.workorder.lbl1323'), value: wo.code },
     { label: t('mes.workorder.lbl1324'), value: wo.materialName ?? wo.materialId },
     { label: t('mes.workorder.status'), value: STATUS_LABEL[wo.status] ?? wo.status },
-    { label: t('mes.workorder.lbl1325'), value: wo.plannedQty },
-    { label: t('mes.workorder.lbl1326'), value: wo.completedQty },
+    { label: t('mes.workorder.lbl1325'), value: String(wo.plannedQty) },
+    { label: t('mes.workorder.lbl1326'), value: String(wo.completedQty) },
     { label: t('mes.workorder.lbl1327'), value: wo.plannedStartDate ?? '-' },
     { label: t('mes.workorder.lbl1328'), value: wo.plannedEndDate ?? '-' },
   ]
@@ -196,8 +196,9 @@ function calcPercent(completed: number, planned: number) {
   return Math.min(100, Math.round((completed / planned) * 100))
 }
 
-function onTreeNodeSelect(keys: string[]) {
-  if (keys[0]) router.push(`/mes/workorder/${keys[0]}`)
+function onTreeNodeSelect(keys: (string | number)[]) {
+  const key = keys[0]
+  if (key) router.push(`/mes/workorder/${key}`)
 }
 
 async function loadWorkOrder() {

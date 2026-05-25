@@ -53,7 +53,7 @@
             :min="0"
             :precision="4"
             style="width: 100px"
-            @change="(v: number) => updateCountQty(record.id as string, v)"
+            @change="(v: number | undefined) => updateCountQty(record.id as string, v as number)"
           />
           <span v-else>{{ record.countQty ?? '-' }}</span>
         </template>

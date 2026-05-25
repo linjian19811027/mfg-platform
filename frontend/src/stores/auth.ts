@@ -1,9 +1,20 @@
 import { defineStore } from 'pinia'
 import { request } from '@/utils/request'
+import router from '@/router'
+import { registerDynamicRoutes } from '@/router/dynamic-routes'
 
 interface TenantItem {
   id: string
   name: string
+}
+
+export interface MenuNode {
+  key: string
+  title: string
+  icon?: string
+  path?: string
+  sortOrder?: number
+  children?: MenuNode[]
 }
 
 interface AuthState {
@@ -14,6 +25,7 @@ interface AuthState {
   roles: string[]
   permissions: string[]
   enabledModules: string[]
+  menus: MenuNode[]
   tenants: TenantItem[]
   _expiryTimer: ReturnType<typeof setInterval> | null
 }
@@ -39,6 +51,7 @@ interface LoginResponse {
     permissions: string[]
     enabledModules?: string[]
   }
+  menus?: MenuNode[]
 }
 
 export const useAuthStore = defineStore('auth', {
@@ -50,6 +63,7 @@ export const useAuthStore = defineStore('auth', {
     roles: [],
     permissions: [],
     enabledModules: [],
+    menus: [],
     tenants: [],
     _expiryTimer: null,
   }),
@@ -68,6 +82,10 @@ export const useAuthStore = defineStore('auth', {
       this.roles = data.user.roles
       this.permissions = data.user.permissions
       this.enabledModules = data.user.enabledModules ?? []
+      this.menus = data.menus ?? []
+
+      // 注册动态路由
+      registerDynamicRoutes(router, this.menus)
 
       localStorage.setItem('token', data.accessToken)
       localStorage.setItem('userId', data.user.id)
@@ -76,6 +94,7 @@ export const useAuthStore = defineStore('auth', {
       localStorage.setItem('roles', JSON.stringify(data.user.roles))
       localStorage.setItem('permissions', JSON.stringify(data.user.permissions))
       localStorage.setItem('enabledModules', JSON.stringify(data.user.enabledModules ?? []))
+      localStorage.setItem('menus', JSON.stringify(data.menus ?? []))
       if (data.refreshToken) localStorage.setItem('refreshToken', data.refreshToken)
 
       this.startExpiryWatch()
@@ -90,6 +109,7 @@ export const useAuthStore = defineStore('auth', {
       this.roles = []
       this.permissions = []
       this.enabledModules = []
+      this.menus = []
       this.tenants = []
 
       localStorage.removeItem('token')
@@ -99,6 +119,7 @@ export const useAuthStore = defineStore('auth', {
       localStorage.removeItem('roles')
       localStorage.removeItem('permissions')
       localStorage.removeItem('enabledModules')
+      localStorage.removeItem('menus')
       localStorage.removeItem('refreshToken')
       localStorage.removeItem('tenants')
     },
@@ -120,7 +141,10 @@ export const useAuthStore = defineStore('auth', {
       this.roles = JSON.parse(localStorage.getItem('roles') || '[]')
       this.permissions = JSON.parse(localStorage.getItem('permissions') || '[]')
       this.enabledModules = JSON.parse(localStorage.getItem('enabledModules') || '[]')
+      this.menus = JSON.parse(localStorage.getItem('menus') || '[]')
       this.tenants = JSON.parse(localStorage.getItem('tenants') || '[]')
+      // 注册动态路由
+      if (this.menus.length) registerDynamicRoutes(router, this.menus)
       this.startExpiryWatch()
     },
 

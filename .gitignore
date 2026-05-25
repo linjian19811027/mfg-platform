@@ -69,3 +69,5 @@ tsconfig.tsbuildinfo
 *.tmp
 *.temp
 .cache/
+.atomcode
+.claude
