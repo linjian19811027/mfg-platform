@@ -5,6 +5,8 @@
     :placeholder="placeholder || $t('common.placeholder.select')"
     allow-search
     allow-clear
+    :trigger-props="{ updateAtScroll: true, autoFixPosition: true }"
+    
     @change="handleChange"
     @search="handleSearch"
     :filter-option="false"

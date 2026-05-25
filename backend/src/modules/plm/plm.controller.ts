@@ -195,7 +195,10 @@ export class PlmController {
   @ApiOperation({ summary: '物料 Excel 批量导入' })
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('file'))
-  importMaterials(@UploadedFile() file: Express.Multer.File) {
+  importMaterials(@UploadedFile() file?: Express.Multer.File) {
+    if (!file) {
+      throw new Error('请上传 Excel 文件');
+    }
     return this.excelSvc.import(file.buffer);
   }
 
@@ -233,16 +236,19 @@ export class PlmController {
   @UseInterceptors(FileInterceptor('file'))
   uploadDrawing(
     @Param('id') id: string,
-    @UploadedFile() file: Express.Multer.File,
-    @Body() body: { docType?: string; tags?: string; uploadedBy?: string },
+    @UploadedFile() file?: Express.Multer.File,
+    @Body() body?: { docType?: string; tags?: string; uploadedBy?: string },
   ) {
-    const tags = body.tags ? body.tags.split(',') : undefined;
+    if (!file) {
+      throw new Error('请上传文件');
+    }
+    const tags = body?.tags ? body.tags.split(',') : undefined;
     return this.docSvc.upload(
       file,
       'MATERIAL',
       id,
-      body.docType ?? 'DRAWING',
-      body.uploadedBy ?? '0',
+      body?.docType ?? 'DRAWING',
+      body?.uploadedBy ?? '0',
       tags,
     );
   }
@@ -369,7 +375,10 @@ export class PlmController {
   @ApiOperation({ summary: 'BOM Excel 批量导入' })
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('file'))
-  importBoms(@UploadedFile() file: Express.Multer.File) {
+  importBoms(@UploadedFile() file?: Express.Multer.File) {
+    if (!file) {
+      throw new Error('请上传 Excel 文件');
+    }
     return this.bomExcelSvc.import(file.buffer);
   }
 

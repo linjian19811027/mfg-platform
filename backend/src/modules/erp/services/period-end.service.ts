@@ -48,6 +48,9 @@ export class PeriodEndService {
   // ── 辅助：期间 YYYY-MM → 起止日期 ────────────────────────────────────────
 
   private periodRange(period: string): { start: string; end: string } {
+    if (!period || !/^\d{4}-\d{2}$/.test(period)) {
+      throw new Error('期间格式必须为 YYYY-MM');
+    }
     const [y, m] = period.split('-').map(Number);
     const lastDay = new Date(y, m, 0).getDate();
     return {

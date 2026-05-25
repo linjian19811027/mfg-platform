@@ -44,6 +44,7 @@
             :placeholder="field.placeholder"
             :disabled="field.disabled"
             :options="field.options"
+            :trigger-props="{ updateAtScroll: true, autoFixPosition: true }"
             v-bind="field.props"
             @update:model-value="update(field.field, $event)"
           />
@@ -108,7 +109,7 @@
           <!-- checkbox -->
           <a-checkbox-group
             v-else-if="field.type === 'checkbox'"
-            :model-value="(modelValue[field.field] as (string | number | boolean)[])"
+            :model-value="(modelValue[field.field] as unknown[])"
             :disabled="field.disabled"
             :options="field.options"
             v-bind="field.props"
@@ -198,17 +199,17 @@ export interface MFormField {
   type: 'input' | 'number' | 'select' | 'date' | 'datetime' | 'textarea' | 'switch' | 'radio' | 'checkbox' | 'slot' | 'supplier-select' | 'work-center-select' | 'warehouse-select' | 'uom-select' | 'material-select' | 'category-select'
   placeholder?: string
   required?: boolean
-  rules?: any[]
-  options?: { label: string; value: string | number }[]
+  rules?: unknown[]
+  options?: { label: string; value: unknown }[]
   slotName?: string
   disabled?: boolean
   span?: number
-  props?: Record<string, any>
+  props?: Record<string, unknown>
 }
 
 const props = withDefaults(defineProps<{
   schema: MFormField[]
-  modelValue: Record<string, any>
+  modelValue: Record<string, unknown>
   loading?: boolean
   showActions?: boolean
   submitText?: string
@@ -226,8 +227,8 @@ const effectiveSubmitText = computed(() => props.submitText || t('common.save'))
 const effectiveCancelText = computed(() => props.cancelText || t('common.cancel'))
 
 const emit = defineEmits<{
-  'update:modelValue': [value: Record<string, any>]
-  'submit': [value: Record<string, any>]
+  'update:modelValue': [value: Record<string, unknown>]
+  'submit': [value: Record<string, unknown>]
   'cancel': []
 }>()
 
@@ -237,8 +238,8 @@ function update(field: string, value: unknown) {
   emit('update:modelValue', { ...props.modelValue, [field]: value })
 }
 
-function buildRules(field: MFormField): any[] {
-  const rules: any[] = []
+function buildRules(field: MFormField): unknown[] {
+  const rules: unknown[] = []
   if (field.required) {
     rules.push({ required: true, message: t('common.required', { label: field.label }) })
   }

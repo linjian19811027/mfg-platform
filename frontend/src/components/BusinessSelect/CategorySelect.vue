@@ -10,6 +10,7 @@
       title: 'name',
       children: 'children'
     }"
+    :trigger-props="{ updateAtScroll: true, autoFixPosition: true }"
     @change="handleChange"
   />
 </template>

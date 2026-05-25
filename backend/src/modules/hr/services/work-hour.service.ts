@@ -225,35 +225,71 @@ export class WorkHourService {
     const page = Math.max(1, query.page ?? 1);
     const pageSize = Math.min(100, Math.max(1, query.pageSize ?? 20));
 
-    const qb = this.summaryRepo
-      .createQueryBuilder('s')
-      .leftJoin('hr_employee', 'e', 'e.id = s.emp_id AND e.tenant_id = s.tenant_id')
-      .addSelect('e.name', 'empName')
-      .where('s.tenant_id = :tenantId', { tenantId });
+    const conditions: string[] = ['s.tenant_id = ?'];
+    const params: unknown[] = [tenantId];
 
     if (query.empId !== undefined) {
-      qb.andWhere('s.emp_id = :empId', { empId: query.empId });
+      conditions.push('s.emp_id = ?');
+      params.push(query.empId);
     }
     if (query.dimension) {
-      qb.andWhere('s.dimension = :dimension', { dimension: query.dimension });
+      conditions.push('s.dimension = ?');
+      params.push(query.dimension);
     }
     if (query.startDate) {
-      qb.andWhere('s.summary_date >= :startDate', {
-        startDate: query.startDate,
-      });
+      conditions.push('s.summary_date >= ?');
+      params.push(query.startDate);
     }
     if (query.endDate) {
-      qb.andWhere('s.summary_date <= :endDate', { endDate: query.endDate });
+      conditions.push('s.summary_date <= ?');
+      params.push(query.endDate);
     }
 
-    const { entities, raw } = await qb
-      .orderBy('s.summary_date', 'DESC')
-      .addOrderBy('s.emp_id', 'ASC')
-      .skip((page - 1) * pageSize)
-      .take(pageSize)
-      .getRawAndEntities();
-    const total = await qb.getCount();
-    const data = entities.map((e, i) => ({ ...e, empName: raw[i]?.empName }));
+    const where = conditions.join(' AND ');
+
+    const countRows = await this.dataSource.query<{ cnt: string }[]>(
+      `SELECT COUNT(*) AS cnt FROM hr_work_hour_summary s WHERE ${where}`,
+      params,
+    );
+    const total = Number(countRows[0]?.cnt ?? 0);
+
+    const rows = await this.dataSource.query<
+      {
+        id: string;
+        tenant_id: string;
+        emp_id: string;
+        summary_date: string;
+        dimension: string;
+        total_hours: string;
+        normal_hours: string;
+        overtime_hours: string;
+        created_at: string;
+        updated_at: string;
+        empName: string;
+      }[]
+    >(
+      `SELECT s.*, e.name AS empName
+       FROM hr_work_hour_summary s
+       LEFT JOIN hr_employee e ON e.id = s.emp_id AND e.tenant_id = s.tenant_id
+       WHERE ${where}
+       ORDER BY s.summary_date DESC, s.emp_id ASC
+       LIMIT ? OFFSET ?`,
+      [...params, pageSize, (page - 1) * pageSize],
+    );
+
+    const data = rows.map((r) => ({
+      id: Number(r.id),
+      tenantId: r.tenant_id,
+      empId: Number(r.emp_id),
+      summaryDate: r.summary_date,
+      dimension: r.dimension,
+      totalHours: Number(r.total_hours),
+      normalHours: Number(r.normal_hours),
+      overtimeHours: Number(r.overtime_hours),
+      createdAt: new Date(r.created_at),
+      updatedAt: new Date(r.updated_at),
+      empName: r.empName,
+    })) as unknown as HrWorkHourSummary[];
 
     return { data, total };
   }
@@ -267,42 +303,75 @@ export class WorkHourService {
     const page = Math.max(1, query.page ?? 1);
     const pageSize = Math.min(100, Math.max(1, query.pageSize ?? 20));
 
-    const qb = this.recordRepo
-      .createQueryBuilder('r')
-      .leftJoin('hr_employee', 'e', 'e.id = r.emp_id AND e.tenant_id = r.tenant_id')
-      .addSelect('e.name', 'empName')
-      .where('r.tenant_id = :tenantId', { tenantId });
+    const conditions: string[] = ['r.tenant_id = ?'];
+    const params: unknown[] = [tenantId];
 
     if (query.empId !== undefined) {
-      qb.andWhere('r.emp_id = :empId', { empId: query.empId });
+      conditions.push('r.emp_id = ?');
+      params.push(query.empId);
     }
     if (query.startDate) {
-      qb.andWhere('r.report_date >= :startDate', {
-        startDate: query.startDate,
-      });
+      conditions.push('r.report_date >= ?');
+      params.push(query.startDate);
     }
     if (query.endDate) {
-      qb.andWhere('r.report_date <= :endDate', { endDate: query.endDate });
+      conditions.push('r.report_date <= ?');
+      params.push(query.endDate);
     }
     if (query.operationCode) {
-      qb.andWhere('r.operation_code = :operationCode', {
-        operationCode: query.operationCode,
-      });
+      conditions.push('r.operation_code = ?');
+      params.push(query.operationCode);
     }
     if (query.workCenterId !== undefined) {
-      qb.andWhere('r.work_center_id = :workCenterId', {
-        workCenterId: query.workCenterId,
-      });
+      conditions.push('r.work_center_id = ?');
+      params.push(query.workCenterId);
     }
 
-    const { entities, raw } = await qb
-      .orderBy('r.report_date', 'DESC')
-      .addOrderBy('r.created_at', 'DESC')
-      .skip((page - 1) * pageSize)
-      .take(pageSize)
-      .getRawAndEntities();
-    const total = await qb.getCount();
-    const data = entities.map((e, i) => ({ ...e, empName: raw[i]?.empName }));
+    const where = conditions.join(' AND ');
+
+    const countRows = await this.dataSource.query<{ cnt: string }[]>(
+      `SELECT COUNT(*) AS cnt FROM hr_work_hour_record r WHERE ${where}`,
+      params,
+    );
+    const total = Number(countRows[0]?.cnt ?? 0);
+
+    const rows = await this.dataSource.query<
+      {
+        id: string;
+        tenant_id: string;
+        emp_id: string;
+        report_date: string;
+        operation_code: string;
+        work_center_id: string | null;
+        actual_hours: string;
+        mes_report_id: string;
+        created_at: string;
+        updated_at: string;
+        empName: string;
+      }[]
+    >(
+      `SELECT r.*, e.name AS empName
+       FROM hr_work_hour_record r
+       LEFT JOIN hr_employee e ON e.id = r.emp_id AND e.tenant_id = r.tenant_id
+       WHERE ${where}
+       ORDER BY r.report_date DESC, r.created_at DESC
+       LIMIT ? OFFSET ?`,
+      [...params, pageSize, (page - 1) * pageSize],
+    );
+
+    const data = rows.map((r) => ({
+      id: Number(r.id),
+      tenantId: r.tenant_id,
+      empId: Number(r.emp_id),
+      reportDate: r.report_date,
+      operationCode: r.operation_code,
+      workCenterId: r.work_center_id ? Number(r.work_center_id) : undefined,
+      actualHours: Number(r.actual_hours),
+      mesReportId: Number(r.mes_report_id),
+      createdAt: new Date(r.created_at),
+      updatedAt: new Date(r.updated_at),
+      empName: r.empName,
+    })) as unknown as HrWorkHourRecord[];
 
     return { data, total };
   }

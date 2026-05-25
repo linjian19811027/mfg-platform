@@ -272,7 +272,7 @@ export class InitSeedService implements OnApplicationBootstrap {
           status: 'ACTIVE',
           plan: 'UNLIMITED',
           maxUsers: 999999,
-          enabledModules: ['PLM', 'MES', 'WMS', 'QMS', 'SCM', 'ERP', 'APS', 'EAM', 'HR', 'TRACE'],
+          enabledModules: ['PLM', 'MES', 'WMS', 'QMS', 'SCM', 'ERP', 'APS', 'EAM', 'HR', 'TRACEABILITY', 'OUTSOURCING'],
         }),
       );
       this.logger.log('✅ 系统租户 __SYSTEM__ 已创建');
@@ -291,7 +291,7 @@ export class InitSeedService implements OnApplicationBootstrap {
         status: 'ACTIVE',
         plan: 'STANDARD',
         maxUsers: 50,
-        enabledModules: ['PLM', 'MES', 'WMS', 'QMS', 'SCM', 'ERP', 'APS', 'EAM', 'HR', 'TRACE'],
+        enabledModules: ['PLM', 'MES', 'WMS', 'QMS', 'SCM', 'ERP', 'APS', 'EAM', 'HR', 'TRACEABILITY', 'OUTSOURCING'],
       }),
     );
     this.logger.log('✅ 默认租户已创建');

@@ -230,6 +230,9 @@ export class LedgerService {
     tenantId: string,
     period: string,
   ): Promise<BalanceSheetItem[]> {
+    if (!period || !/^\d{4}-\d{2}$/.test(period)) {
+      throw new Error('期间格式必须为 YYYY-MM');
+    }
     const [y, m] = period.split('-').map(Number);
     const periodStart = `${period}-01`;
     const lastDay = new Date(y, m, 0).getDate();
