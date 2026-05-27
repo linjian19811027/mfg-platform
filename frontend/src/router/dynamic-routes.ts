@@ -1,6 +1,9 @@
 import type { Router, RouteRecordRaw } from 'vue-router'
 import type { MenuNode } from '@/stores/auth'
 
+// 预加载所有 views 下的 index.vue，Vite 可以静态分析并按需拆分
+const viewModules = import.meta.glob('@/views/**/index.vue')
+
 /**
  * 从菜单数据动态注册路由
  * 后端返回的 menus 包含 path 和 component 信息
@@ -14,13 +17,12 @@ export function registerDynamicRoutes(router: Router, menus: MenuNode[]) {
   function walk(nodes: MenuNode[]) {
     for (const node of nodes) {
       if (node.path && !existingPaths.has(node.path)) {
-        // 从路径推断组件路径：/mes/workorder → /views/mes/workorder/index.vue
         const componentPath = inferComponentPath(node.path)
-        if (componentPath) {
+        if (componentPath && viewModules[componentPath]) {
           const route: RouteRecordRaw = {
             path: node.path,
             name: pathToName(node.path),
-            component: () => import(componentPath),
+            component: viewModules[componentPath] as () => Promise<any>,
           }
           router.addRoute(route)
           existingPaths.add(node.path)
@@ -36,15 +38,11 @@ export function registerDynamicRoutes(router: Router, menus: MenuNode[]) {
 }
 
 function inferComponentPath(path: string): string | null {
-  // /mes/workorder → @/views/mes/workorder/index.vue
-  // /sys/tenant → @/views/sys/tenant/index.vue
-  // /rpt/list → @/views/rpt/list/index.vue
   const cleanPath = path.replace(/^\//, '')
-  return `@/views/${cleanPath}/index.vue`
+  return `/src/views/${cleanPath}/index.vue`
 }
 
 function pathToName(path: string): string {
-  // /mes/workorder → MesWorkorder
   return path
     .replace(/^\//, '')
     .split('/')

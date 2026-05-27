@@ -36,12 +36,12 @@
     </a-card>
 
     <!-- 新建/编辑抽屉 -->
-    <a-drawer v-model:visible="drawerVisible" ::title="t('qms.standard.lbl1538')" :width="520" @cancel="drawerVisible = false">
+    <a-drawer v-model:visible="drawerVisible" :title="t('qms.standard.lbl1538')" :width="520" @cancel="drawerVisible = false">
       <MForm :schema="formSchema" v-model="formData" :loading="saving" :submit-text="$t('qms.standard.index.保存')" @submit="handleSave" @cancel="drawerVisible = false" />
     </a-drawer>
 
     <!-- 详情/版本历史抽屉 -->
-    <a-drawer v-model:visible="detailDrawerVisible" ::title="t('qms.standard.lbl1539')" :width="640" @cancel="detailDrawerVisible = false">
+    <a-drawer v-model:visible="detailDrawerVisible" :title="t('qms.standard.lbl1539')" :width="640" @cancel="detailDrawerVisible = false">
       <template v-if="currentStd">
         <a-descriptions :column="2" bordered style="margin-bottom: 16px">
           <a-descriptions-item :label="$t('common.code')">{{ currentStd.code }}</a-descriptions-item>

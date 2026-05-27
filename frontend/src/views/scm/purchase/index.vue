@@ -64,7 +64,7 @@
       </a-form>
     </a-drawer>
 
-    <a-drawer v-model:visible="detailVisible" ::title="t('scm.purchase.lbl1579')" :width="520" @cancel="detailVisible=false">
+    <a-drawer v-model:visible="detailVisible" :title="t('scm.purchase.lbl1579')" :width="520" @cancel="detailVisible=false">
       <a-descriptions :data="detailItems" layout="inline-vertical" bordered />
     </a-drawer>
   </div>

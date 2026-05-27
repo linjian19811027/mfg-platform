@@ -40,7 +40,7 @@
     </a-drawer>
 
     <!-- 拣货明细抽屉 -->
-    <a-drawer v-model:visible="detailDrawerVisible" ::title="t('wms.picking-task.lbl1925')" :width="720" @cancel="detailDrawerVisible = false">
+    <a-drawer v-model:visible="detailDrawerVisible" :title="t('wms.picking-task.lbl1925')" :width="720" @cancel="detailDrawerVisible = false">
       <a-table :columns="lineColumns" :data="currentTask?.lines ?? []" :pagination="false" row-key="id">
         <template #pickedQty="{ record }">
           <a-input-number v-model="(record as PickTaskLine).pickedQty" :min="0" :max="record.requiredQty as number" :precision="4" style="width: 100px" />

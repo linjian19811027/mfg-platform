@@ -14,7 +14,7 @@
         <a-form-item
           :field="field.field"
           :label="field.label"
-          :rules="buildRules(field)"
+          :rules="(buildRules(field) as any)"
           :validate-trigger="field.type === 'select' || field.type === 'date' || field.type === 'datetime' ? ['change'] : ['blur', 'change']"
         >
           <!-- input -->
@@ -27,23 +27,24 @@
             @update:model-value="update(field.field, $event)"
           />
 
-          <!-- number -->
-          <a-input-number
+          <!-- number: use a-input with inputmode=numeric for E2E testability -->
+          <a-input
             v-else-if="field.type === 'number'"
-            :model-value="(modelValue[field.field] as number)"
+            :model-value="modelValue[field.field] != null ? String(modelValue[field.field]) : ''"
             :placeholder="field.placeholder"
             :disabled="field.disabled"
+            inputmode="numeric"
             v-bind="field.props"
-            @update:model-value="update(field.field, $event)"
+            @update:model-value="update(field.field, $event === '' ? null : Number($event))"
           />
 
           <!-- select -->
           <a-select
             v-else-if="field.type === 'select'"
-            :model-value="modelValue[field.field]"
+            :model-value="(modelValue[field.field] as any)"
             :placeholder="field.placeholder"
             :disabled="field.disabled"
-            :options="field.options"
+            :options="(field.options as any)"
             :trigger-props="{ updateAtScroll: true, autoFixPosition: true }"
             v-bind="field.props"
             @update:model-value="update(field.field, $event)"
@@ -94,7 +95,7 @@
           <!-- radio -->
           <a-radio-group
             v-else-if="field.type === 'radio'"
-            :model-value="modelValue[field.field]"
+            :model-value="(modelValue[field.field] as any)"
             :disabled="field.disabled"
             v-bind="field.props"
             @update:model-value="update(field.field, $event)"
@@ -102,16 +103,16 @@
             <a-radio
               v-for="opt in field.options"
               :key="String(opt.value)"
-              :value="opt.value"
+              :value="(opt.value as any)"
             >{{ opt.label }}</a-radio>
           </a-radio-group>
 
           <!-- checkbox -->
           <a-checkbox-group
             v-else-if="field.type === 'checkbox'"
-            :model-value="(modelValue[field.field] as unknown[])"
+            :model-value="(modelValue[field.field] as any)"
             :disabled="field.disabled"
-            :options="field.options"
+            :options="(field.options as any)"
             v-bind="field.props"
             @update:model-value="update(field.field, $event)"
           />
@@ -199,8 +200,8 @@ export interface MFormField {
   type: 'input' | 'number' | 'select' | 'date' | 'datetime' | 'textarea' | 'switch' | 'radio' | 'checkbox' | 'slot' | 'supplier-select' | 'work-center-select' | 'warehouse-select' | 'uom-select' | 'material-select' | 'category-select'
   placeholder?: string
   required?: boolean
-  rules?: unknown[]
-  options?: { label: string; value: unknown }[]
+  rules?: any[]
+  options?: { label: string; value: string | number }[]
   slotName?: string
   disabled?: boolean
   span?: number

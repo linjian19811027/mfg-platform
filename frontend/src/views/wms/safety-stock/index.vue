@@ -34,7 +34,7 @@
       </MTable>
     </a-card>
 
-    <a-drawer v-model:visible="drawerVisible" ::title="t('wms.safety-stock.lbl1939')" :width="480" @cancel="drawerVisible = false">
+    <a-drawer v-model:visible="drawerVisible" :title="t('wms.safety-stock.lbl1939')" :width="480" @cancel="drawerVisible = false">
       <MForm :schema="formSchema" v-model="formData" :loading="saving" :submit-text="$t('wms.safety-stock.index.保存')" @submit="handleSave" @cancel="drawerVisible = false" />
     </a-drawer>
   </div>

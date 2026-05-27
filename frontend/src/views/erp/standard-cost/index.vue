@@ -20,7 +20,7 @@
         </template>
       </MTable>
     </a-card>
-    <a-drawer v-model:visible="drawerVisible" ::title="t('erp.standard-cost.lbl1247')" :width="520" @cancel="drawerVisible = false">
+    <a-drawer v-model:visible="drawerVisible" :title="t('erp.standard-cost.lbl1247')" :width="520" @cancel="drawerVisible = false">
       <MForm :schema="formSchema" v-model="formData" :loading="saving" :submit-text="$t('erp.standard-cost.index.保存')" @submit="handleSave" @cancel="drawerVisible = false" />
     </a-drawer>
   </div>

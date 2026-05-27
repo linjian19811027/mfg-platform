@@ -78,13 +78,15 @@
       <a-form :model="createForm" layout="vertical">
         <a-form-item :label="$t('mes.workorder.index.物料')" required>
           <a-select
-            v-model="createForm.materialId"
+            :model-value="createForm.materialId"
             :placeholder="$t('mes.workorder.index.输入编码或名称搜索物料')"
             allow-search
             allow-clear
             :filter-option="false"
+            :trigger-props="{ updateAtScroll: true, autoFixPosition: true }"
             style="width: 100%"
             @search="searchMaterials"
+            @change="(val: any) => { createForm.materialId = val }"
           >
             <a-option v-for="m in matOptions" :key="m.id" :value="m.id" :label="`${m.code} - ${m.name}`" />
           </a-select>
@@ -127,7 +129,7 @@
             <a-input-number
               v-model="splitQtys[idx]"
               :min="1"
-              ::placeholder="t('mes.workorder.lbl1329')"
+              :placeholder="t('mes.workorder.lbl1329')"
               style="width: 140px"
             />
             <a-button

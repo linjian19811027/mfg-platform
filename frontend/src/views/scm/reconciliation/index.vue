@@ -35,7 +35,7 @@
       </MTable>
     </a-card>
 
-    <a-drawer v-model:visible="drawerVisible" ::title="t('scm.reconciliation.lbl1616')" :width="480" @cancel="drawerVisible = false">
+    <a-drawer v-model:visible="drawerVisible" :title="t('scm.reconciliation.lbl1616')" :width="480" @cancel="drawerVisible = false">
       <MForm :schema="formSchema" v-model="formData" :loading="saving" :submit-text="$t('scm.reconciliation.index.保存')" @submit="handleSave" @cancel="drawerVisible = false" />
     </a-drawer>
   </div>

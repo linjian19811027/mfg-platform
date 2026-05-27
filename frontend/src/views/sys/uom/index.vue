@@ -89,7 +89,7 @@
     <!-- 新建/编辑抽屉 -->
     <a-drawer
       v-model:visible="drawerVisible"
-      ::title="t('sys.uom.lbl1797')"
+      :title="t('sys.uom.lbl1797')"
       :width="480"
       @cancel="drawerVisible = false"
     >

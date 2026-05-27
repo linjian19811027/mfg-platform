@@ -103,7 +103,7 @@
     <!-- 新建/编辑抽屉 -->
     <a-drawer
       v-model:visible="drawerVisible"
-      ::title="t('sys.tenant.lbl1786')"
+      :title="t('sys.tenant.lbl1786')"
       :width="520"
       @cancel="drawerVisible = false"
     >

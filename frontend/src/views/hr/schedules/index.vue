@@ -84,7 +84,7 @@
     <!-- 侧边抽屉：当天排班明细 -->
     <a-drawer
       v-model:visible="drawerVisible"
-      ::title="t('hr.schedules.lbl1267')"
+      :title="t('hr.schedules.lbl1267')"
       width="480"
       :footer="false"
     >

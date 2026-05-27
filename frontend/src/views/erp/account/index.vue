@@ -17,7 +17,7 @@
         </a-tree>
       </a-spin>
     </a-card>
-    <a-modal v-model:visible="modalVisible" ::title="t('erp.account.lbl1153')" :ok-loading="saving" @ok="handleSave" @cancel="modalVisible = false">
+    <a-modal v-model:visible="modalVisible" :title="t('erp.account.lbl1153')" :ok-loading="saving" @ok="handleSave" @cancel="modalVisible = false">
       <a-form :model="formData" layout="vertical">
         <a-form-item :label="$t('erp.account.index.科目编码')" required><a-input v-model="formData.code" :disabled="!!editing" /></a-form-item>
         <a-form-item :label="$t('erp.account.index.科目名称')" required><a-input v-model="formData.name" /></a-form-item>

@@ -69,7 +69,7 @@
     <!-- 新建/编辑抽屉 -->
     <a-drawer
       v-model:visible="drawerVisible"
-      ::title="t('plm.standard-operation.lbl1432')"
+      :title="t('plm.standard-operation.lbl1432')"
       :width="520"
       @cancel="drawerVisible = false"
     >

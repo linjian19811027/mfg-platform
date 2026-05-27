@@ -32,7 +32,7 @@
       <MForm :schema="createSchema" v-model="createForm" :loading="submitting" @submit="handleCreate" @cancel="createVisible=false" />
     </a-drawer>
 
-    <a-drawer v-model:visible="detailVisible" ::title="t('scm.supplier.lbl1634')" :width="480" @cancel="detailVisible=false">
+    <a-drawer v-model:visible="detailVisible" :title="t('scm.supplier.lbl1634')" :width="480" @cancel="detailVisible=false">
       <a-descriptions :data="detailItems" layout="inline-vertical" bordered />
     </a-drawer>
   </div>

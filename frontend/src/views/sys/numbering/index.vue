@@ -47,7 +47,7 @@
       </MTable>
     </a-card>
 
-    <a-drawer v-model:visible="drawerVisible" ::title="t('sys.numbering.lbl1715')" :width="600">
+    <a-drawer v-model:visible="drawerVisible" :title="t('sys.numbering.lbl1715')" :width="600">
       <a-form :model="formData" layout="vertical" @submit="handleSave">
         <a-row :gutter="16">
           <a-col :span="12">

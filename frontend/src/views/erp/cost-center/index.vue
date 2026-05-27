@@ -17,7 +17,7 @@
         </a-tree>
       </a-spin>
     </a-card>
-    <a-modal v-model:visible="modalVisible" ::title="t('erp.cost-center.lbl1169')" :ok-loading="saving" @ok="handleSave" @cancel="modalVisible = false">
+    <a-modal v-model:visible="modalVisible" :title="t('erp.cost-center.lbl1169')" :ok-loading="saving" @ok="handleSave" @cancel="modalVisible = false">
       <a-form :model="formData" layout="vertical">
         <a-form-item :label="$t('common.code')" required><a-input v-model="formData.code" /></a-form-item>
         <a-form-item :label="$t('common.name')" required><a-input v-model="formData.name" /></a-form-item>

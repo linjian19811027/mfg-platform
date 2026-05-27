@@ -64,7 +64,7 @@
     <!-- 新建/编辑抽屉 -->
     <a-drawer
       v-model:visible="drawerVisible"
-      ::title="t('sys.role.lbl1772')"
+      :title="t('sys.role.lbl1772')"
       :width="680"
       @cancel="drawerVisible = false"
     >

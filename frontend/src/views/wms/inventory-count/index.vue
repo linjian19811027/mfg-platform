@@ -41,7 +41,7 @@
     </a-drawer>
 
     <!-- 盘点明细抽屉 -->
-    <a-drawer v-model:visible="detailDrawerVisible" ::title="t('wms.inventory-count.lbl1913')" :width="800" @cancel="detailDrawerVisible = false">
+    <a-drawer v-model:visible="detailDrawerVisible" :title="t('wms.inventory-count.lbl1913')" :width="800" @cancel="detailDrawerVisible = false">
       <div style="margin-bottom: 12px; display: flex; gap: 8px; justify-content: flex-end">
         <a-button v-if="currentTake?.status === 'IN_PROGRESS'" type="primary" size="small" @click="submitForApproval">{{ $t('wms.inventory-count.lbl1914') }}</a-button>
       </div>
